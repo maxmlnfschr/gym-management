@@ -15,20 +15,24 @@ import { MemberFormContainer } from '@/features/members/components/MemberFormCon
 
 function App() {
   return (
-    <Routes>
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-      </Route>
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
+        <Routes>
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+          </Route>
 
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/members" element={<MemberList />} />
-        <Route path="/members/add" element={<MemberFormContainer />} />
-        <Route path="/members/edit/:id" element={<MemberFormContainer />} />
-        <Route path="/test-responsive" element={<TestResponsive />} />
-      </Route>
-    </Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/members" element={<MemberList />} />
+            <Route path="/members/add" element={<MemberFormContainer />} />
+            <Route path="/members/edit/:id" element={<MemberFormContainer />} />
+            <Route path="/test-responsive" element={<TestResponsive />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
