@@ -6,11 +6,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { setUser, setInitialized } = useAuthStore();
 
   useEffect(() => {
-    // Get initial session
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('Initial session:', session);
+        console.log('Current session state:', {
+          hasSession: !!session,
+          user: session?.user,
+          token: session?.access_token ? `${session.access_token.substring(0, 20)}...` : null,
+          expiresAt: session?.expires_at
+        });
         setUser(session?.user ?? null);
         setInitialized(true);
       } catch (error) {
@@ -21,11 +25,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', session);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event);
+      console.log('Session after event:', {
+        hasSession: !!session,
+        user: session?.user,
+        token: session?.access_token ? `${session.access_token.substring(0, 20)}...` : null,
+        expiresAt: session?.expires_at
+      });
       setUser(session?.user ?? null);
     });
 
