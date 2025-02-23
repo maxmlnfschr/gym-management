@@ -14,10 +14,12 @@ import {
 } from '@mui/material';
 import { FilterList as FilterIcon, Close as CloseIcon } from '@mui/icons-material';
 
+// Actualizar la interfaz añadiendo sortDirection
 export interface FilterValues {
   search: string;
   status: 'all' | 'active' | 'inactive';
   sortBy: 'name' | 'date' | 'status';
+  sortDirection: 'asc' | 'desc';
 }
 
 interface Props {
@@ -29,7 +31,8 @@ export const MemberFilters = ({ onFilter }: Props) => {
   const [filters, setFilters] = useState<FilterValues>({
     search: '',
     status: 'all',
-    sortBy: 'name'
+    sortBy: 'name',
+    sortDirection: 'asc'  // Añadir valor inicial
   });
 
   const handleSubmit = () => {
@@ -80,18 +83,28 @@ export const MemberFilters = ({ onFilter }: Props) => {
               </Select>
             </FormControl>
 
-            <FormControl fullWidth>
-              <InputLabel>Sort By</InputLabel>
-              <Select
-                value={filters.sortBy}
-                label="Sort By"
-                onChange={(e) => setFilters({ ...filters, sortBy: e.target.value as any })}
+            <Stack direction="row" spacing={1} alignItems="center">
+              <FormControl fullWidth>
+                <InputLabel>Sort By</InputLabel>
+                <Select
+                  value={filters.sortBy}
+                  label="Sort By"
+                  onChange={(e) => setFilters({ ...filters, sortBy: e.target.value as any })}
+                >
+                  <MenuItem value="name">Name</MenuItem>
+                  <MenuItem value="date">Date Added</MenuItem>
+                  <MenuItem value="status">Status</MenuItem>
+                </Select>
+              </FormControl>
+              <IconButton
+                onClick={() => setFilters(f => ({ 
+                  ...f, 
+                  sortDirection: f.sortDirection === 'asc' ? 'desc' : 'asc' 
+                }))}
               >
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="date">Date Added</MenuItem>
-                <MenuItem value="status">Status</MenuItem>
-              </Select>
-            </FormControl>
+                {filters.sortDirection === 'asc' ? '↑' : '↓'}
+              </IconButton>
+            </Stack>
 
             <Button 
               variant="contained" 

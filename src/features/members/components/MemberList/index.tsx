@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { MemberFilters } from '@/features/members/components/MemberFilters';
 import type { Member } from '@/features/members/types';
 import type { FilterValues } from '@/features/members/components/MemberFilters';
+import { FileDownload as DownloadIcon } from '@mui/icons-material';
+import { exportToCsv } from '@/features/members/utils/exportToCsv';
 
 export const MemberList = () => {
   const navigate = useNavigate();
@@ -88,7 +90,14 @@ export const MemberList = () => {
 
   return (
     <Container maxWidth="md">
-      <Stack direction="row" justifyContent="flex-end" mb={2}>
+      <Stack direction="row" justifyContent="flex-end" spacing={2} mb={2}>
+        <IconButton 
+          onClick={() => exportToCsv(filteredMembers)}
+          color="primary"
+          title="Export to CSV"
+        >
+          <DownloadIcon />
+        </IconButton>
         <MemberFilters onFilter={handleFilter} />
       </Stack>
 
