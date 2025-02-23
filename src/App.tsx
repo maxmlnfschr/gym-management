@@ -5,17 +5,29 @@ import { theme } from "@/theme";
 import AppRoutes from "@/routes";
 import { AuthProvider } from "@/features/auth/components/AuthProvider";
 import { Routes, Route } from 'react-router-dom';
-import { MembersPage } from '@/features/members/pages/MembersPage';
-import { AddMemberPage } from '@/features/members/pages/AddMemberPage';
-import { EditMemberPage } from '@/features/members/pages/EditMemberPage';
+import { MainLayout } from '@/layouts/MainLayout';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import { LoginPage } from '@/features/auth/components/LoginPage';
+import { DashboardPage } from '@/features/dashboard/components/DashboardPage';
+import { TestResponsive } from '@/features/shared/components/TestResponsive';
+import { MemberList } from '@/features/members/components/MemberList';
+import { MemberFormContainer } from '@/features/members/components/MemberFormContainer';
 
 function App() {
   return (
     <Routes>
-      <Route path="/members" element={<MembersPage />} />
-      <Route path="/members/add" element={<AddMemberPage />} />
-      <Route path="/members/edit/:id" element={<EditMemberPage />} />
-      {/* ... otras rutas ... */}
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
+
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/members" element={<MemberList />} />
+        <Route path="/members/add" element={<MemberFormContainer />} />
+        <Route path="/members/edit/:id" element={<MemberFormContainer />} />
+        <Route path="/test-responsive" element={<TestResponsive />} />
+      </Route>
     </Routes>
   );
 }

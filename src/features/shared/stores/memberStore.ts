@@ -14,15 +14,14 @@ interface MemberState {
   setSelectedMember: (member: Member | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
-  // Métodos CRUD con Supabase
-  fetchMembers: () => Promise<void>;
+  getMember: (id: string) => Promise<Member>;  // Add this line
   addMember: (memberData: MemberFormData) => Promise<void>;
   updateMember: (id: string, memberData: Partial<MemberFormData>) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
+  fetchMembers: () => Promise<void>;
 }
 
-export const useMemberStore = create<MemberState>((set, get) => ({
+export const useMemberStore = create<MemberState>((set) => ({
   members: [],
   loading: false,
   error: null,
@@ -53,7 +52,7 @@ export const useMemberStore = create<MemberState>((set, get) => ({
     }
   },
 
-  addMember: async (memberData) => {
+  addMember: async (memberData: MemberFormData) => {
     try {
       set({ loading: true, error: null });
       const { data, error } = await supabase
@@ -72,7 +71,7 @@ export const useMemberStore = create<MemberState>((set, get) => ({
     }
   },
 
-  updateMember: async (id, memberData) => {
+  updateMember: async (id: string, memberData: Partial<MemberFormData>) => {
     try {
       set({ loading: true, error: null });
       const { data, error } = await supabase
@@ -96,7 +95,7 @@ export const useMemberStore = create<MemberState>((set, get) => ({
     }
   },
 
-  deleteMember: async (id) => {
+  deleteMember: async (id: string) => {
     try {
       set({ loading: true, error: null });
       const { error } = await supabase
@@ -114,5 +113,15 @@ export const useMemberStore = create<MemberState>((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+  getMember: async (id: string) => {
+    const { data, error } = await supabase
+      .from('members')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    return data;
   },
 }));
