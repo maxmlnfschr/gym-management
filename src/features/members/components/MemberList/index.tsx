@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { 
   Box, 
   Card, 
@@ -21,6 +22,9 @@ export const MemberList = () => {
   const navigate = useNavigate();
   const { members, loading, fetchMembers, deleteMember } = useMemberStore();
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
+  const [page, setPage] = useState(1);
+  const { ref, inView } = useInView();
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchMembers();
@@ -65,6 +69,15 @@ export const MemberList = () => {
     setFilteredMembers(filtered);
   };
 
+  const paginatedMembers = filteredMembers.slice(0, page * itemsPerPage);
+  const hasMore = paginatedMembers.length < filteredMembers.length;
+
+  useEffect(() => {
+    if (inView && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  }, [inView, hasMore]);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" p={3}>
@@ -80,7 +93,7 @@ export const MemberList = () => {
       </Stack>
 
       <Stack spacing={2}>
-        {filteredMembers.map((member) => (
+        {paginatedMembers.map((member) => (
           <Card key={member.id}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -111,6 +124,11 @@ export const MemberList = () => {
             </CardContent>
           </Card>
         ))}
+        {hasMore && (
+          <Box ref={ref} display="flex" justifyContent="center" p={2}>
+            <CircularProgress size={24} />
+          </Box>
+        )}
       </Stack>
       
       <Fab 
