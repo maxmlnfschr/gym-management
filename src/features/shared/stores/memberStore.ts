@@ -57,15 +57,24 @@ export const useMemberStore = create<MemberState>((set) => ({
       set({ loading: true, error: null });
       const { data, error } = await supabase
         .from('members')
-        .insert([{ ...memberData, status: 'active' }])
-        .select()
+        .insert([{
+          first_name: memberData.first_name,
+          last_name: memberData.last_name,
+          email: memberData.email,
+          phone: memberData.phone,
+          notes: memberData.notes,
+          status: 'active'
+        }])
+        .select('*')
         .single();
 
       if (error) throw error;
       set((state) => ({ members: [...state.members, data] }));
+      return data;
     } catch (error) {
       const pgError = error as PostgrestError;
       set({ error: pgError.message });
+      throw error;
     } finally {
       set({ loading: false });
     }

@@ -1,24 +1,28 @@
-import { useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  Typography, 
-  IconButton, 
+import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
   Stack,
   CircularProgress,
   Fab,
-  Container
-} from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import { useMemberStore } from '@/features/shared/stores/memberStore';
-import { useNavigate } from 'react-router-dom';
-import { MemberFilters } from '@/features/members/components/MemberFilters';
-import type { Member } from '@/features/members/types';
-import type { FilterValues } from '@/features/members/components/MemberFilters';
-import { FileDownload as DownloadIcon } from '@mui/icons-material';
-import { exportToCsv } from '@/features/members/utils/exportToCsv';
+  Container,
+} from "@mui/material";
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+} from "@mui/icons-material";
+import { useMemberStore } from "@/features/shared/stores/memberStore";
+import { useNavigate } from "react-router-dom";
+import { MemberFilters } from "@/features/members/components/MemberFilters";
+import type { Member } from "@/features/members/types";
+import type { FilterValues } from "@/features/members/components/MemberFilters";
+import { FileDownload as DownloadIcon } from "@mui/icons-material";
+import { exportToCsv } from "@/features/members/utils/exportToCsv";
 
 export const MemberList = () => {
   const navigate = useNavigate();
@@ -42,26 +46,31 @@ export const MemberList = () => {
     // Apply search
     if (search) {
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(member => 
-        member.first_name.toLowerCase().includes(searchLower) ||
-        member.last_name.toLowerCase().includes(searchLower) ||
-        member.email.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (member) =>
+          member.first_name.toLowerCase().includes(searchLower) ||
+          member.last_name.toLowerCase().includes(searchLower) ||
+          member.email.toLowerCase().includes(searchLower)
       );
     }
 
     // Apply status filter
-    if (status !== 'all') {
-      filtered = filtered.filter(member => member.status === status);
+    if (status !== "all") {
+      filtered = filtered.filter((member) => member.status === status);
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'name':
-          return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
-        case 'date':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        case 'status':
+        case "name":
+          return `${a.first_name} ${a.last_name}`.localeCompare(
+            `${b.first_name} ${b.last_name}`
+          );
+        case "date":
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        case "status":
           return a.status.localeCompare(b.status);
         default:
           return 0;
@@ -76,7 +85,7 @@ export const MemberList = () => {
 
   useEffect(() => {
     if (inView && hasMore) {
-      setPage(prev => prev + 1);
+      setPage((prev) => prev + 1);
     }
   }, [inView, hasMore]);
 
@@ -91,10 +100,10 @@ export const MemberList = () => {
   return (
     <Container maxWidth="md">
       <Stack direction="row" justifyContent="flex-end" spacing={2} mb={2}>
-        <IconButton 
+        <IconButton
           onClick={() => exportToCsv(filteredMembers)}
           color="primary"
-          title="Export to CSV"
+          title="Exportar como CSV"
         >
           <DownloadIcon />
         </IconButton>
@@ -105,24 +114,30 @@ export const MemberList = () => {
         {paginatedMembers.map((member) => (
           <Card key={member.id}>
             <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Box>
                   <Typography variant="h6">
                     {member.first_name} {member.last_name}
                   </Typography>
                   <Typography color="textSecondary">{member.email}</Typography>
                   {member.phone && (
-                    <Typography color="textSecondary">{member.phone}</Typography>
+                    <Typography color="textSecondary">
+                      {member.phone}
+                    </Typography>
                   )}
                 </Box>
                 <Stack direction="row" spacing={1}>
-                  <IconButton 
+                  <IconButton
                     onClick={() => navigate(`/members/edit/${member.id}`)}
                     color="primary"
                   >
                     <EditIcon />
                   </IconButton>
-                  <IconButton 
+                  <IconButton
                     onClick={() => deleteMember(member.id)}
                     color="error"
                   >
@@ -139,11 +154,11 @@ export const MemberList = () => {
           </Box>
         )}
       </Stack>
-      
-      <Fab 
-        color="primary" 
-        sx={{ position: 'fixed', bottom: 16, right: 16 }}
-        onClick={() => navigate('/members/add')}
+
+      <Fab
+        color="primary"
+        sx={{ position: "fixed", bottom: 16, right: 16 }}
+        onClick={() => navigate("/members/add")}
       >
         <AddIcon />
       </Fab>

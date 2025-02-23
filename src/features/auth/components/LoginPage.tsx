@@ -1,20 +1,20 @@
-import { Box, TextField, Button, Typography, Link } from '@mui/material';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { ROUTES } from '@/lib/constants/routes';
+import { Box, TextField, Button, Typography, Link } from "@mui/material";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { ROUTES } from "@/lib/constants/routes";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -25,21 +25,32 @@ export const LoginPage = () => {
       if (error) throw error;
       navigate(ROUTES.DASHBOARD);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
+    <Box
+      component="form"
+      onSubmit={handleLogin}
+      sx={{
+        width: "100%",
+        maxWidth: 400,
+        mx: 'auto',
+        p: 3
+      }}
+    >
       <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-        Sign in
+        Inicio de sesión
       </Typography>
-      
+
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
-          {error}
+          {error === "Invalid login credentials"
+            ? "Credenciales inválidas"
+            : "Ocurrió un error"}
         </Typography>
       )}
 
@@ -47,7 +58,7 @@ export const LoginPage = () => {
         margin="normal"
         required
         fullWidth
-        label="Email Address"
+        label="Correo electrónico"
         autoComplete="email"
         autoFocus
         value={email}
@@ -57,7 +68,7 @@ export const LoginPage = () => {
         margin="normal"
         required
         fullWidth
-        label="Password"
+        label="Contraseña"
         type="password"
         autoComplete="current-password"
         value={password}
@@ -70,10 +81,10 @@ export const LoginPage = () => {
         sx={{ mt: 3, mb: 2 }}
         disabled={loading}
       >
-        {loading ? 'Signing in...' : 'Sign In'}
+        {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
       </Button>
       <Link href={ROUTES.REGISTER} variant="body2">
-        {"Don't have an account? Sign Up"}
+        {"¿No tenés una cuenta? Registrate"}
       </Link>
     </Box>
   );

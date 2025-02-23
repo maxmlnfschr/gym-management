@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Box, CircularProgress, Container, Typography } from '@mui/material';
-import { MemberForm } from '../MemberForm';
-import { useMemberStore } from '@/features/shared/stores/memberStore';
-import type { MemberFormData } from '@/features/members/types';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Box, CircularProgress, Container, Typography } from "@mui/material";
+import { MemberForm } from "@/features/members/components/MemberForm";
+import { useMemberStore } from "@/features/shared/stores/memberStore";
+import type { MemberFormData } from "@/features/members/types";
 
 export const MemberFormContainer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getMember, updateMember, addMember } = useMemberStore();  // changed createMember to addMember
+  const { getMember, updateMember, addMember } = useMemberStore(); // changed createMember to addMember
   const [loading, setLoading] = useState(false);
   // Cambiamos null por undefined para coincidir con el tipo esperado
   const [member, setMember] = useState<MemberFormData | undefined>(undefined);
-  
+
   useEffect(() => {
     if (id) {
       const fetchMember = async () => {
@@ -21,7 +21,7 @@ export const MemberFormContainer = () => {
           const data = await getMember(id);
           setMember(data);
         } catch (error) {
-          console.error('Error fetching member:', error);
+          console.error("Error al obtener miembro:", error);
         } finally {
           setLoading(false);
         }
@@ -35,11 +35,11 @@ export const MemberFormContainer = () => {
       if (id) {
         await updateMember(id, data);
       } else {
-        await addMember(data);  // changed createMember to addMember
+        await addMember(data);
       }
-      navigate('/members');
+      navigate("/members");
     } catch (error) {
-      console.error('Error saving member:', error);
+      console.error("Error al guardar miembro:", error);
     }
   };
 
@@ -55,17 +55,13 @@ export const MemberFormContainer = () => {
     return (
       <Container maxWidth="sm">
         <Typography variant="h5" textAlign="center" py={3}>
-          Member not found
+          Miembro no encontrado
         </Typography>
       </Container>
     );
   }
-
   return (
     <Container maxWidth="sm">
-      <Typography variant="h5" mb={3}>
-        {id ? 'Edit Member' : 'Add New Member'}
-      </Typography>
       <MemberForm onSubmit={handleSubmit} initialData={member} />
     </Container>
   );

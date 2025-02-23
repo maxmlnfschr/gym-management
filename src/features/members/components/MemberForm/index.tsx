@@ -1,8 +1,8 @@
-import { Box, TextField, Button, Stack } from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { memberSchema } from '@/features/members/validations/memberSchema';
-import type { MemberFormData } from '@/features/members/types';
+import { Box, TextField, Button, Stack } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { memberSchema } from "@/features/members/validations/memberSchema";
+import type { MemberFormData } from "@/features/members/types";
 
 interface Props {
   onSubmit: (data: MemberFormData) => Promise<void>;
@@ -10,26 +10,32 @@ interface Props {
 }
 
 export const MemberForm = ({ onSubmit, initialData }: Props) => {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<MemberFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<MemberFormData>({
     resolver: zodResolver(memberSchema),
-    defaultValues: initialData
+    defaultValues: initialData,
   });
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
       <Stack spacing={3}>
         <TextField
-          {...register('first_name')}
-          label="First Name"
+          {...register("first_name")}
+          id="first-name"
+          label="Nombre"
           fullWidth
           error={!!errors.first_name}
           helperText={errors.first_name?.message}
           autoComplete="given-name"
         />
-        
+
         <TextField
-          {...register('last_name')}
-          label="Last Name"
+          {...register("last_name")}
+          id="last-name"
+          label="Apellido"
           fullWidth
           error={!!errors.last_name}
           helperText={errors.last_name?.message}
@@ -37,8 +43,9 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
         />
 
         <TextField
-          {...register('email')}
-          label="Email"
+          {...register("email")}
+          id="email"
+          label="Correo electrónico"
           type="email"
           fullWidth
           error={!!errors.email}
@@ -47,8 +54,9 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
         />
 
         <TextField
-          {...register('phone')}
-          label="Phone"
+          {...register("phone")}
+          id="phone"
+          label="Celular"
           fullWidth
           error={!!errors.phone}
           helperText={errors.phone?.message}
@@ -56,8 +64,9 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
         />
 
         <TextField
-          {...register('notes')}
-          label="Notes"
+          {...register("notes")}
+          id="notes"
+          label="Notas"
           multiline
           rows={4}
           fullWidth
@@ -65,14 +74,14 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
           helperText={errors.notes?.message}
         />
 
-        <Button 
+        <Button
           type="submit"
           variant="contained"
           fullWidth
           size="large"
           disabled={isSubmitting}
         >
-          {initialData ? 'Update Member' : 'Add Member'}
+          {initialData ? "Actualizar" : "Guardar"}
         </Button>
       </Stack>
     </Box>

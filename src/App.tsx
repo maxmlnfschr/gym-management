@@ -8,6 +8,7 @@ import { Routes, Route } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { LoginPage } from '@/features/auth/components/LoginPage';
+import { RegisterPage } from '@/features/auth/components/RegisterPage';
 import { DashboardPage } from '@/features/dashboard/components/DashboardPage';
 import { TestResponsive } from '@/features/shared/components/TestResponsive';
 import { MemberList } from '@/features/members/components/MemberList';
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
           </Route>
 
           <Route element={<MainLayout />}>

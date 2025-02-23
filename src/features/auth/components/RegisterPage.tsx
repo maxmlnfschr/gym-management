@@ -1,24 +1,24 @@
-import { Box, TextField, Button, Typography, Link } from '@mui/material';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { ROUTES } from '@/lib/constants/routes';
+import { Box, TextField, Button, Typography, Link } from "@mui/material";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { ROUTES } from "@/lib/constants/routes";
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Las contraseñas no coinciden");
       setLoading(false);
       return;
     }
@@ -30,9 +30,13 @@ export const RegisterPage = () => {
       });
 
       if (error) throw error;
-      navigate(ROUTES.LOGIN, { state: { message: 'Please check your email to verify your account' } });
+      navigate(ROUTES.LOGIN, {
+        state: {
+          message: "Por favor, revisa tu correo para verificar tu cuenta",
+        },
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "Ocurrió un error");
     } finally {
       setLoading(false);
     }
@@ -41,9 +45,9 @@ export const RegisterPage = () => {
   return (
     <Box component="form" onSubmit={handleRegister} sx={{ mt: 1 }}>
       <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-        Sign up
+        Registro
       </Typography>
-      
+
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
@@ -54,7 +58,7 @@ export const RegisterPage = () => {
         margin="normal"
         required
         fullWidth
-        label="Email Address"
+        label="Correo electrónico"
         autoComplete="email"
         autoFocus
         value={email}
@@ -64,7 +68,7 @@ export const RegisterPage = () => {
         margin="normal"
         required
         fullWidth
-        label="Password"
+        label="Contraseña"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -73,7 +77,7 @@ export const RegisterPage = () => {
         margin="normal"
         required
         fullWidth
-        label="Confirm Password"
+        label="Confirmar contraseña"
         type="password"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -85,10 +89,10 @@ export const RegisterPage = () => {
         sx={{ mt: 3, mb: 2 }}
         disabled={loading}
       >
-        {loading ? 'Signing up...' : 'Sign Up'}
+        {loading ? "Registrando..." : "Registrarse"}
       </Button>
       <Link href={ROUTES.LOGIN} variant="body2">
-        {"Already have an account? Sign In"}
+        {"¿Ya tenés una cuenta? Iniciá sesión"}
       </Link>
     </Box>
   );

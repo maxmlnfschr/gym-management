@@ -16,7 +16,7 @@ export const EditMemberPage = () => {
       await updateMember(id, data);
       navigate('/members');
     } catch (error) {
-      console.error(error);
+      console.error('Error al actualizar miembro:', error);
     }
   };
 
@@ -31,7 +31,7 @@ export const EditMemberPage = () => {
   if (!selectedMember) {
     return (
       <Typography color="error" align="center">
-        Member not found
+        Miembro no encontrado
       </Typography>
     );
   }
@@ -39,7 +39,7 @@ export const EditMemberPage = () => {
   return (
     <Container maxWidth="sm">
       <Typography variant="h5" component="h1" gutterBottom align="center">
-        Edit Member
+        Editar Miembro
       </Typography>
       <MemberForm 
         onSubmit={handleSubmit} 

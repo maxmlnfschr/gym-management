@@ -1,16 +1,32 @@
 import { createTheme } from '@mui/material';
 
 export const theme = createTheme({
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 960,
-      lg: 1280,
-      xl: 1920,
+  palette: {
+    primary: {
+      main: '#000000',
+      light: '#171717',
+      dark: '#000000',
+      contrastText: '#fff',
+    },
+    secondary: {
+      main: '#666666',
+      light: '#888888',
+      dark: '#444444',
+      contrastText: '#fff',
+    },
+    background: {
+      default: '#fff',
+      paper: '#ffffff',
     },
   },
   components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#000000',
+        },
+      },
+    },
     MuiContainer: {
       styleOverrides: {
         root: {
@@ -26,9 +42,18 @@ export const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          minHeight: 48, // Better touch targets
+          minHeight: 48,
+          borderRadius: '6px',
+          textTransform: 'none',
           "@media (max-width: 600px)": {
             width: "100%",
+          },
+        },
+        contained: {
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: 'none',
+            backgroundColor: '#171717',
           },
         },
       },
@@ -37,7 +62,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           "@media (max-width: 600px)": {
-            fontSize: "16px", // Prevents zoom on iOS
+            fontSize: "16px",
           },
         },
       },

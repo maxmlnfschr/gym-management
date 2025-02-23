@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Drawer,
   IconButton,
@@ -10,16 +10,19 @@ import {
   Select,
   MenuItem,
   Button,
-  Stack
-} from '@mui/material';
-import { FilterList as FilterIcon, Close as CloseIcon } from '@mui/icons-material';
+  Stack,
+} from "@mui/material";
+import {
+  FilterList as FilterIcon,
+  Close as CloseIcon,
+} from "@mui/icons-material";
 
 // Actualizar la interfaz añadiendo sortDirection
 export interface FilterValues {
   search: string;
-  status: 'all' | 'active' | 'inactive';
-  sortBy: 'name' | 'date' | 'status';
-  sortDirection: 'asc' | 'desc';
+  status: "all" | "active" | "inactive";
+  sortBy: "name" | "date" | "status";
+  sortDirection: "asc" | "desc";
 }
 
 interface Props {
@@ -29,10 +32,10 @@ interface Props {
 export const MemberFilters = ({ onFilter }: Props) => {
   const [open, setOpen] = useState(false);
   const [filters, setFilters] = useState<FilterValues>({
-    search: '',
-    status: 'all',
-    sortBy: 'name',
-    sortDirection: 'asc'  // Añadir valor inicial
+    search: "",
+    status: "all",
+    sortBy: "name",
+    sortDirection: "asc", // Añadir valor inicial
   });
 
   const handleSubmit = () => {
@@ -51,12 +54,17 @@ export const MemberFilters = ({ onFilter }: Props) => {
         open={open}
         onClose={() => setOpen(false)}
         PaperProps={{
-          sx: { borderTopLeftRadius: 16, borderTopRightRadius: 16 }
+          sx: { borderTopLeftRadius: 16, borderTopRightRadius: 16 },
         }}
       >
         <Box p={2}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Filters</Typography>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography variant="h6">Filtros</Typography>
             <IconButton onClick={() => setOpen(false)}>
               <CloseIcon />
             </IconButton>
@@ -64,55 +72,65 @@ export const MemberFilters = ({ onFilter }: Props) => {
 
           <Stack spacing={3}>
             <TextField
-              label="Search"
+              label="Buscar"
               fullWidth
               value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, search: e.target.value })
+              }
             />
 
             <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
+              <InputLabel id="status-label">Estado</InputLabel>
               <Select
+                labelId="status-label"
                 value={filters.status}
-                label="Status"
-                onChange={(e) => setFilters({ ...filters, status: e.target.value as any })}
+                label="Estado"
+                onChange={(e) =>
+                  setFilters({ ...filters, status: e.target.value as any })
+                }
               >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="inactive">Inactive</MenuItem>
+                <MenuItem value="all">Todos</MenuItem>
+                <MenuItem value="active">Activo</MenuItem>
+                <MenuItem value="inactive">Inactivo</MenuItem>
               </Select>
             </FormControl>
 
             <Stack direction="row" spacing={1} alignItems="center">
               <FormControl fullWidth>
-                <InputLabel>Sort By</InputLabel>
+                <InputLabel id="sort-by-label">Ordenar por</InputLabel>
                 <Select
+                  labelId="sort-by-label"
                   value={filters.sortBy}
-                  label="Sort By"
-                  onChange={(e) => setFilters({ ...filters, sortBy: e.target.value as any })}
+                  label="Ordenar por"
+                  onChange={(e) =>
+                    setFilters({ ...filters, sortBy: e.target.value as any })
+                  }
                 >
-                  <MenuItem value="name">Name</MenuItem>
-                  <MenuItem value="date">Date Added</MenuItem>
-                  <MenuItem value="status">Status</MenuItem>
+                  <MenuItem value="name">Nombre</MenuItem>
+                  <MenuItem value="date">Fecha</MenuItem>
+                  <MenuItem value="status">Estado</MenuItem>
                 </Select>
               </FormControl>
               <IconButton
-                onClick={() => setFilters(f => ({ 
-                  ...f, 
-                  sortDirection: f.sortDirection === 'asc' ? 'desc' : 'asc' 
-                }))}
+                onClick={() =>
+                  setFilters((f) => ({
+                    ...f,
+                    sortDirection: f.sortDirection === "asc" ? "desc" : "asc",
+                  }))
+                }
               >
-                {filters.sortDirection === 'asc' ? '↑' : '↓'}
+                {filters.sortDirection === "asc" ? "↑" : "↓"}
               </IconButton>
             </Stack>
 
-            <Button 
-              variant="contained" 
-              fullWidth 
+            <Button
+              variant="contained"
+              fullWidth
               size="large"
               onClick={handleSubmit}
             >
-              Apply Filters
+              Aplicar filtros
             </Button>
           </Stack>
         </Box>

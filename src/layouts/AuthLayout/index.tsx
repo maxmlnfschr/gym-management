@@ -13,7 +13,7 @@ export const AuthLayout = () => {
         }}
       >
         <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
-          Gym Management
+          
         </Typography>
         <Outlet />
       </Box>
