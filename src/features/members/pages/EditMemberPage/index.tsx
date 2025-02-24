@@ -22,7 +22,7 @@ export const EditMemberPage = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={3}>
+      <Box display="flex" justifyContent="center">
         <CircularProgress />
       </Box>
     );
@@ -37,7 +37,7 @@ export const EditMemberPage = () => {
   }
 
   return (
-    <Container maxWidth="sm">
+    <>
       <Typography variant="h5" component="h1" gutterBottom align="center">
         Editar Miembro
       </Typography>
@@ -51,6 +51,6 @@ export const EditMemberPage = () => {
           notes: selectedMember.notes || ''
         }} 
       />
-    </Container>
+    </>
   );
 };

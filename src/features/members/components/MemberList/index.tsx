@@ -91,14 +91,14 @@ export const MemberList = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={3}>
+      <Box display="flex" justifyContent="center">
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Container maxWidth="md">
+    <>
       <Stack direction="row" justifyContent="flex-end" spacing={2} mb={2}>
         <IconButton
           onClick={() => exportToCsv(filteredMembers)}
@@ -149,7 +149,7 @@ export const MemberList = () => {
           </Card>
         ))}
         {hasMore && (
-          <Box ref={ref} display="flex" justifyContent="center" p={2}>
+          <Box ref={ref} display="flex" justifyContent="center">
             <CircularProgress size={24} />
           </Box>
         )}
@@ -162,6 +162,6 @@ export const MemberList = () => {
       >
         <AddIcon />
       </Fab>
-    </Container>
+    </>
   );
 };

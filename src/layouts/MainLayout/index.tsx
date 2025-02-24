@@ -16,6 +16,24 @@ export const MainLayout = () => {
   const { isDrawerOpen, toggleDrawer } = useUIStore();
   const location = useLocation();
 
+  const getMaxWidth = () => {
+    if (location.pathname.includes('/members/add') || 
+        location.pathname.includes('/members/edit')) {
+      return {
+        xs: '100%',
+        sm: '600px',  // Ajustado para mantener consistencia con otras vistas en tablet
+        md: '600px',  // Mantenemos el ancho controlado en desktop
+        lg: '600px'   // Mantenemos el ancho controlado en pantallas grandes
+      }
+    }
+    return {
+      xs: '100%',
+      sm: '600px',
+      md: '900px',
+      lg: '1200px'
+    }
+  };
+
   const getPageTitle = () => {
     switch (true) {
       case location.pathname === "/" || location.pathname === "/dashboard":
@@ -32,7 +50,6 @@ export const MainLayout = () => {
         return "";
     }
   };
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <AppBar position="static">
@@ -57,15 +74,13 @@ export const MainLayout = () => {
         component="main" 
         sx={{ 
           flex: 1,
-          py: 3,
+          py: { xs: 2, sm: 3 },
           px: { xs: 2, sm: 3 },
-          maxWidth: {
-            xs: '100%',
-            sm: '600px',
-            md: '900px',
-            lg: '1200px'
-          },
-          mx: 'auto'
+          maxWidth: getMaxWidth(),
+          mx: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: { xs: 2, sm: 3 }
         }}
       >
         <Outlet />

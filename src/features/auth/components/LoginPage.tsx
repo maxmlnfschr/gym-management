@@ -32,16 +32,7 @@ export const LoginPage = () => {
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleLogin}
-      sx={{
-        width: "100%",
-        maxWidth: 400,
-        mx: 'auto',
-        p: 3
-      }}
-    >
+    <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
       <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
         Inicio de sesión
       </Typography>

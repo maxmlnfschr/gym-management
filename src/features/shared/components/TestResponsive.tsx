@@ -20,7 +20,7 @@ export const TestResponsive = () => {
   };
 
   return (
-    <Stack spacing={3} sx={{ p: 2 }}>
+    <Stack spacing={3}>
       <Stack 
         direction="row" 
         spacing={2}

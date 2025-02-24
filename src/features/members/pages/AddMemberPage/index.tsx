@@ -18,11 +18,11 @@ export const AddMemberPage = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <>
       <Typography variant="h5" component="h1" gutterBottom align="center">
         Agregar nuevo miembro
       </Typography>
       <MemberForm onSubmit={handleSubmit} />
-    </Container>
+    </>
   );
 };
