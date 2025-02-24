@@ -20,7 +20,11 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
   });
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+    <Box 
+      component="form" 
+      onSubmit={handleSubmit(onSubmit)} 
+      noValidate
+    >
       <Stack spacing={3}>
         <TextField
           {...register("first_name")}

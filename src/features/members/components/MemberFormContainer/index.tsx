@@ -61,8 +61,8 @@ export const MemberFormContainer = () => {
     );
   }
   return (
-    <Container maxWidth="sm">
+    <Box sx={{ mt: 1 }}>
       <MemberForm onSubmit={handleSubmit} initialData={member} />
-    </Container>
+    </Box>
   );
 };
