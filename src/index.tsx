@@ -7,6 +7,18 @@ import { queryClient } from '@/lib/queryClient';
 import { theme } from '@/theme';
 import '@/index.css';
 import App from '@/App';
+import { RouterProvider } from '@/routes/RouterProvider';
+import { AuthProvider } from "@/features/auth/components/AuthProvider";
+
+const Root = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
+        <RouterProvider />
+      </AuthProvider>
+    </ThemeProvider>
+  );
+};
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,11 +27,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <App />
-        </ThemeProvider>
-      </QueryClientProvider>
+      <App />
     </BrowserRouter>
   </React.StrictMode>
 );

@@ -2,8 +2,8 @@ import "@/App.css";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "@/theme";
-import AppRoutes from "@/routes";
 import { AuthProvider } from "@/features/auth/components/AuthProvider";
+import AppRoutes from "@/routes";
 import { Routes, Route } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
@@ -16,8 +16,18 @@ import { MemberFormContainer } from '@/features/members/components/MemberFormCon
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/features/shared/stores/authStore';
 import { CircularProgress, Box } from '@mui/material';
-
 function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+// Componente separado para manejar el estado de carga
+function AppContent() {
   const { initialized } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
 
@@ -45,25 +55,21 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <Routes>
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
+    <Routes>
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
 
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/members" element={<MemberList />} />
-            <Route path="/members/add" element={<MemberFormContainer />} />
-            <Route path="/members/edit/:id" element={<MemberFormContainer />} />
-            <Route path="/test-responsive" element={<TestResponsive />} />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </ThemeProvider>
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/members" element={<MemberList />} />
+        <Route path="/members/add" element={<MemberFormContainer />} />
+        <Route path="/members/edit/:id" element={<MemberFormContainer />} />
+        <Route path="/test-responsive" element={<TestResponsive />} />
+      </Route>
+    </Routes>
   );
 }
 
