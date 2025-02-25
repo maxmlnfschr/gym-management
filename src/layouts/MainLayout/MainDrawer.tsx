@@ -183,11 +183,29 @@ export const MainDrawer = ({ open, onClose, isCollapsed }: MainDrawerProps) => {
       >
         <BottomNavigation
           sx={{
-            height: 64, // Aumentamos la altura
+            height: 64,
             '& .MuiBottomNavigationAction-root': {
-              paddingTop: 1,
-              paddingBottom: 1.5, // Más padding en la parte inferior
+              padding: '8px 12px',
               minWidth: 'auto',
+              transition: 'none',
+              '& .MuiBottomNavigationAction-label': {
+                fontSize: '0.75rem !important',
+                transition: 'none',
+              },
+              '& .MuiSvgIcon-root': {
+                fontSize: '1.5rem !important',
+                transition: 'none',
+                transform: 'none !important'
+              },
+              '&.Mui-selected': {
+                padding: '8px 12px',
+                '& .MuiBottomNavigationAction-label': {
+                  fontSize: '0.75rem !important'
+                },
+                '& .MuiSvgIcon-root': {
+                  transform: 'none !important'
+                }
+              }
             }
           }}
           value={location.pathname}
