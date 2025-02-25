@@ -1,5 +1,5 @@
 import { InputBase, Paper, IconButton, styled } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
+import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 
 interface SearchBarProps {
   value: string;
@@ -23,6 +23,10 @@ export const SearchBar = ({
   onChange,
   placeholder = "Buscar...",
 }: SearchBarProps) => {
+  const handleClear = () => {
+    onChange("");
+  };
+
   return (
     <SearchWrapper elevation={1}>
       <InputBase
@@ -31,8 +35,13 @@ export const SearchBar = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
-      <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
-        <SearchIcon />
+      <IconButton 
+        type="button" 
+        sx={{ p: "10px" }} 
+        aria-label={value ? "clear" : "search"}
+        onClick={value ? handleClear : undefined}
+      >
+        {value ? <ClearIcon /> : <SearchIcon />}
       </IconButton>
     </SearchWrapper>
   );
