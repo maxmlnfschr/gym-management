@@ -12,7 +12,7 @@ import {
 import {
   Home,
   People,
-  FitnessCenter,
+  QrCodeScanner,  // Cambiado de FitnessCenter a QrCodeScanner
   Settings,
   FileDownload as DownloadIcon,
 } from "@mui/icons-material";
@@ -47,9 +47,9 @@ export const MainDrawer = ({ open, onClose, isCollapsed }: MainDrawerProps) => {
       path: ROUTES.MEMBERS,
     },
     {
-      text: "Acceso",
+      text: "Control de Acceso",  // Actualizado el texto
       mobileText: "Acceso",
-      icon: <FitnessCenter />,
+      icon: <QrCodeScanner />,    // Cambiado el ícono
       path: ROUTES.ACCESS,
     },
     {

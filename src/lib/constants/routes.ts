@@ -10,8 +10,8 @@ export const ROUTES = {
   
   // Members
   MEMBERS: '/members',
-  MEMBER_NEW: '/members/new',
   MEMBER_DETAIL: '/members/:id',
+  MEMBER_MEMBERSHIP: '/members/:id/membership',
   MEMBER_EDIT: '/members/:id/edit',
 
   // Access

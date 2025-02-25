@@ -6,6 +6,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Button,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -20,6 +21,8 @@ import type { Member } from "@/features/members/types";
 import { Card, CardContent } from "@mui/material";
 import { useState } from "react";
 import { StatusChip } from "@/components/common/StatusChip";
+import { Edit, Delete, CreditCard } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 interface MemberCardProps {
   member: Member;
@@ -28,12 +31,14 @@ interface MemberCardProps {
 }
 
 export const MemberCard = ({ member, onEdit, onDelete }: MemberCardProps) => {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuClick = (
     event: React.MouseEvent<HTMLElement>,
     id: string
   ) => {
+    event.stopPropagation(); // Prevent card click when clicking menu
     setAnchorEl(event.currentTarget);
   };
 
@@ -42,8 +47,17 @@ export const MemberCard = ({ member, onEdit, onDelete }: MemberCardProps) => {
   };
 
   return (
-    <Card variant="outlined">
-      <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+    <Card
+      onClick={() => navigate(`/members/${member.id}`)}
+      sx={{
+        cursor: "pointer",
+        "&:hover": {
+          boxShadow: 2,
+          transition: "all 0.2s ease-in-out",
+        },
+      }}
+    >
+      <CardContent>
         <Stack spacing={1}>
           <Stack
             direction="row"

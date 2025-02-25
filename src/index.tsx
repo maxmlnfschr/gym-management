@@ -6,7 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { theme } from '@/theme';
 import '@/index.css';
-import App from '@/App';
+import { App } from '@/App';  // Changed from 'import App' to 'import { App }'
 import { RouterProvider } from '@/routes/RouterProvider';
 import { AuthProvider } from "@/features/auth/components/AuthProvider";
 

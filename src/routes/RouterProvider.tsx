@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/features/shared/stores/authStore';
 import { CircularProgress, Box } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
-import App from '@/App';
+import { App } from '@/App';  // Changed from 'import App' to 'import { App }'
 
 export const RouterProvider = () => {
   const { initialized } = useAuthStore();

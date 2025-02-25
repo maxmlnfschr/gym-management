@@ -295,9 +295,7 @@ export const MemberList = () => {
           </Stack>
         </Collapse>
         {/* Lista de miembros */}
-        <Stack spacing={3}>
-          {" "}
-          {/* Aumentado de 2 a 3 para mejor separación entre tarjetas */}
+        <Stack spacing={2}> {/* Reducido de 3 a 2 para las tarjetas */}
           {paginatedMembers.map((member: Member) => (
             <MemberCard
               key={member.id}
@@ -311,15 +309,12 @@ export const MemberList = () => {
               ref={ref}
               display="flex"
               justifyContent="center"
-              sx={{ mt: 3 }}
+              sx={{ mt: 2 }}
             >
-              {" "}
-              {/* Aumentado de 2 a 3 */}
               <CircularProgress size={24} />
             </Box>
           )}
         </Stack>
-        {/* Botón de scroll to top */}
       </Stack>
       <FloatingActions />
     </Box>
