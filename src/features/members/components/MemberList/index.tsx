@@ -101,28 +101,11 @@ export const MemberList = () => {
   };
   const paginatedMembers = filteredMembers.slice(0, page * itemsPerPage);
   const hasMore = paginatedMembers.length < filteredMembers.length;
-  // Eliminar esta definición duplicada
-  // const handleFilter = (newValues: Partial<FilterValues>) => {
-  //   const newFilters: FilterValues = {
-  //     ...filterValues,
-  //     ...newValues
-  //   };
-  //   setFilterValues(newFilters);
-  //   let filtered = [...members];
-  //   if (newFilters.search) {
-  //     const searchLower = newFilters.search.toLowerCase();
-  //     filtered = filtered.filter(
-  //       (member: Member) =>
-  //         member.first_name.toLowerCase().includes(searchLower) ||
-  //         member.last_name.toLowerCase().includes(searchLower) ||
-  //         member.email.toLowerCase().includes(searchLower)
-  //     );
-  //   }
-  // };
+
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" spacing={2} mb={2}>
-        <Box sx={{ flexGrow: 1, maxWidth: 300 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2} mb={1}>
+        <Box sx={{ flexGrow: 1 }}>
           <SearchBar
             placeholder="Buscar miembros..."
             value={filterValues.search}
@@ -132,13 +115,6 @@ export const MemberList = () => {
             })}
           />
         </Box>
-        <IconButton
-          onClick={() => exportToCsv(filteredMembers)}
-          color="primary"
-          title="Exportar como CSV"
-        >
-          <DownloadIcon />
-        </IconButton>
         <MemberFilters 
           onFilter={({status, sortBy, sortDirection}) => handleFilter({
             ...filterValues,
@@ -148,8 +124,7 @@ export const MemberList = () => {
           })} 
         />
       </Stack>
-
-      <Stack spacing={2}>
+      <Stack spacing={1}>
         {paginatedMembers.map((member) => (
           <ResponsiveCard
             key={member.id}

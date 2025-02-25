@@ -1,7 +1,9 @@
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Home, People, FitnessCenter, Settings } from '@mui/icons-material';
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { Home, People, FitnessCenter, Settings, FileDownload } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants/routes';
+import { exportToCsv } from '@/features/members/utils/exportToCsv';
+import { useMemberStore } from '@/features/shared/stores/memberStore';
 
 interface MainDrawerProps {
   open: boolean;
@@ -10,6 +12,7 @@ interface MainDrawerProps {
 
 export const MainDrawer = ({ open, onClose }: MainDrawerProps) => {
   const navigate = useNavigate();
+  const { members } = useMemberStore();
 
   const menuItems = [
     { text: 'Dashboard', icon: <Home />, path: ROUTES.DASHBOARD },
@@ -42,6 +45,16 @@ export const MainDrawer = ({ open, onClose }: MainDrawerProps) => {
             <ListItemText primary={item.text} />
           </ListItemButton>
         ))}
+        <Divider sx={{ my: 1 }} />
+        <ListItemButton 
+          onClick={() => {
+            exportToCsv(members);
+            onClose();
+          }}
+        >
+          <ListItemIcon><FileDownload /></ListItemIcon>
+          <ListItemText primary="Exportar miembros" />
+        </ListItemButton>
       </List>
     </Drawer>
   );
