@@ -152,54 +152,58 @@ export const MemberList = () => {
 
       {/* Nueva sección de filtros */}
       <Stack
-        direction={{ xs: "column", sm: "row" }}
+        direction="row"
         spacing={2}
         sx={{
           backgroundColor: "background.paper",
           p: 2,
           borderRadius: 1,
-          boxShadow: 1
+          boxShadow: 1,
+          display: 'flex',
+          justifyContent: 'space-between'
         }}
       >
-        <Box sx={{ minWidth: 120 }}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Estado</InputLabel>
-            <Select
-              value={filterValues.status}
-              label="Estado"
-              onChange={(e) =>
-                handleFilter({
-                  ...filterValues,
-                  status: e.target.value as FilterValues["status"],
-                })
-              }
-            >
-              <MenuItem value="all">Todos</MenuItem>
-              <MenuItem value="active">Activos</MenuItem>
-              <MenuItem value="inactive">Inactivos</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
+        <Stack direction="row" spacing={2} sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Estado</InputLabel>
+              <Select
+                value={filterValues.status}
+                label="Estado"
+                onChange={(e) =>
+                  handleFilter({
+                    ...filterValues,
+                    status: e.target.value as FilterValues["status"],
+                  })
+                }
+              >
+                <MenuItem value="all">Todos</MenuItem>
+                <MenuItem value="active">Activos</MenuItem>
+                <MenuItem value="inactive">Inactivos</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
 
-        <Box sx={{ minWidth: 120 }}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Ordenar por</InputLabel>
-            <Select
-              value={filterValues.sortBy}
-              label="Ordenar por"
-              onChange={(e) =>
-                handleFilter({
-                  ...filterValues,
-                  sortBy: e.target.value as FilterValues["sortBy"],
-                })
-              }
-            >
-              <MenuItem value="name">Nombre</MenuItem>
-              <MenuItem value="date">Fecha</MenuItem>
-              <MenuItem value="status">Estado</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
+          <Box sx={{ flex: 1 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Ordenar por</InputLabel>
+              <Select
+                value={filterValues.sortBy}
+                label="Ordenar por"
+                onChange={(e) =>
+                  handleFilter({
+                    ...filterValues,
+                    sortBy: e.target.value as FilterValues["sortBy"],
+                  })
+                }
+              >
+                <MenuItem value="name">Nombre</MenuItem>
+                <MenuItem value="date">Fecha</MenuItem>
+                <MenuItem value="status">Estado</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </Stack>
       </Stack>
 
       {/* Lista de miembros */}

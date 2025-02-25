@@ -13,7 +13,7 @@ import { MainDrawer } from "@/layouts/MainLayout/MainDrawer";
 import { useLocation } from "react-router-dom";
 
 export const MainLayout = () => {
-  const { isDrawerOpen, toggleDrawer } = useUIStore();
+  const { isDrawerOpen, isDrawerCollapsed, toggleDrawerCollapse, toggleDrawer } = useUIStore();
   const location = useLocation();
 
   const getMaxWidth = () => {
@@ -59,7 +59,7 @@ export const MainLayout = () => {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={toggleDrawer}
+            onClick={toggleDrawerCollapse}
           >
             <MenuIcon />
           </IconButton>
@@ -68,8 +68,8 @@ export const MainLayout = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Toolbar /> {/* Este Toolbar vacío compensa el espacio del AppBar fijo */}
-      <MainDrawer open={isDrawerOpen} onClose={toggleDrawer} />
+      <Toolbar />
+      <MainDrawer open={isDrawerOpen} onClose={toggleDrawer} isCollapsed={isDrawerCollapsed} />
       <Container 
         component="main" 
         sx={{ 
@@ -80,9 +80,9 @@ export const MainLayout = () => {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          marginLeft: { xs: 'auto', sm: '240px' }, // Añadido margen para el drawer
-          width: { xs: '100%', sm: `calc(100% - 240px)` }, // Ajustado el ancho
-          marginBottom: { xs: '56px', sm: 0 } // Espacio para la navegación móvil
+          marginLeft: { xs: 'auto', sm: isDrawerCollapsed ? '72px' : '240px' },
+          width: { xs: '100%', sm: `calc(100% - ${isDrawerCollapsed ? '72px' : '240px'})` },
+          marginBottom: { xs: '56px', sm: 0 }
         }}
       >
         <Outlet />

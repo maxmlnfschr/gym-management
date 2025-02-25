@@ -2,12 +2,16 @@ import { create } from 'zustand';
 
 interface UIState {
   isDrawerOpen: boolean;
+  isDrawerCollapsed: boolean;
   toggleDrawer: () => void;
   setDrawerOpen: (open: boolean) => void;
+  toggleDrawerCollapse: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
-  isDrawerOpen: false,
+  isDrawerOpen: true,
+  isDrawerCollapsed: false,
   toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
-  setDrawerOpen: (open) => set({ isDrawerOpen: open }),
+  toggleDrawerCollapse: () => set((state) => ({ isDrawerCollapsed: !state.isDrawerCollapsed })),
+  setDrawerOpen: (open: boolean) => set({ isDrawerOpen: open }),
 }));
