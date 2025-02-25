@@ -185,12 +185,13 @@ export const MainDrawer = ({ open, onClose, isCollapsed }: MainDrawerProps) => {
           sx={{
             height: 64,
             "& .MuiBottomNavigationAction-root": {
-              padding: "8px 12px",
+              padding: "4px 12px 12px", // Reducido el padding superior
               minWidth: "auto",
               transition: "none",
               "& .MuiBottomNavigationAction-label": {
                 fontSize: "0.75rem !important",
                 transition: "none",
+                marginTop: "-4px", // Ajuste adicional para acercar la etiqueta al icono
               },
               "& .MuiSvgIcon-root": {
                 fontSize: "1.5rem !important",
@@ -198,9 +199,10 @@ export const MainDrawer = ({ open, onClose, isCollapsed }: MainDrawerProps) => {
                 transform: "none !important",
               },
               "&.Mui-selected": {
-                padding: "8px 12px",
+                padding: "4px 12px 12px", // Mantener el mismo padding cuando está seleccionado
                 "& .MuiBottomNavigationAction-label": {
                   fontSize: "0.75rem !important",
+                  marginTop: "-4px",
                 },
                 "& .MuiSvgIcon-root": {
                   transform: "none !important",
