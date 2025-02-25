@@ -12,10 +12,7 @@ const SearchWrapper = styled(Paper)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   width: "100%",
-  marginBottom: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    marginBottom: theme.spacing(3),
-  },
+  marginBottom: 0, // Removido el margin bottom
 }));
 
 export const SearchBar = ({

@@ -12,6 +12,9 @@ import {
   CircularProgress,
   Fab,
   Container,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import {
   MoreVert as MoreVertIcon,
@@ -26,8 +29,11 @@ import type { Member } from "@/features/members/types";
 import type { FilterValues } from "@/features/members/components/MemberFilters";
 import { FileDownload as DownloadIcon } from "@mui/icons-material";
 import { exportToCsv } from "@/features/members/utils/exportToCsv";
-import { ResponsiveCard, ResponsiveCardContent } from "@/components/common/ResponsiveCard";
-import { TextField } from "@mui/material";  // Añadir esta importación
+import {
+  ResponsiveCard,
+  ResponsiveCardContent,
+} from "@/components/common/ResponsiveCard";
+import { TextField } from "@mui/material"; // Añadir esta importación
 import { SearchBar } from "@/components/common/SearchBar";
 
 export const MemberList = () => {
@@ -52,12 +58,12 @@ export const MemberList = () => {
     search: "",
     status: "all",
     sortBy: "name",
-    sortDirection: "asc"
+    sortDirection: "asc",
   });
   const handleFilter = (newValues: Partial<FilterValues>) => {
     const newFilters: FilterValues = {
       ...filterValues,
-      ...newValues
+      ...newValues,
     };
     setFilterValues(newFilters);
 
@@ -76,7 +82,9 @@ export const MemberList = () => {
 
     // Apply status filter
     if (newFilters.status !== "all") {
-      filtered = filtered.filter((member) => member.status === newFilters.status);
+      filtered = filtered.filter(
+        (member) => member.status === newFilters.status
+      );
     }
 
     // Apply sorting
@@ -103,27 +111,98 @@ export const MemberList = () => {
   const hasMore = paginatedMembers.length < filteredMembers.length;
 
   return (
-    <>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2} mb={1}>
-        <Box sx={{ flexGrow: 1 }}>
+    <Stack spacing={1}>  {/* Cambiado de 2 a 1 para mantener consistencia */}
+      {/* Barra de búsqueda y botón agregar */}
+      <Stack 
+        direction="row" 
+        spacing={2} 
+        alignItems="center"
+      >
+        <Box sx={{ flex: 1 }}>
           <SearchBar
             placeholder="Buscar miembros..."
             value={filterValues.search}
-            onChange={(value) => handleFilter({
-              ...filterValues,
-              search: value
-            })}
+            onChange={(value) =>
+              handleFilter({
+                ...filterValues,
+                search: value,
+              })
+            }
           />
         </Box>
-        <MemberFilters 
-          onFilter={({status, sortBy, sortDirection}) => handleFilter({
-            ...filterValues,
-            status,
-            sortBy,
-            sortDirection
-          })} 
-        />
+        <IconButton
+          color="primary"
+          onClick={() => navigate("/members/add", {
+            state: { defaultName: filterValues.search }
+          })}
+          sx={{ 
+            backgroundColor: 'primary.main',
+            color: 'white',
+            width: 48,
+            height: 48,
+            borderRadius: 1,
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            }
+          }}
+        >
+          <AddIcon fontSize="medium" />
+        </IconButton>
       </Stack>
+
+      {/* Nueva sección de filtros */}
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        sx={{
+          backgroundColor: "background.paper",
+          p: 2,
+          borderRadius: 1,
+          boxShadow: 1
+        }}
+      >
+        <Box sx={{ minWidth: 120 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Estado</InputLabel>
+            <Select
+              value={filterValues.status}
+              label="Estado"
+              onChange={(e) =>
+                handleFilter({
+                  ...filterValues,
+                  status: e.target.value as FilterValues["status"],
+                })
+              }
+            >
+              <MenuItem value="all">Todos</MenuItem>
+              <MenuItem value="active">Activos</MenuItem>
+              <MenuItem value="inactive">Inactivos</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        <Box sx={{ minWidth: 120 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Ordenar por</InputLabel>
+            <Select
+              value={filterValues.sortBy}
+              label="Ordenar por"
+              onChange={(e) =>
+                handleFilter({
+                  ...filterValues,
+                  sortBy: e.target.value as FilterValues["sortBy"],
+                })
+              }
+            >
+              <MenuItem value="name">Nombre</MenuItem>
+              <MenuItem value="date">Fecha</MenuItem>
+              <MenuItem value="status">Estado</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Stack>
+
+      {/* Lista de miembros */}
       <Stack spacing={1}>
         {paginatedMembers.map((member) => (
           <ResponsiveCard
@@ -132,13 +211,13 @@ export const MemberList = () => {
               {
                 label: "Editar",
                 icon: <EditIcon fontSize="small" sx={{ mt: 0.5 }} />,
-                onClick: () => navigate(`/members/edit/${member.id}`)
+                onClick: () => navigate(`/members/edit/${member.id}`),
               },
               {
                 label: "Eliminar",
                 icon: <DeleteIcon fontSize="small" sx={{ mt: 0.5 }} />,
-                onClick: () => deleteMember(member.id)
-              }
+                onClick: () => deleteMember(member.id),
+              },
             ]}
           >
             <ResponsiveCardContent>
@@ -151,14 +230,17 @@ export const MemberList = () => {
                   <Typography variant="h6">
                     {member.first_name} {member.last_name}
                   </Typography>
-                  <Typography 
+                  <Typography
                     color="textSecondary"
                     sx={{
-                      textTransform: 'capitalize',
-                      color: member.status === 'active' ? 'success.main' : 'error.main'
+                      textTransform: "capitalize",
+                      color:
+                        member.status === "active"
+                          ? "success.main"
+                          : "error.main",
                     }}
                   >
-                    {member.status === 'active' ? 'Activo' : 'Inactivo'}
+                    {member.status === "active" ? "Activo" : "Inactivo"}
                   </Typography>
                   {member.phone && (
                     <Typography color="textSecondary">
@@ -176,13 +258,6 @@ export const MemberList = () => {
           </Box>
         )}
       </Stack>
-      <Fab
-        color="primary"
-        sx={{ position: "fixed", bottom: 16, right: 16 }}
-        onClick={() => navigate("/members/add")}
-      >
-        <AddIcon />
-      </Fab>
-    </>
+    </Stack>
   );
 };

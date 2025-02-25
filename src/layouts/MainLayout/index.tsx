@@ -79,7 +79,10 @@ export const MainLayout = () => {
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2
+          gap: 2,
+          marginLeft: { xs: 'auto', sm: '240px' }, // Añadido margen para el drawer
+          width: { xs: '100%', sm: `calc(100% - 240px)` }, // Ajustado el ancho
+          marginBottom: { xs: '56px', sm: 0 } // Espacio para la navegación móvil
         }}
       >
         <Outlet />

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { memberSchema } from "@/features/members/validations/memberSchema";
 import type { MemberFormData } from "@/features/members/types";
+import { useLocation } from 'react-router-dom';
 
 interface Props {
   onSubmit: (data: MemberFormData) => Promise<void>;
@@ -10,15 +11,21 @@ interface Props {
 }
 
 export const MemberForm = ({ onSubmit, initialData }: Props) => {
+  const location = useLocation();
+  const defaultName = location.state?.defaultName || '';
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<MemberFormData>({
     resolver: zodResolver(memberSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      ...initialData,
+      first_name: defaultName || initialData?.first_name || ''
+    },
   });
-
+  // Eliminar el useState y formValues que habíamos agregado
   return (
     <Box 
       component="form" 
