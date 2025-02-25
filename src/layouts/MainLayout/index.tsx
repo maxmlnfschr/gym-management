@@ -51,7 +51,7 @@ export const MainLayout = () => {
   };
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton
             size="large"
@@ -68,18 +68,18 @@ export const MainLayout = () => {
           </Typography>
         </Toolbar>
       </AppBar>
+      <Toolbar /> {/* Este Toolbar vacío compensa el espacio del AppBar fijo */}
       <MainDrawer open={isDrawerOpen} onClose={toggleDrawer} />
       <Container 
         component="main" 
         sx={{ 
           flex: 1,
-          p: 2, // 16px de padding uniforme (como en las páginas de auth)
+          p: 2,
           maxWidth: getMaxWidth(),
-          mx: 'auto', // margin auto para centrado
+          mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2, // 16px de espaciado entre elementos
-          width: '100%' // asegura que tome el ancho completo disponible
+          gap: 2
         }}
       >
         <Outlet />
