@@ -35,6 +35,7 @@ import {
 } from "@/components/common/ResponsiveCard";
 import { TextField } from "@mui/material"; // Añadir esta importación
 import { SearchBar } from "@/components/common/SearchBar";
+import { MemberCard } from "@/features/members/components/MemberCard";
 
 export const MemberList = () => {
   const navigate = useNavigate();
@@ -111,13 +112,11 @@ export const MemberList = () => {
   const hasMore = paginatedMembers.length < filteredMembers.length;
 
   return (
-    <Stack spacing={1}>  {/* Cambiado de 2 a 1 para mantener consistencia */}
+    <Stack spacing={1}>
+      {" "}
+      {/* Cambiado de 2 a 1 para mantener consistencia */}
       {/* Barra de búsqueda y botón agregar */}
-      <Stack 
-        direction="row" 
-        spacing={2} 
-        alignItems="center"
-      >
+      <Stack direction="row" spacing={2} alignItems="center">
         <Box sx={{ flex: 1 }}>
           <SearchBar
             placeholder="Buscar miembros..."
@@ -132,24 +131,25 @@ export const MemberList = () => {
         </Box>
         <IconButton
           color="primary"
-          onClick={() => navigate("/members/add", {
-            state: { defaultName: filterValues.search }
-          })}
-          sx={{ 
-            backgroundColor: 'primary.main',
-            color: 'white',
+          onClick={() =>
+            navigate("/members/add", {
+              state: { defaultName: filterValues.search },
+            })
+          }
+          sx={{
+            backgroundColor: "primary.main",
+            color: "white",
             width: 48,
             height: 48,
             borderRadius: 1,
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-            }
+            "&:hover": {
+              backgroundColor: "primary.dark",
+            },
           }}
         >
           <AddIcon fontSize="medium" />
         </IconButton>
       </Stack>
-
       {/* Nueva sección de filtros */}
       <Stack
         direction="row"
@@ -159,8 +159,8 @@ export const MemberList = () => {
           p: 2,
           borderRadius: 1,
           boxShadow: 1,
-          display: 'flex',
-          justifyContent: 'space-between'
+          display: "flex",
+          justifyContent: "space-between",
         }}
       >
         <Stack direction="row" spacing={2} sx={{ flex: 1 }}>
@@ -205,56 +205,15 @@ export const MemberList = () => {
           </Box>
         </Stack>
       </Stack>
-
       {/* Lista de miembros */}
       <Stack spacing={1}>
         {paginatedMembers.map((member) => (
-          <ResponsiveCard
+          <MemberCard
             key={member.id}
-            actions={[
-              {
-                label: "Editar",
-                icon: <EditIcon fontSize="small" sx={{ mt: 0.5 }} />,
-                onClick: () => navigate(`/members/edit/${member.id}`),
-              },
-              {
-                label: "Eliminar",
-                icon: <DeleteIcon fontSize="small" sx={{ mt: 0.5 }} />,
-                onClick: () => deleteMember(member.id),
-              },
-            ]}
-          >
-            <ResponsiveCardContent>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Box>
-                  <Typography variant="h6">
-                    {member.first_name} {member.last_name}
-                  </Typography>
-                  <Typography
-                    color="textSecondary"
-                    sx={{
-                      textTransform: "capitalize",
-                      color:
-                        member.status === "active"
-                          ? "success.main"
-                          : "error.main",
-                    }}
-                  >
-                    {member.status === "active" ? "Activo" : "Inactivo"}
-                  </Typography>
-                  {member.phone && (
-                    <Typography color="textSecondary">
-                      {member.phone}
-                    </Typography>
-                  )}
-                </Box>
-              </Stack>
-            </ResponsiveCardContent>
-          </ResponsiveCard>
+            member={member}
+            onEdit={(id: string) => navigate(`/members/edit/${id}`)}
+            onDelete={(id: string) => deleteMember(id)}
+          />
         ))}
         {hasMore && (
           <Box ref={ref} display="flex" justifyContent="center">

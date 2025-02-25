@@ -51,23 +51,31 @@ export const MainLayout = () => {
   };
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={toggleDrawerCollapse}
+      <AppBar 
+            position="fixed"
+            sx={{ 
+              height: 64 
+            }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {getPageTitle()}
-          </Typography>
-        </Toolbar>
-      </AppBar>
+            <Toolbar sx={{ minHeight: 64 }}>
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ 
+                  mr: 2,
+                  display: { xs: 'none', sm: 'flex' } // Ocultar en móvil, mostrar en desktop
+                }}
+                onClick={toggleDrawerCollapse}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                {getPageTitle()}
+              </Typography>
+            </Toolbar>
+          </AppBar>
       <Toolbar />
       <MainDrawer open={isDrawerOpen} onClose={toggleDrawer} isCollapsed={isDrawerCollapsed} />
       <Container 
