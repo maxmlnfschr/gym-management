@@ -131,14 +131,13 @@ export const MemberList = () => {
             actions={[
               {
                 label: "Editar",
-                icon: <EditIcon fontSize="small" />,
+                icon: <EditIcon fontSize="small" sx={{ mt: 0.5 }} />,
                 onClick: () => navigate(`/members/edit/${member.id}`)
               },
               {
                 label: "Eliminar",
-                icon: <DeleteIcon fontSize="small" />,
+                icon: <DeleteIcon fontSize="small" sx={{ mt: 0.5 }} />,
                 onClick: () => deleteMember(member.id)
-                // Removido el color: 'error.main'
               }
             ]}
           >
