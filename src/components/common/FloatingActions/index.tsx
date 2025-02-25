@@ -32,7 +32,7 @@ export const FloatingActions = () => {
         spacing={1.5}
         sx={{
           position: "fixed",
-          bottom: { xs: 100, sm: 32 },
+          bottom: { xs: 98, sm: 32 },
           right: { xs: 30, sm: 40 },
           zIndex: 1500,
         }}

@@ -177,36 +177,36 @@ export const MainDrawer = ({ open, onClose, isCollapsed }: MainDrawerProps) => {
           display: { xs: "block", sm: "none" },
           zIndex: 1100,
           boxShadow: 3,
-          pb: 'calc(env(safe-area-inset-bottom) + 16px)', // Aumentado el padding inferior
+          pb: "calc(env(safe-area-inset-bottom) + 17px)", // Aumentado el padding inferior
         }}
         elevation={3}
       >
         <BottomNavigation
           sx={{
             height: 64,
-            '& .MuiBottomNavigationAction-root': {
-              padding: '8px 12px',
-              minWidth: 'auto',
-              transition: 'none',
-              '& .MuiBottomNavigationAction-label': {
-                fontSize: '0.75rem !important',
-                transition: 'none',
+            "& .MuiBottomNavigationAction-root": {
+              padding: "8px 12px",
+              minWidth: "auto",
+              transition: "none",
+              "& .MuiBottomNavigationAction-label": {
+                fontSize: "0.75rem !important",
+                transition: "none",
               },
-              '& .MuiSvgIcon-root': {
-                fontSize: '1.5rem !important',
-                transition: 'none',
-                transform: 'none !important'
+              "& .MuiSvgIcon-root": {
+                fontSize: "1.5rem !important",
+                transition: "none",
+                transform: "none !important",
               },
-              '&.Mui-selected': {
-                padding: '8px 12px',
-                '& .MuiBottomNavigationAction-label': {
-                  fontSize: '0.75rem !important'
+              "&.Mui-selected": {
+                padding: "8px 12px",
+                "& .MuiBottomNavigationAction-label": {
+                  fontSize: "0.75rem !important",
                 },
-                '& .MuiSvgIcon-root': {
-                  transform: 'none !important'
-                }
-              }
-            }
+                "& .MuiSvgIcon-root": {
+                  transform: "none !important",
+                },
+              },
+            },
           }}
           value={location.pathname}
           onChange={(_, newPath) => {
