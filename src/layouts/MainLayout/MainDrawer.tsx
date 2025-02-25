@@ -176,30 +176,25 @@ export const MainDrawer = ({ open, onClose, isCollapsed }: MainDrawerProps) => {
           right: 0,
           display: { xs: "block", sm: "none" },
           zIndex: 1100,
-          boxShadow: 3, // Añadido sombreado
+          boxShadow: 3,
+          pb: 'env(safe-area-inset-bottom)', // Añade padding para dispositivos con notch
         }}
         elevation={3}
       >
         <BottomNavigation
+          sx={{
+            height: 64, // Aumentamos la altura
+            '& .MuiBottomNavigationAction-root': {
+              paddingTop: 1,
+              paddingBottom: 1.5, // Más padding en la parte inferior
+              minWidth: 'auto',
+            }
+          }}
           value={location.pathname}
           onChange={(_, newPath) => {
             navigate(newPath);
           }}
           showLabels
-          sx={{
-            "& .MuiBottomNavigationAction-root": {
-              padding: "6px 0",
-              "&.Mui-selected": {
-                transform: "none",
-                "& .MuiBottomNavigationAction-label": {
-                  fontSize: "0.75rem",
-                },
-              },
-              "& .MuiBottomNavigationAction-label": {
-                fontSize: "0.75rem",
-              },
-            },
-          }}
         >
           {menuItems.map((item) => (
             <BottomNavigationAction

@@ -43,9 +43,11 @@ export const MemberCard = ({ member, onEdit, onDelete }: MemberCardProps) => {
               size="small"
               sx={{
                 backgroundColor: member.status === "active" 
-                  ? "rgba(84, 214, 44, 0.16)"
+                  ? "rgba(0, 112, 243, 0.16)"
                   : "rgba(255, 72, 66, 0.16)",
-                color: member.status === "active" ? "success.main" : "error.main",
+                color: member.status === "active" 
+                  ? "rgb(0, 112, 243)"
+                  : "error.main",
                 fontWeight: 500,
                 fontSize: "0.75rem",
                 "& .MuiChip-label": {
