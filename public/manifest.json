@@ -3,25 +3,16 @@
   "name": "Gym Management System",
   "icons": [
     {
-      "src": "/future_gadget_laboratory.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/future_gadget_laboratory_icono-300x300.png",
+      "sizes": "300x300",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
+      "src": "/future_gadget_laboratory_icono-525x525.png",
+      "sizes": "525x525",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
