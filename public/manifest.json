@@ -3,13 +3,13 @@
   "name": "Gym Management System",
   "icons": [
     {
-      "src": "/future_gadget_laboratory_icono-300x300.png",
+      "src": "future_gadget_laboratory_icono-300x300.png",
       "sizes": "300x300",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/future_gadget_laboratory_icono-525x525.png",
+      "src": "future_gadget_laboratory_icono-525x525.png",
       "sizes": "525x525",
       "type": "image/png",
       "purpose": "any maskable"
