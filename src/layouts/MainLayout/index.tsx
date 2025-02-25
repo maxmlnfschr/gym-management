@@ -17,7 +17,7 @@ export const MainLayout = () => {
   const location = useLocation();
 
   const getMaxWidth = () => {
-    if (location.pathname === '/members/form') {  // Cambiado para coincidir con la ruta correcta
+    if (location.pathname === '/members/form') {
       return {
         xs: '100%',
         sm: '400px',
@@ -49,49 +49,64 @@ export const MainLayout = () => {
         return "";
     }
   };
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <Box 
+      sx={{ 
+        display: "flex", 
+        flexDirection: "column", 
+        minHeight: "100vh",
+        overscrollBehavior: 'contain',
+        WebkitOverflowScrolling: 'touch',
+      }}
+    >
       <AppBar 
-            position="fixed"
+        position="fixed"
+        sx={{ 
+          height: 64 
+        }}
+      >
+        <Toolbar sx={{ minHeight: 64 }}>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
             sx={{ 
-              height: 64 
+              mr: 2,
+              display: { xs: 'none', sm: 'flex' }
             }}
+            onClick={toggleDrawerCollapse}
           >
-            <Toolbar sx={{ minHeight: 64 }}>
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                sx={{ 
-                  mr: 2,
-                  display: { xs: 'none', sm: 'flex' } // Ocultar en móvil, mostrar en desktop
-                }}
-                onClick={toggleDrawerCollapse}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                {getPageTitle()}
-              </Typography>
-            </Toolbar>
-          </AppBar>
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            {getPageTitle()}
+          </Typography>
+        </Toolbar>
+      </AppBar>
       <Toolbar />
-      <MainDrawer open={isDrawerOpen} onClose={toggleDrawer} isCollapsed={isDrawerCollapsed} />
+      <MainDrawer 
+        open={isDrawerOpen} 
+        onClose={toggleDrawer} 
+        isCollapsed={isDrawerCollapsed} 
+      />
       <Container 
         component="main" 
         sx={{ 
           flex: 1,
-          p: 3,  // Cambiado de 2 a 3
-          pt: 4,  // Cambiado de 3 a 4 para más espacio arriba
+          p: 3,
+          pt: 4,
           maxWidth: getMaxWidth(),
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: 3,  // Cambiado de 2 a 3
+          gap: 3,
           marginLeft: { xs: 'auto', sm: isDrawerCollapsed ? '72px' : '240px' },
           width: { xs: '100%', sm: `calc(100% - ${isDrawerCollapsed ? '72px' : '240px'})` },
-          marginBottom: { xs: '56px', sm: 0 }
+          marginBottom: { xs: '56px', sm: 0 },
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         <Outlet />

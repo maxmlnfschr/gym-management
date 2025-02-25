@@ -6,6 +6,7 @@ export const FloatingActions = () => {
   const navigate = useNavigate();
   const trigger = useScrollTrigger({
     threshold: 100,
+    disableHysteresis: true // Hace que la transición sea más inmediata
   });
 
   const handleScrollTop = () => {
@@ -31,7 +32,7 @@ export const FloatingActions = () => {
         spacing={1.5}
         sx={{
           position: "fixed",
-          bottom: { xs: 88, sm: 32 },
+          bottom: { xs: 120, sm: 32 }, // Aumentado el espacio en móvil
           right: { xs: 24, sm: 32 },
           zIndex: 1500,
         }}
