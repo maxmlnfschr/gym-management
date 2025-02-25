@@ -1,10 +1,25 @@
-import { Typography, Chip, Stack, Box } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import {
+  Typography,
+  Chip,
+  Stack,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  MoreVert as MoreVertIcon,
+} from "@mui/icons-material";
 import {
   ResponsiveCard,
   ResponsiveCardContent,
 } from "@/components/common/ResponsiveCard";
 import type { Member } from "@/features/members/types";
+import { Card, CardContent } from "@mui/material";
+import { useState } from "react";
+import { StatusChip } from "@/components/common/StatusChip";
 
 interface MemberCardProps {
   member: Member;
@@ -13,51 +28,68 @@ interface MemberCardProps {
 }
 
 export const MemberCard = ({ member, onEdit, onDelete }: MemberCardProps) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenuClick = (
+    event: React.MouseEvent<HTMLElement>,
+    id: string
+  ) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <ResponsiveCard
-      actions={[
-        {
-          label: "Editar",
-          icon: <EditIcon fontSize="small" sx={{ mt: 0.5 }} />,
-          onClick: () => onEdit(member.id),
-        },
-        {
-          label: "Eliminar",
-          icon: <DeleteIcon fontSize="small" sx={{ mt: 0.5 }} />,
-          onClick: () => onDelete(member.id),
-        },
-      ]}
-    >
-      <ResponsiveCardContent>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography variant="h6" sx={{ mb: 1 }}>
-              {member.first_name} {member.last_name}
-            </Typography>
-            <Chip
-              label={member.status === "active" ? "Activo" : "Inactivo"}
+    <Card variant="outlined">
+      <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+        <Stack spacing={1}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
+            <Stack spacing={1}>
+              <Typography variant="h6">
+                {member.first_name} {member.last_name}
+              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="body2" color="text.secondary">
+                  {new Date(member.created_at).toLocaleDateString()} •
+                </Typography>
+                <StatusChip status={member.status} />
+              </Stack>
+            </Stack>
+            <IconButton
               size="small"
-              sx={{
-                backgroundColor: member.status === "active" 
-                  ? "rgba(0, 112, 243, 0.16)"
-                  : "rgba(255, 72, 66, 0.16)",
-                color: member.status === "active" 
-                  ? "rgb(0, 112, 243)"
-                  : "error.main",
-                fontWeight: 500,
-                fontSize: "0.75rem",
-                "& .MuiChip-label": {
-                  px: 1.5,
-                },
-              }}
-            />
-          </Box>
+              onClick={(event) => handleMenuClick(event, member.id)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+          </Stack>
         </Stack>
-      </ResponsiveCardContent>
-    </ResponsiveCard>
+      </CardContent>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem
+          onClick={() => {
+            onEdit(member.id);
+            handleClose();
+          }}
+        >
+          <EditIcon sx={{ mr: 1 }} fontSize="small" />
+          Editar
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            onDelete(member.id);
+            handleClose();
+          }}
+        >
+          <DeleteIcon sx={{ mr: 1 }} fontSize="small" />
+          Eliminar
+        </MenuItem>
+      </Menu>
+    </Card>
   );
 };

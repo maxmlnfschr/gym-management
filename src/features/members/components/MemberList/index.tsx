@@ -36,6 +36,9 @@ import {
 import { TextField } from "@mui/material"; // Añadir esta importación
 import { SearchBar } from "@/components/common/SearchBar";
 import { MemberCard } from "@/features/members/components/MemberCard";
+import { Chip } from "@mui/material";
+import { Collapse } from "@mui/material";
+import { FilterChip } from "@/components/common/FilterChip";
 
 export const MemberList = () => {
   const navigate = useNavigate();
@@ -46,15 +49,7 @@ export const MemberList = () => {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const { ref, inView } = useInView();
   const itemsPerPage = 10;
-
-  useEffect(() => {
-    fetchMembers();
-  }, [fetchMembers]);
-
-  useEffect(() => {
-    setFilteredMembers(members);
-  }, [members]);
-
+  const [showFilters, setShowFilters] = useState(false);
   const [filterValues, setFilterValues] = useState<FilterValues>({
     search: "",
     status: "all",
@@ -70,7 +65,6 @@ export const MemberList = () => {
 
     let filtered = [...members];
 
-    // Apply search
     if (newFilters.search) {
       const searchLower = newFilters.search.toLowerCase();
       filtered = filtered.filter(
@@ -81,14 +75,12 @@ export const MemberList = () => {
       );
     }
 
-    // Apply status filter
     if (newFilters.status !== "all") {
       filtered = filtered.filter(
         (member) => member.status === newFilters.status
       );
     }
 
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (newFilters.sortBy) {
         case "name":
@@ -108,14 +100,26 @@ export const MemberList = () => {
 
     setFilteredMembers(filtered);
   };
+  const handleFilterClick = (event: React.MouseEvent<HTMLElement>) => {
+    setShowFilters(!showFilters);
+  };
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
+  useEffect(() => {
+    setFilteredMembers(members);
+  }, [members]);
+  // Añadir estas definiciones antes del return
   const paginatedMembers = filteredMembers.slice(0, page * itemsPerPage);
   const hasMore = paginatedMembers.length < filteredMembers.length;
-
+  useEffect(() => {
+    if (inView && hasMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  }, [inView, hasMore]);
   return (
-    <Stack spacing={1}>
-      {" "}
-      {/* Cambiado de 2 a 1 para mantener consistencia */}
-      {/* Barra de búsqueda y botón agregar */}
+    <Stack spacing={3}>
+      {/* Barra de búsqueda y botón */}
       <Stack direction="row" spacing={2} alignItems="center">
         <Box sx={{ flex: 1 }}>
           <SearchBar
@@ -127,15 +131,13 @@ export const MemberList = () => {
                 search: value,
               })
             }
+            onFilterClick={handleFilterClick}
+            isFilterActive={showFilters}
           />
         </Box>
         <IconButton
           color="primary"
-          onClick={() =>
-            navigate("/members/add", {
-              state: { defaultName: filterValues.search },
-            })
-          }
+          onClick={() => navigate("/members/add")}
           sx={{
             backgroundColor: "primary.main",
             color: "white",
@@ -150,64 +152,109 @@ export const MemberList = () => {
           <AddIcon fontSize="medium" />
         </IconButton>
       </Stack>
-      {/* Nueva sección de filtros */}
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{
-          backgroundColor: "background.paper",
-          p: 2,
-          borderRadius: 1,
-          boxShadow: 1,
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <Stack direction="row" spacing={2} sx={{ flex: 1 }}>
-          <Box sx={{ flex: 1 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Estado</InputLabel>
-              <Select
-                value={filterValues.status}
+{/* Filtros en línea */}
+      <Collapse in={showFilters}>
+        <Stack 
+          spacing={2} 
+          sx={{
+            backgroundColor: 'background.paper',
+            borderRadius: 1.5,
+            p: 2,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            border: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                minWidth: 'auto',
+                fontWeight: 500
+              }}
+            >
+              Estado:
+            </Typography>
+            <Stack direction="row" spacing={0.5}>
+              <FilterChip
+                label="Todos"
+                isSelected={filterValues.status === "all"}
+                onSelect={() => handleFilter({ ...filterValues, status: "all" })}
+              />
+              <FilterChip
+                label="Activos"
+                isSelected={filterValues.status === "active"}
+                onSelect={() => handleFilter({ ...filterValues, status: "active" })}
+              />
+              <FilterChip
+                label="Inactivos"
+                isSelected={filterValues.status === "inactive"}
+                onSelect={() => handleFilter({ ...filterValues, status: "inactive" })}
+              />
+            </Stack>
+          </Stack>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                minWidth: 'auto',
+                fontWeight: 500
+              }}
+            >
+              Ordenar por:
+            </Typography>
+            <Stack direction="row" spacing={0.5}>
+              <Chip
+                label="Nombre"
+                size="small"
+                onClick={() => handleFilter({ ...filterValues, sortBy: "name" })}
+                sx={{
+                  height: '24px',
+                  fontSize: '0.75rem',
+                  bgcolor: filterValues.sortBy === "name" ? "text.primary" : "grey.100",
+                  color: filterValues.sortBy === "name" ? "white" : "text.primary",
+                  '&:hover': {
+                    bgcolor: filterValues.sortBy === "name" ? "text.primary" : "grey.200",
+                  }
+                }}
+              />
+              <Chip
+                label="Fecha"
+                size="small"
+                onClick={() => handleFilter({ ...filterValues, sortBy: "date" })}
+                sx={{
+                  height: '24px',
+                  fontSize: '0.75rem',
+                  bgcolor: filterValues.sortBy === "date" ? "text.primary" : "grey.100",
+                  color: filterValues.sortBy === "date" ? "white" : "text.primary",
+                  '&:hover': {
+                    bgcolor: filterValues.sortBy === "date" ? "text.primary" : "grey.200",
+                  }
+                }}
+              />
+              <Chip
                 label="Estado"
-                onChange={(e) =>
-                  handleFilter({
-                    ...filterValues,
-                    status: e.target.value as FilterValues["status"],
-                  })
-                }
-              >
-                <MenuItem value="all">Todos</MenuItem>
-                <MenuItem value="active">Activos</MenuItem>
-                <MenuItem value="inactive">Inactivos</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-
-          <Box sx={{ flex: 1 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Ordenar por</InputLabel>
-              <Select
-                value={filterValues.sortBy}
-                label="Ordenar por"
-                onChange={(e) =>
-                  handleFilter({
-                    ...filterValues,
-                    sortBy: e.target.value as FilterValues["sortBy"],
-                  })
-                }
-              >
-                <MenuItem value="name">Nombre</MenuItem>
-                <MenuItem value="date">Fecha</MenuItem>
-                <MenuItem value="status">Estado</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+                size="small"
+                onClick={() => handleFilter({ ...filterValues, sortBy: "status" })}
+                sx={{
+                  height: '24px',
+                  fontSize: '0.75rem',
+                  bgcolor: filterValues.sortBy === "status" ? "text.primary" : "grey.100",
+                  color: filterValues.sortBy === "status" ? "white" : "text.primary",
+                  '&:hover': {
+                    bgcolor: filterValues.sortBy === "status" ? "text.primary" : "grey.200",
+                  }
+                }}
+              />
+            </Stack>
+          </Stack>
         </Stack>
-      </Stack>
+      </Collapse>
       {/* Lista de miembros */}
-      <Stack spacing={1}>
-        {paginatedMembers.map((member) => (
+      <Stack spacing={3}>  {/* Aumentado de 2 a 3 para mejor separación entre tarjetas */}
+        {paginatedMembers.map((member: Member) => (
           <MemberCard
             key={member.id}
             member={member}
@@ -216,7 +263,7 @@ export const MemberList = () => {
           />
         ))}
         {hasMore && (
-          <Box ref={ref} display="flex" justifyContent="center">
+          <Box ref={ref} display="flex" justifyContent="center" sx={{ mt: 3 }}>  {/* Aumentado de 2 a 3 */}
             <CircularProgress size={24} />
           </Box>
         )}

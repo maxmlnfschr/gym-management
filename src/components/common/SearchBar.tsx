@@ -1,24 +1,27 @@
 import { InputBase, Paper, IconButton, styled } from "@mui/material";
-import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
-
-interface SearchBarProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-}
+import { Search as SearchIcon, Cancel as CancelIcon, Tune as TuneIcon } from "@mui/icons-material";
 
 const SearchWrapper = styled(Paper)(({ theme }) => ({
   padding: "2px 4px",
   display: "flex",
   alignItems: "center",
   width: "100%",
-  marginBottom: 0, // Removido el margin bottom
 }));
+
+interface SearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  onFilterClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  isFilterActive?: boolean;
+}
 
 export const SearchBar = ({
   value,
   onChange,
   placeholder = "Buscar...",
+  onFilterClick,
+  isFilterActive = false,
 }: SearchBarProps) => {
   const handleClear = () => {
     onChange("");
@@ -26,19 +29,46 @@ export const SearchBar = ({
 
   return (
     <SearchWrapper elevation={1}>
+      <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+        <SearchIcon />
+      </IconButton>
       <InputBase
-        sx={{ ml: 1, flex: 1 }}
+        sx={{ flex: 1 }}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
-      <IconButton 
-        type="button" 
-        sx={{ p: "10px" }} 
-        aria-label={value ? "clear" : "search"}
-        onClick={value ? handleClear : undefined}
+      {value && (
+        <IconButton
+          type="button"
+          sx={{
+            p: "10px",
+            ml: -1,
+            '& .MuiSvgIcon-root': {
+              fontSize: '20px'
+            }
+          }}
+          aria-label="clear"
+          onClick={handleClear}
+        >
+          <CancelIcon />
+        </IconButton>
+      )}
+      <IconButton
+        type="button"
+        sx={{
+          p: "10px",
+          color: isFilterActive ? "text.primary" : "text.secondary",
+          '&:hover': {
+            bgcolor: 'transparent',
+            color: 'text.primary'
+          },
+          transition: 'color 0.2s ease-in-out'
+        }}
+        aria-label="filters"
+        onClick={onFilterClick}
       >
-        {value ? <ClearIcon /> : <SearchIcon />}
+        <TuneIcon />
       </IconButton>
     </SearchWrapper>
   );

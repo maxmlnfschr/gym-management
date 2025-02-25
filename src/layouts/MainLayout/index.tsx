@@ -82,12 +82,13 @@ export const MainLayout = () => {
         component="main" 
         sx={{ 
           flex: 1,
-          p: 2,
+          p: 3,  // Cambiado de 2 a 3
+          pt: 4,  // Cambiado de 3 a 4 para más espacio arriba
           maxWidth: getMaxWidth(),
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
+          gap: 3,  // Cambiado de 2 a 3
           marginLeft: { xs: 'auto', sm: isDrawerCollapsed ? '72px' : '240px' },
           width: { xs: '100%', sm: `calc(100% - ${isDrawerCollapsed ? '72px' : '240px'})` },
           marginBottom: { xs: '56px', sm: 0 }
