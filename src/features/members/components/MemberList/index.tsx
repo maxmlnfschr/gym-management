@@ -39,6 +39,8 @@ import { MemberCard } from "@/features/members/components/MemberCard";
 import { Chip } from "@mui/material";
 import { Collapse } from "@mui/material";
 import { FilterChip } from "@/components/common/FilterChip";
+import { ScrollToTop } from "@/components/common/ScrollToTop";
+import { FloatingActions } from "@/components/common/FloatingActions";
 
 export const MemberList = () => {
   const navigate = useNavigate();
@@ -118,156 +120,208 @@ export const MemberList = () => {
     }
   }, [inView, hasMore]);
   return (
-    <Stack spacing={3}>
-      {/* Barra de búsqueda y botón */}
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Box sx={{ flex: 1 }}>
-          <SearchBar
-            placeholder="Buscar miembros..."
-            value={filterValues.search}
-            onChange={(value) =>
-              handleFilter({
-                ...filterValues,
-                search: value,
-              })
-            }
-            onFilterClick={handleFilterClick}
-            isFilterActive={showFilters}
-          />
-        </Box>
-        <IconButton
-          color="primary"
-          onClick={() => navigate("/members/add")}
-          sx={{
-            backgroundColor: "primary.main",
-            color: "white",
-            width: 48,
-            height: 48,
-            borderRadius: 1,
-            "&:hover": {
-              backgroundColor: "primary.dark",
-            },
-          }}
-        >
-          <AddIcon fontSize="medium" />
-        </IconButton>
-      </Stack>
-{/* Filtros en línea */}
-      <Collapse in={showFilters}>
-        <Stack 
-          spacing={2} 
-          sx={{
-            backgroundColor: 'background.paper',
-            borderRadius: 1.5,
-            p: 2,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            border: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
-              sx={{ 
-                minWidth: 'auto',
-                fontWeight: 500
-              }}
-            >
-              Estado:
-            </Typography>
-            <Stack direction="row" spacing={0.5}>
-              <FilterChip
-                label="Todos"
-                isSelected={filterValues.status === "all"}
-                onSelect={() => handleFilter({ ...filterValues, status: "all" })}
-              />
-              <FilterChip
-                label="Activos"
-                isSelected={filterValues.status === "active"}
-                onSelect={() => handleFilter({ ...filterValues, status: "active" })}
-              />
-              <FilterChip
-                label="Inactivos"
-                isSelected={filterValues.status === "inactive"}
-                onSelect={() => handleFilter({ ...filterValues, status: "inactive" })}
-              />
-            </Stack>
-          </Stack>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
-              sx={{ 
-                minWidth: 'auto',
-                fontWeight: 500
-              }}
-            >
-              Ordenar por:
-            </Typography>
-            <Stack direction="row" spacing={0.5}>
-              <Chip
-                label="Nombre"
-                size="small"
-                onClick={() => handleFilter({ ...filterValues, sortBy: "name" })}
-                sx={{
-                  height: '24px',
-                  fontSize: '0.75rem',
-                  bgcolor: filterValues.sortBy === "name" ? "text.primary" : "grey.100",
-                  color: filterValues.sortBy === "name" ? "white" : "text.primary",
-                  '&:hover': {
-                    bgcolor: filterValues.sortBy === "name" ? "text.primary" : "grey.200",
-                  }
-                }}
-              />
-              <Chip
-                label="Fecha"
-                size="small"
-                onClick={() => handleFilter({ ...filterValues, sortBy: "date" })}
-                sx={{
-                  height: '24px',
-                  fontSize: '0.75rem',
-                  bgcolor: filterValues.sortBy === "date" ? "text.primary" : "grey.100",
-                  color: filterValues.sortBy === "date" ? "white" : "text.primary",
-                  '&:hover': {
-                    bgcolor: filterValues.sortBy === "date" ? "text.primary" : "grey.200",
-                  }
-                }}
-              />
-              <Chip
-                label="Estado"
-                size="small"
-                onClick={() => handleFilter({ ...filterValues, sortBy: "status" })}
-                sx={{
-                  height: '24px',
-                  fontSize: '0.75rem',
-                  bgcolor: filterValues.sortBy === "status" ? "text.primary" : "grey.100",
-                  color: filterValues.sortBy === "status" ? "white" : "text.primary",
-                  '&:hover': {
-                    bgcolor: filterValues.sortBy === "status" ? "text.primary" : "grey.200",
-                  }
-                }}
-              />
-            </Stack>
-          </Stack>
-        </Stack>
-      </Collapse>
-      {/* Lista de miembros */}
-      <Stack spacing={3}>  {/* Aumentado de 2 a 3 para mejor separación entre tarjetas */}
-        {paginatedMembers.map((member: Member) => (
-          <MemberCard
-            key={member.id}
-            member={member}
-            onEdit={(id: string) => navigate(`/members/edit/${id}`)}
-            onDelete={(id: string) => deleteMember(id)}
-          />
-        ))}
-        {hasMore && (
-          <Box ref={ref} display="flex" justifyContent="center" sx={{ mt: 3 }}>  {/* Aumentado de 2 a 3 */}
-            <CircularProgress size={24} />
+    <Box>
+      {" "}
+      {/* Cambiamos Stack por Box como contenedor principal */}
+      <Stack spacing={3}>
+        {/* Barra de búsqueda y botón */}
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Box sx={{ flex: 1 }}>
+            <SearchBar
+              placeholder="Buscar miembros..."
+              value={filterValues.search}
+              onChange={(value) =>
+                handleFilter({
+                  ...filterValues,
+                  search: value,
+                })
+              }
+              onFilterClick={handleFilterClick}
+              isFilterActive={showFilters}
+            />
           </Box>
-        )}
+          <IconButton
+            color="primary"
+            onClick={() => navigate("/members/add")}
+            sx={{
+              backgroundColor: "primary.main",
+              color: "white",
+              width: 48,
+              height: 48,
+              borderRadius: '50%', // Hacemos el botón redondo
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              "&:hover": {
+                backgroundColor: "primary.dark",
+                boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+              },
+            }}
+          >
+            <AddIcon fontSize="medium" />
+          </IconButton>
+        </Stack>
+        {/* Filtros en línea */}
+        <Collapse in={showFilters}>
+          <Stack
+            spacing={2}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: 1.5,
+              p: 2,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  minWidth: "auto",
+                  fontWeight: 500,
+                }}
+              >
+                Estado:
+              </Typography>
+              <Stack direction="row" spacing={0.5}>
+                <FilterChip
+                  label="Todos"
+                  isSelected={filterValues.status === "all"}
+                  onSelect={() =>
+                    handleFilter({ ...filterValues, status: "all" })
+                  }
+                />
+                <FilterChip
+                  label="Activos"
+                  isSelected={filterValues.status === "active"}
+                  onSelect={() =>
+                    handleFilter({ ...filterValues, status: "active" })
+                  }
+                />
+                <FilterChip
+                  label="Inactivos"
+                  isSelected={filterValues.status === "inactive"}
+                  onSelect={() =>
+                    handleFilter({ ...filterValues, status: "inactive" })
+                  }
+                />
+              </Stack>
+            </Stack>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  minWidth: "auto",
+                  fontWeight: 500,
+                }}
+              >
+                Ordenar por:
+              </Typography>
+              <Stack direction="row" spacing={0.5}>
+                <Chip
+                  label="Nombre"
+                  size="small"
+                  onClick={() =>
+                    handleFilter({ ...filterValues, sortBy: "name" })
+                  }
+                  sx={{
+                    height: "24px",
+                    fontSize: "0.75rem",
+                    bgcolor:
+                      filterValues.sortBy === "name"
+                        ? "text.primary"
+                        : "grey.100",
+                    color:
+                      filterValues.sortBy === "name" ? "white" : "text.primary",
+                    "&:hover": {
+                      bgcolor:
+                        filterValues.sortBy === "name"
+                          ? "text.primary"
+                          : "grey.200",
+                    },
+                  }}
+                />
+                <Chip
+                  label="Fecha"
+                  size="small"
+                  onClick={() =>
+                    handleFilter({ ...filterValues, sortBy: "date" })
+                  }
+                  sx={{
+                    height: "24px",
+                    fontSize: "0.75rem",
+                    bgcolor:
+                      filterValues.sortBy === "date"
+                        ? "text.primary"
+                        : "grey.100",
+                    color:
+                      filterValues.sortBy === "date" ? "white" : "text.primary",
+                    "&:hover": {
+                      bgcolor:
+                        filterValues.sortBy === "date"
+                          ? "text.primary"
+                          : "grey.200",
+                    },
+                  }}
+                />
+                <Chip
+                  label="Estado"
+                  size="small"
+                  onClick={() =>
+                    handleFilter({ ...filterValues, sortBy: "status" })
+                  }
+                  sx={{
+                    height: "24px",
+                    fontSize: "0.75rem",
+                    bgcolor:
+                      filterValues.sortBy === "status"
+                        ? "text.primary"
+                        : "grey.100",
+                    color:
+                      filterValues.sortBy === "status"
+                        ? "white"
+                        : "text.primary",
+                    "&:hover": {
+                      bgcolor:
+                        filterValues.sortBy === "status"
+                          ? "text.primary"
+                          : "grey.200",
+                    },
+                  }}
+                />
+              </Stack>
+            </Stack>
+          </Stack>
+        </Collapse>
+        {/* Lista de miembros */}
+        <Stack spacing={3}>
+          {" "}
+          {/* Aumentado de 2 a 3 para mejor separación entre tarjetas */}
+          {paginatedMembers.map((member: Member) => (
+            <MemberCard
+              key={member.id}
+              member={member}
+              onEdit={(id: string) => navigate(`/members/edit/${id}`)}
+              onDelete={(id: string) => deleteMember(id)}
+            />
+          ))}
+          {hasMore && (
+            <Box
+              ref={ref}
+              display="flex"
+              justifyContent="center"
+              sx={{ mt: 3 }}
+            >
+              {" "}
+              {/* Aumentado de 2 a 3 */}
+              <CircularProgress size={24} />
+            </Box>
+          )}
+        </Stack>
+        {/* Botón de scroll to top */}
       </Stack>
-    </Stack>
+      <FloatingActions />
+    </Box>
   );
 };
