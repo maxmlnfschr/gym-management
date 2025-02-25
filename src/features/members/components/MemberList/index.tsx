@@ -27,6 +27,8 @@ import type { FilterValues } from "@/features/members/components/MemberFilters";
 import { FileDownload as DownloadIcon } from "@mui/icons-material";
 import { exportToCsv } from "@/features/members/utils/exportToCsv";
 import { ResponsiveCard, ResponsiveCardContent } from "@/components/common/ResponsiveCard";
+import { TextField } from "@mui/material";  // Añadir esta importación
+import { SearchBar } from "@/components/common/SearchBar";
 
 export const MemberList = () => {
   const navigate = useNavigate();
@@ -46,14 +48,26 @@ export const MemberList = () => {
     setFilteredMembers(members);
   }, [members]);
 
-  const handleFilter = ({ search, status, sortBy }: FilterValues) => {
+  const [filterValues, setFilterValues] = useState<FilterValues>({
+    search: "",
+    status: "all",
+    sortBy: "name",
+    sortDirection: "asc"
+  });
+  const handleFilter = (newValues: Partial<FilterValues>) => {
+    const newFilters: FilterValues = {
+      ...filterValues,
+      ...newValues
+    };
+    setFilterValues(newFilters);
+
     let filtered = [...members];
 
     // Apply search
-    if (search) {
-      const searchLower = search.toLowerCase();
+    if (newFilters.search) {
+      const searchLower = newFilters.search.toLowerCase();
       filtered = filtered.filter(
-        (member) =>
+        (member: Member) =>
           member.first_name.toLowerCase().includes(searchLower) ||
           member.last_name.toLowerCase().includes(searchLower) ||
           member.email.toLowerCase().includes(searchLower)
@@ -61,13 +75,13 @@ export const MemberList = () => {
     }
 
     // Apply status filter
-    if (status !== "all") {
-      filtered = filtered.filter((member) => member.status === status);
+    if (newFilters.status !== "all") {
+      filtered = filtered.filter((member) => member.status === newFilters.status);
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
-      switch (sortBy) {
+      switch (newFilters.sortBy) {
         case "name":
           return `${a.first_name} ${a.last_name}`.localeCompare(
             `${b.first_name} ${b.last_name}`
@@ -85,51 +99,39 @@ export const MemberList = () => {
 
     setFilteredMembers(filtered);
   };
-
   const paginatedMembers = filteredMembers.slice(0, page * itemsPerPage);
   const hasMore = paginatedMembers.length < filteredMembers.length;
-
-  useEffect(() => {
-    if (inView && hasMore) {
-      setPage((prev) => prev + 1);
-    }
-  }, [inView, hasMore]);
-
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, memberId: string) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedMemberId(memberId);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedMemberId(null);
-  };
-
-  const handleEdit = () => {
-    if (selectedMemberId) {
-      navigate(`/members/edit/${selectedMemberId}`);
-      handleMenuClose();
-    }
-  };
-
-  const handleDelete = () => {
-    if (selectedMemberId) {
-      deleteMember(selectedMemberId);
-      handleMenuClose();
-    }
-  };
-
+  // Eliminar esta definición duplicada
+  // const handleFilter = (newValues: Partial<FilterValues>) => {
+  //   const newFilters: FilterValues = {
+  //     ...filterValues,
+  //     ...newValues
+  //   };
+  //   setFilterValues(newFilters);
+  //   let filtered = [...members];
+  //   if (newFilters.search) {
+  //     const searchLower = newFilters.search.toLowerCase();
+  //     filtered = filtered.filter(
+  //       (member: Member) =>
+  //         member.first_name.toLowerCase().includes(searchLower) ||
+  //         member.last_name.toLowerCase().includes(searchLower) ||
+  //         member.email.toLowerCase().includes(searchLower)
+  //     );
+  //   }
+  // };
   return (
     <>
       <Stack direction="row" justifyContent="flex-end" spacing={2} mb={2}>
+        <Box sx={{ flexGrow: 1, maxWidth: 300 }}>
+          <SearchBar
+            placeholder="Buscar miembros..."
+            value={filterValues.search}
+            onChange={(value) => handleFilter({
+              ...filterValues,
+              search: value
+            })}
+          />
+        </Box>
         <IconButton
           onClick={() => exportToCsv(filteredMembers)}
           color="primary"
@@ -137,7 +139,14 @@ export const MemberList = () => {
         >
           <DownloadIcon />
         </IconButton>
-        <MemberFilters onFilter={handleFilter} />
+        <MemberFilters 
+          onFilter={({status, sortBy, sortDirection}) => handleFilter({
+            ...filterValues,
+            status,
+            sortBy,
+            sortDirection
+          })} 
+        />
       </Stack>
 
       <Stack spacing={2}>
@@ -193,7 +202,6 @@ export const MemberList = () => {
           </Box>
         )}
       </Stack>
-
       <Fab
         color="primary"
         sx={{ position: "fixed", bottom: 16, right: 16 }}

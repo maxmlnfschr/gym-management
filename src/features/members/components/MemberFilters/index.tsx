@@ -18,8 +18,9 @@ import {
 } from "@mui/icons-material";
 
 // Actualizar la interfaz añadiendo sortDirection
+// Actualizar la interfaz quitando search
 export interface FilterValues {
-  search: string;
+  search: string; // Mantenemos esto para compatibilidad con MemberList
   status: "all" | "active" | "inactive";
   sortBy: "name" | "date" | "status";
   sortDirection: "asc" | "desc";
@@ -32,10 +33,10 @@ interface Props {
 export const MemberFilters = ({ onFilter }: Props) => {
   const [open, setOpen] = useState(false);
   const [filters, setFilters] = useState<FilterValues>({
-    search: "",
+    search: "", // Mantenemos esto para compatibilidad
     status: "all",
     sortBy: "name",
-    sortDirection: "asc", // Añadir valor inicial
+    sortDirection: "asc",
   });
 
   const handleSubmit = () => {
@@ -71,14 +72,7 @@ export const MemberFilters = ({ onFilter }: Props) => {
           </Stack>
 
           <Stack spacing={3}>
-            <TextField
-              label="Buscar"
-              fullWidth
-              value={filters.search}
-              onChange={(e) =>
-                setFilters({ ...filters, search: e.target.value })
-              }
-            />
+            {/* Eliminamos el TextField de búsqueda */}
 
             <FormControl fullWidth>
               <InputLabel id="status-label">Estado</InputLabel>
