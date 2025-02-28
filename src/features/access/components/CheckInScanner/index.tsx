@@ -11,8 +11,13 @@ export const CheckInScanner = () => {
   const { checkIn, isLoading, error } = useCheckIn();
   const { showToast } = useToast();
 
-  const handleScan = (memberId: string) => {
-    checkIn(memberId);
+  const handleScan = async (memberId: string) => {
+    try {
+      await checkIn(memberId);
+      showToast('Acceso registrado correctamente', 'success');
+    } catch (error) {
+      // El error ya se maneja en useCheckIn y se muestra en el Alert
+    }
   };
 
   return (
@@ -22,7 +27,11 @@ export const CheckInScanner = () => {
       </Typography>
       <QRScanner onScanSuccess={handleScan} />
       {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert 
+          severity="warning" 
+          sx={{ mt: 2 }}
+          variant="outlined"
+        >
           {error}
         </Alert>
       )}

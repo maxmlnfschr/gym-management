@@ -22,6 +22,22 @@ export const useMemberships = (memberId?: string) => {
 
   const createMembership = useMutation({
     mutationFn: async (data: MembershipFormData & { memberId: string }) => {
+      // Verificar y actualizar membresías activas existentes
+      const { data: activeMemberships } = await supabase
+        .from('memberships')
+        .select('*')
+        .eq('member_id', data.memberId)
+        .gte('end_date', new Date().toISOString());
+
+      if (activeMemberships && activeMemberships.length > 0) {
+        await supabase
+          .from('memberships')
+          .update({ end_date: new Date().toISOString() })
+          .eq('member_id', data.memberId)
+          .gte('end_date', new Date().toISOString());
+      }
+
+      // Crear nueva membresía (código existente)
       const startDate = new Date(data.startDate).toISOString();
       const endDate = addMonths(
         new Date(data.startDate), 
