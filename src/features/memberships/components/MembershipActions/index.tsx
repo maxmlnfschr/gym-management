@@ -1,7 +1,7 @@
-import { Button, Stack } from '@mui/material';
-import { Refresh, Payment } from '@mui/icons-material';
-import { useMemberships } from '@/features/memberships/hooks/useMemberships';
-import { useNavigate } from 'react-router-dom';
+import { Button, Stack } from "@mui/material";
+import { Refresh, Payment } from "@mui/icons-material";
+import { useMemberships } from "@/features/memberships/hooks/useMemberships";
+import { useNavigate } from "react-router-dom";
 
 interface MembershipActionsProps {
   memberId: string;
@@ -13,7 +13,7 @@ export const MembershipActions = ({ memberId }: MembershipActionsProps) => {
 
   const handleRenew = () => {
     navigate(`/members/${memberId}/membership`, {
-      state: { isRenewal: true, previousMembership: currentMembership }
+      state: { isRenewal: true, previousMembership: currentMembership },
     });
   };
 
@@ -24,15 +24,17 @@ export const MembershipActions = ({ memberId }: MembershipActionsProps) => {
         variant="outlined"
         onClick={handleRenew}
         disabled={!currentMembership}
+        sx={{ flex: 1 }}
       >
-        Renovar Membresía
+        Renovar
       </Button>
       <Button
         startIcon={<Payment />}
         variant="outlined"
         onClick={() => navigate(`/members/${memberId}/payments`)}
+        sx={{ flex: 1 }}
       >
-        Ver Pagos
+        Ver pagos
       </Button>
     </Stack>
   );

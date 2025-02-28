@@ -12,15 +12,24 @@ import {
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react"; // Added this import
+// Modificar el import para solo traer lo necesario
 import { MembershipList } from "@/features/memberships/components/MembershipList";
 import { MembershipStatus } from "@/features/memberships/components/MembershipStatus";
-import { MembershipActions } from "@/features/memberships/components/MembershipActions";
 import { PaymentHistory } from "@/features/memberships/components/PaymentHistory";
 import { useMember } from "@/features/members/hooks/useMember";
-import { Email, Phone, Edit, MoreVert, Delete } from "@mui/icons-material";
+import {
+  Email,
+  Phone,
+  Edit,
+  MoreVert,
+  Delete,
+  Payment,
+} from "@mui/icons-material";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { useTheme, useMediaQuery } from "@mui/material"; // Añadir estos imports
+// Agregar este import junto a los demás
+import { useMemberships } from "@/features/memberships/hooks/useMemberships";
 
 export const MemberDetails = () => {
   const theme = useTheme();
@@ -31,22 +40,29 @@ export const MemberDetails = () => {
   const { member, isLoading } = useMember(id);
   const { deleteMember } = useMember();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  // Agregar este hook junto a los demás hooks
+  const { currentMembership } = useMemberships(id!);
+  // Agregar esta función antes del return
+  const handleMembershipAction = () => {
+    if (currentMembership) {
+      navigate(`/members/${id}/membership`, {
+        state: {
+          isRenewal: true,
+          previousMembership: currentMembership,
+        },
+      });
+    } else {
+      navigate(`/members/${id}/membership`);
+    }
+  };
 
-  if (isLoading) {
-    return <Typography>Cargando...</Typography>;
-  }
-
-  if (!member) {
-    return <Typography>Miembro no encontrado</Typography>;
-  }
- 
   const handleDelete = async () => {
     try {
       await deleteMember(id!);
       handleMenuClose();
-      navigate('/members');
+      navigate("/members");
     } catch (error) {
-      console.error('Error deleting member:', error);
+      console.error("Error deleting member:", error);
     }
   };
 
@@ -57,11 +73,17 @@ export const MemberDetails = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+  if (isLoading) {
+    return <Typography>Cargando...</Typography>;
+  }
+
+  if (!member) {
+    return <Typography>Miembro no encontrado</Typography>;
+  }
 
   return (
     <>
       <Stack spacing={3}>
-        {/* Primera Paper - Información del miembro */}
         <Paper sx={{ p: 3 }}>
           <Stack spacing={3}>
             {isMobile ? (
@@ -73,25 +95,30 @@ export const MemberDetails = () => {
                   alignItems="center"
                 >
                   <Typography variant="h5">
-                    {member.first_name} {member.last_name}
+                    {member?.first_name} {member?.last_name}
                   </Typography>
                   <IconButton onClick={handleMenuClick}>
                     <MoreVert />
                   </IconButton>
                 </Stack>
-
-                <Stack spacing={1} width="100%">
+                <Stack direction="row" spacing={2}>
                   <Button
                     variant="contained"
-                    onClick={() => navigate(`/members/${id}/membership`)}
-                    fullWidth
+                    onClick={handleMembershipAction}
+                    sx={{
+                      flex: 1,
+                      whiteSpace: "normal",
+                      lineHeight: 1.2,
+                    }}
                   >
-                    Nueva Membresía
+                    {currentMembership
+                      ? "Renovar\nmembresía"
+                      : "Nueva\nmembresía"}
                   </Button>
                   <Button
                     variant="outlined"
                     onClick={() => setShowQR(true)}
-                    fullWidth
+                    sx={{ flex: 1 }}
                   >
                     Mostrar QR
                   </Button>
@@ -108,11 +135,10 @@ export const MemberDetails = () => {
                   {member.first_name} {member.last_name}
                 </Typography>
                 <Stack direction="row" spacing={2}>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate(`/members/${id}/membership`)}
-                  >
-                    Nueva Membresía
+                  <Button variant="contained" onClick={handleMembershipAction}>
+                    {currentMembership
+                      ? "Renovar membresía"
+                      : "Nueva membresía"}
                   </Button>
                   <Button variant="outlined" onClick={() => setShowQR(true)}>
                     Mostrar QR
@@ -125,7 +151,16 @@ export const MemberDetails = () => {
             )}
             {/* Rest of the content remains unchanged */}
             <MembershipStatus memberId={id!} />
-            <MembershipActions memberId={id!} />
+            <Stack direction="row" spacing={2}>
+              <Button
+                startIcon={<Payment />}
+                variant="outlined"
+                onClick={() => navigate(`/members/${id}/payments`)}
+                sx={{ flex: 1 }}
+              >
+                Ver pagos
+              </Button>
+            </Stack>
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -149,7 +184,9 @@ export const MemberDetails = () => {
         {/* Segunda Paper - Historial */}
         <Paper sx={{ p: 3 }}>
           <Stack spacing={2}>
-            <Typography variant="h6">Historial de Membresías y Pagos</Typography>
+            <Typography variant="h6">
+              Historial de membresías y pagos
+            </Typography>
             <PaymentHistory memberId={id!} />
           </Stack>
         </Paper>

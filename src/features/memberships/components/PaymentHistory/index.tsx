@@ -12,10 +12,15 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // Ordenar las membresías por fecha de registro, de más reciente a más antigua
+  const sortedMemberships = [...memberships].sort((a, b) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
   if (isMobile) {
     return (
       <Box>
-        {memberships.map((membership) => (
+        {sortedMemberships.map((membership) => (
           <Paper key={membership.id} sx={{ p: 2, mb: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
               Fecha: {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })}
@@ -51,7 +56,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {memberships.map((membership) => (
+          {sortedMemberships.map((membership) => (
             <TableRow key={membership.id}>
               <TableCell>
                 {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })}
