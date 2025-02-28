@@ -29,11 +29,11 @@ export const PlanCard = ({ type, price, selected = false, onSelect }: PlanCardPr
       onClick={onSelect}
       sx={{
         cursor: 'pointer',
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        transform: selected ? 'scale(1.02)' : 'none',
-        boxShadow: selected ? 8 : 1,
+        transition: 'all 0.15s ease-out',
+        transform: selected ? 'scale(1.01)' : 'none',
+        boxShadow: selected ? 3 : 1,
         '&:hover': {
-          boxShadow: 4,
+          boxShadow: 2,
         },
       }}
     >

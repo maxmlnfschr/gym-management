@@ -295,14 +295,20 @@ export const MemberList = () => {
           </Stack>
         </Collapse>
         {/* Lista de miembros */}
-        <Stack spacing={2}> {/* Reducido de 3 a 2 para las tarjetas */}
+        <Stack spacing={2}>
           {paginatedMembers.map((member: Member) => (
-            <MemberCard
+            <Box
               key={member.id}
-              member={member}
-              onEdit={(id: string) => navigate(`/members/edit/${id}`)}
-              onDelete={(id: string) => deleteMember(id)}
-            />
+              onClick={() => navigate(`/members/${member.id}`)}
+              sx={{ cursor: 'pointer' }}
+            >
+              <MemberCard
+                key={member.id}
+                member={member}
+                onEdit={(id: string) => navigate(`/members/edit/${id}`)}
+                onDelete={(id: string) => deleteMember(id)}
+              />
+            </Box>
           ))}
           {hasMore && (
             <Box

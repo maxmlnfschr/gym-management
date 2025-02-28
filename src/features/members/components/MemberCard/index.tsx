@@ -24,7 +24,12 @@ export const MemberCard = ({ member, onEdit, onDelete }: MemberCardProps) => {
   return (
     <ResponsiveCard
       sx={{
-        cursor: "default",
+        cursor: "pointer",
+        transition: "all 0.15s ease-out",
+        "&:hover": {
+          boxShadow: (theme) => theme.shadows[2],
+          transform: "translateY(-1px)",
+        },
       }}
     >
       <ResponsiveCardContent>
@@ -45,12 +50,6 @@ export const MemberCard = ({ member, onEdit, onDelete }: MemberCardProps) => {
                 <StatusChip status={member.status} />
               </Stack>
             </Stack>
-            <IconButton
-              color="primary"
-              onClick={() => navigate(`/members/${member.id}`)}
-            >
-              <Info />
-            </IconButton>
           </Stack>
         </Stack>
       </ResponsiveCardContent>

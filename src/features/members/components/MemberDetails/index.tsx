@@ -33,7 +33,8 @@ import { useMemberships } from "@/features/memberships/hooks/useMemberships";
 
 export const MemberDetails = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // Modificar esta línea
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // Cambiado de "sm" a "md"
   const [showQR, setShowQR] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -141,7 +142,8 @@ export const MemberDetails = () => {
                 <Typography variant="h5">
                   {member.first_name} {member.last_name}
                 </Typography>
-                <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <MembershipStatus memberId={id!} />
                   <Button variant="contained" onClick={handleMembershipAction}>
                     {currentMembership ? 'Renovar membresía' : 'Nueva membresía'}
                   </Button>
