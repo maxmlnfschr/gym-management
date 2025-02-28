@@ -26,7 +26,11 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
               Fecha: {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              Plan: {membership.plan_type === 'monthly' ? 'Mensual' : 'Anual'}
+              Plan: {membership.plan_type === 'monthly' 
+                ? 'Mensual' 
+                : membership.plan_type === 'quarterly'
+                ? 'Trimestral'
+                : 'Anual'}
             </Typography>
             <Typography variant="body2" gutterBottom>
               Período: {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })} - 
@@ -45,8 +49,8 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
+    <TableContainer component={Paper} sx={{ mt: -2 }}>
+      <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell>Fecha</TableCell>
@@ -58,16 +62,20 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
         <TableBody>
           {sortedMemberships.map((membership) => (
             <TableRow key={membership.id}>
-              <TableCell>
+              <TableCell sx={{ py: 1 }}>
                 {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })}
               </TableCell>
-              <TableCell>
-                {membership.plan_type === 'monthly' ? 'Mensual' : 'Anual'}
+              <TableCell sx={{ py: 1 }}>
+                {membership.plan_type === 'monthly' 
+                  ? 'Mensual' 
+                  : membership.plan_type === 'quarterly'
+                  ? 'Trimestral'
+                  : 'Anual'}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{ py: 1 }}>
                 {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })} - {format(new Date(membership.end_date), 'dd/MM/yyyy', { locale: es })}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{ py: 1 }}>
                 <Chip
                   label={membership.payment_status === 'paid' ? 'Pagado' : membership.payment_status === 'pending' ? 'Pendiente' : 'Vencido'}
                   color={membership.payment_status === 'paid' ? 'success' : membership.payment_status === 'pending' ? 'warning' : 'error'}

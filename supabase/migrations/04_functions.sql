@@ -22,3 +22,27 @@ BEGIN
     WHERE id = member_id;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Función para calcular la fecha de fin de membresía
+create or replace function calculate_end_date(start_date date, plan_type text)
+returns date as $$
+begin
+  return case plan_type
+    when 'monthly' then start_date + interval '1 month'
+    when 'quarterly' then start_date + interval '3 months'
+    when 'annual' then start_date + interval '1 year'
+  end;
+end;
+$$ language plpgsql;
+
+-- Función para calcular la fecha de fin de membresía
+create or replace function calculate_end_date(start_date date, plan_type text)
+returns date as $$
+begin
+  return case plan_type
+    when 'monthly' then start_date + interval '1 month'
+    when 'quarterly' then start_date + interval '3 months'
+    when 'annual' then start_date + interval '1 year'
+  end;
+end;
+$$ language plpgsql IMMUTABLE;

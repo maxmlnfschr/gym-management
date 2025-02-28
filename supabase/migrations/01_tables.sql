@@ -27,7 +27,7 @@ create table memberships (
   member_id uuid references members(id),
   plan_type text not null,
   start_date date not null,
-  end_date date not null,
+  end_date date generated always as (calculate_end_date(start_date, plan_type)) stored,
   payment_status text default 'pending'
 );
 
