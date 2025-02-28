@@ -17,8 +17,8 @@ export const useCheckIn = () => {
         .from('memberships')
         .select('*')
         .eq('member_id', memberId)
-        .gte('end_date', new Date().toISOString())
-        .lte('start_date', new Date().toISOString())
+        .gte('end_date', new Date().toISOString())    // Changed from end_date
+        .lte('start_date', new Date().toISOString())  // Changed from start_date
         .single();
 
       if (membershipError || !membership) {

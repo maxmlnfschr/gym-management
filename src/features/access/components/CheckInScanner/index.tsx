@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
-import { Box, Paper, Typography, Alert, Button } from '@mui/material';
-import { Html5Qrcode } from 'html5-qrcode';
-import { useToast } from '@/features/shared/hooks/useToast';
-import { QRScanner } from '../QRScanner';
-import { useCheckIn } from '@/features/access/hooks/useCheckIn';
+import { useState, useRef, useEffect } from "react";
+import { Box, Paper, Typography, Alert, Button } from "@mui/material";
+import { Html5Qrcode } from "html5-qrcode";
+import { useToast } from "@/features/shared/hooks/useToast";
+import { QRScanner } from "../QRScanner";
+import { useCheckIn } from "@/features/access/hooks/useCheckIn";
 
 export const CheckInScanner = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -20,9 +20,7 @@ export const CheckInScanner = () => {
       <Typography variant="h6" gutterBottom>
         Escanear QR
       </Typography>
-      <QRScanner 
-        onScanSuccess={handleScan}
-      />
+      <QRScanner onScanSuccess={handleScan} />
       {error && (
         <Alert severity="error" sx={{ mt: 2 }}>
           {error}

@@ -24,7 +24,7 @@ export const MembershipStatus = ({ memberId }: MembershipStatusProps) => {
       };
     }
 
-    if (currentMembership.paymentStatus === 'overdue') {
+    if (currentMembership.payment_status === 'overdue') {
       return {
         label: 'Pago vencido',
         color: 'warning' as const,
@@ -51,7 +51,7 @@ export const MembershipStatus = ({ memberId }: MembershipStatusProps) => {
         />
         {currentMembership && (
           <Typography variant="body2">
-            Vence: {format(new Date(currentMembership.endDate), 'dd/MM/yyyy', { locale: es })}
+            Vence: {format(new Date(currentMembership.end_date), 'dd/MM/yyyy', { locale: es })}
           </Typography>
         )}
       </Stack>

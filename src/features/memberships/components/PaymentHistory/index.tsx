@@ -25,18 +25,18 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
           {memberships.map((membership) => (
             <TableRow key={membership.id}>
               <TableCell>
-                {format(new Date(membership.startDate), 'dd/MM/yyyy', { locale: es })}
+                {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })}
               </TableCell>
               <TableCell>
-                {membership.planType === 'monthly' ? 'Mensual' : 'Anual'}
+                {membership.plan_type === 'monthly' ? 'Mensual' : 'Anual'}
               </TableCell>
               <TableCell>
-                {format(new Date(membership.startDate), 'dd/MM/yyyy', { locale: es })} - {format(new Date(membership.endDate), 'dd/MM/yyyy', { locale: es })}
+                {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })} - {format(new Date(membership.end_date), 'dd/MM/yyyy', { locale: es })}
               </TableCell>
               <TableCell>
                 <Chip
-                  label={membership.paymentStatus === 'paid' ? 'Pagado' : membership.paymentStatus === 'pending' ? 'Pendiente' : 'Vencido'}
-                  color={membership.paymentStatus === 'paid' ? 'success' : membership.paymentStatus === 'pending' ? 'warning' : 'error'}
+                  label={membership.payment_status === 'paid' ? 'Pagado' : membership.payment_status === 'pending' ? 'Pendiente' : 'Vencido'}
+                  color={membership.payment_status === 'paid' ? 'success' : membership.payment_status === 'pending' ? 'warning' : 'error'}
                   size="small"
                 />
               </TableCell>

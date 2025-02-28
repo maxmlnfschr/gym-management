@@ -1,7 +1,7 @@
-import { Box, Typography, Stack, Card, CardContent, Chip } from '@mui/material';
-import { useMemberships } from '@/features/memberships/hooks/useMemberships';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { Box, Typography, Stack, Card, CardContent, Chip } from "@mui/material";
+import { useMemberships } from "@/features/memberships/hooks/useMemberships";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 interface MembershipListProps {
   memberId: string;
@@ -25,15 +25,33 @@ export const MembershipList = ({ memberId }: MembershipListProps) => {
           <CardContent>
             <Stack spacing={1}>
               <Typography variant="h6">
-                Plan {membership.planType === 'monthly' ? 'Mensual' : 'Anual'}
+                Plan {membership.plan_type === "monthly" ? "Mensual" : "Anual"}
               </Typography>
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography variant="body2" color="text.secondary">
-                  {format(new Date(membership.startDate), 'dd/MM/yyyy', { locale: es })} - {format(new Date(membership.endDate), 'dd/MM/yyyy', { locale: es })}
+                  {format(new Date(membership.start_date), "dd/MM/yyyy", {
+                    locale: es,
+                  })}{" "}
+                  -{" "}
+                  {format(new Date(membership.end_date), "dd/MM/yyyy", {
+                    locale: es,
+                  })}
                 </Typography>
-                <Chip 
-                  label={membership.paymentStatus === 'paid' ? 'Pagado' : membership.paymentStatus === 'pending' ? 'Pendiente' : 'Vencido'}
-                  color={membership.paymentStatus === 'paid' ? 'success' : membership.paymentStatus === 'pending' ? 'warning' : 'error'}
+                <Chip
+                  label={
+                    membership.payment_status === "paid"
+                      ? "Pagado"
+                      : membership.payment_status === "pending"
+                      ? "Pendiente"
+                      : "Vencido"
+                  }
+                  color={
+                    membership.payment_status === "paid"
+                      ? "success"
+                      : membership.payment_status === "pending"
+                      ? "warning"
+                      : "error"
+                  }
                   size="small"
                 />
               </Stack>

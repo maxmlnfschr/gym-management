@@ -1,9 +1,10 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { MembershipFormData, Membership } from '../types';
 import { addMonths } from 'date-fns';
 
 export const useMemberships = (memberId?: string) => {
+  const queryClient = useQueryClient();
   const getMemberships = useQuery({
     queryKey: ['memberships', memberId],
     queryFn: async () => {
@@ -11,7 +12,7 @@ export const useMemberships = (memberId?: string) => {
         .from('memberships')
         .select('*')
         .eq('member_id', memberId)
-        .order('startDate', { ascending: false });
+        .order('start_date', { ascending: false });  // Changed from startDate
 
       if (error) throw error;
       return data as Membership[];
@@ -21,33 +22,42 @@ export const useMemberships = (memberId?: string) => {
 
   const createMembership = useMutation({
     mutationFn: async (data: MembershipFormData & { memberId: string }) => {
-      const endDate = addMonths(data.startDate, data.planType === 'monthly' ? 1 : 12);
+      const startDate = new Date(data.startDate).toISOString();
+      const endDate = addMonths(
+        new Date(data.startDate), 
+        data.planType === 'monthly' ? 1 : data.planType === 'quarterly' ? 3 : 12
+      ).toISOString();
       
       const { data: membership, error } = await supabase
         .from('memberships')
         .insert([
           {
             member_id: data.memberId,
-            planType: data.planType,
-            startDate: data.startDate,
-            endDate,
-            paymentStatus: data.paymentStatus,
+            plan_type: data.planType,
+            start_date: startDate,
+            end_date: endDate,
+            payment_status: data.paymentStatus,
           },
         ])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating membership:', error);
+        throw error;
+      }
       return membership;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['memberships', memberId] });
+    },
   });
-
   const getCurrentMembership = () => {
     if (!getMemberships.data) return null;
     const now = new Date();
     return getMemberships.data.find(membership => 
-      new Date(membership.startDate) <= now && 
-      new Date(membership.endDate) >= now
+      new Date(membership.start_date) <= now &&    // Changed from startDate
+      new Date(membership.end_date) >= now         // Changed from endDate
     );
   };
 

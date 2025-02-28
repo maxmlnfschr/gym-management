@@ -3,23 +3,16 @@ export type PaymentStatus = 'pending' | 'paid' | 'overdue';
 
 export interface Membership {
   id: string;
-  memberId: string;
-  planType: PlanType;
-  startDate: Date;
-  endDate: Date;
-  paymentStatus: PaymentStatus;
-  createdAt: Date;
+  member_id: string;
+  plan_type: PlanType;
+  start_date: string;
+  end_date: string;
+  payment_status: PaymentStatus;
+  created_at: string;
 }
 
 export interface MembershipFormData {
   planType: PlanType;
   startDate: Date;
-  paymentStatus: 'pending' | 'paid' | 'overdue';
-}
-
-export interface Membership extends MembershipFormData {
-  id: string;
-  member_id: string;
-  created_at: string;
-  end_date: Date;
+  paymentStatus: PaymentStatus;
 }
