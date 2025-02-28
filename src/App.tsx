@@ -23,6 +23,7 @@ import { es } from "date-fns/locale";
 import { MemberDetails } from "@/features/members/components/MemberDetails";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AccessControlPage } from "@/features/access/components/AccessControlPage";
+import { AccessList } from "@/features/access/components/AccessList";
 
 const queryClient = new QueryClient({
   defaultOptions: {

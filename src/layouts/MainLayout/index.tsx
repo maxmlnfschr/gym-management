@@ -11,9 +11,11 @@ import { Outlet } from "react-router-dom";
 import { useUIStore } from "@/features/shared/stores/uiStore";
 import { MainDrawer } from "@/layouts/MainLayout/MainDrawer";
 import { useLocation } from "react-router-dom";
+import { Toast } from "@/components/common/Toast";
 
 export const MainLayout = () => {
   const { isDrawerOpen, isDrawerCollapsed, toggleDrawerCollapse, toggleDrawer } = useUIStore();
+  const { toast, hideToast } = useUIStore();
   const location = useLocation();
 
   const getMaxWidth = () => {
@@ -51,21 +53,13 @@ export const MainLayout = () => {
   };
 
   return (
-    <Box 
-      sx={{ 
-        display: "flex", 
-        flexDirection: "column", 
-        minHeight: "100vh",
-        overscrollBehavior: 'contain',
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
-      <AppBar 
-        position="fixed"
-        sx={{ 
-          height: 64 
-        }}
-      >
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <Toast 
+        state={toast}
+        onClose={hideToast}
+      />
+      
+      <AppBar position="fixed" sx={{ height: 64 }}>
         <Toolbar sx={{ minHeight: 64 }}>
           <IconButton
             size="large"

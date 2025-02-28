@@ -11,3 +11,10 @@ export interface AccessLogWithMember extends AccessLog {
     last_name: string;
   };
 }
+
+export interface AccessFilterValues {
+  search: string;
+  dateRange: "day" | "week" | "month" | "all";
+  sortBy: "date" | "member" | "status";
+  sortDirection: "asc" | "desc";
+}
