@@ -101,6 +101,7 @@ export const MemberDetails = () => {
                     <MoreVert />
                   </IconButton>
                 </Stack>
+                <MembershipStatus memberId={id!} />
                 <Stack direction="row" spacing={2}>
                   <Button
                     variant="contained"
@@ -111,9 +112,7 @@ export const MemberDetails = () => {
                       lineHeight: 1.2,
                     }}
                   >
-                    {currentMembership
-                      ? "Renovar\nmembresía"
-                      : "Nueva\nmembresía"}
+                    {currentMembership ? 'Renovar\nmembresía' : 'Nueva\nmembresía'}
                   </Button>
                   <Button
                     variant="outlined"
@@ -123,6 +122,14 @@ export const MemberDetails = () => {
                     Mostrar QR
                   </Button>
                 </Stack>
+                <Button
+                  startIcon={<Payment />}
+                  variant="outlined"
+                  onClick={() => navigate(`/members/${id}/payments`)}
+                  fullWidth
+                >
+                  Ver pagos
+                </Button>
               </Stack>
             ) : (
               // Vista desktop
@@ -136,12 +143,17 @@ export const MemberDetails = () => {
                 </Typography>
                 <Stack direction="row" spacing={2}>
                   <Button variant="contained" onClick={handleMembershipAction}>
-                    {currentMembership
-                      ? "Renovar membresía"
-                      : "Nueva membresía"}
+                    {currentMembership ? 'Renovar membresía' : 'Nueva membresía'}
                   </Button>
                   <Button variant="outlined" onClick={() => setShowQR(true)}>
                     Mostrar QR
+                  </Button>
+                  <Button
+                    startIcon={<Payment />}
+                    variant="outlined"
+                    onClick={() => navigate(`/members/${id}/payments`)}
+                  >
+                    Ver pagos
                   </Button>
                   <IconButton onClick={handleMenuClick}>
                     <MoreVert />
@@ -149,18 +161,6 @@ export const MemberDetails = () => {
                 </Stack>
               </Stack>
             )}
-            {/* Rest of the content remains unchanged */}
-            <MembershipStatus memberId={id!} />
-            <Stack direction="row" spacing={2}>
-              <Button
-                startIcon={<Payment />}
-                variant="outlined"
-                onClick={() => navigate(`/members/${id}/payments`)}
-                sx={{ flex: 1 }}
-              >
-                Ver pagos
-              </Button>
-            </Stack>
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
