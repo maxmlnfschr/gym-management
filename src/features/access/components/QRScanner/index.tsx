@@ -16,7 +16,9 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
       {
         fps: 10,
         qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
+        aspectRatio: 1.0,
+        rememberLastUsedCamera: true,
+        showTorchButtonIfSupported: true
       },
       false
     );
@@ -31,9 +33,11 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
     );
 
     return () => {
-      scannerRef.current?.clear();
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+      }
     };
-  }, [onScanSuccess, onScanError]);
+  }, []);  // Removemos las dependencias para que solo se ejecute una vez
 
   return (
     <Box 
