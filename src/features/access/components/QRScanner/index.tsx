@@ -34,7 +34,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
           qrbox: { width: 300, height: 300 },
         },
         (decodedText) => {
-          setStatus("QR detectado!");
+          setStatus("¡QR detectado!");
           onScanSuccess(decodedText);
         },
         (errorMessage) => {
@@ -83,7 +83,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
       elevation={0}
       sx={{
         p: 3,
-        backgroundColor: 'background.default',
+        backgroundColor: "background.default",
         borderRadius: 2,
       }}
     >
@@ -99,10 +99,10 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
           id="qr-reader"
           sx={{
             width: "100%",
-            maxWidth: 400,
+            maxWidth: 350,
+            aspectRatio: "1/1", // Forzar proporción cuadrada
             borderRadius: 2,
             overflow: "hidden",
-            minHeight: 300,
             position: "relative",
             border: "1px solid",
             borderColor: "divider",
