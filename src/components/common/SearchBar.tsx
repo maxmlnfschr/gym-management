@@ -2,10 +2,16 @@ import { InputBase, Paper, IconButton, styled } from "@mui/material";
 import { Search as SearchIcon, Cancel as CancelIcon, Tune as TuneIcon } from "@mui/icons-material";
 
 const SearchWrapper = styled(Paper)(({ theme }) => ({
-  padding: "2px 4px",
+  padding: '4px 0',  // Añadimos padding vertical pero mantenemos 0 en horizontal
   display: "flex",
   alignItems: "center",
   width: "100%",
+  '& .MuiIconButton-root': {
+    padding: '8px',
+  },
+  '& .MuiInputBase-root': {
+    padding: '0 8px',
+  }
 }));
 
 interface SearchBarProps {
@@ -42,8 +48,6 @@ export const SearchBar = ({
         <IconButton
           type="button"
           sx={{
-            p: "10px",
-            ml: -1,
             '& .MuiSvgIcon-root': {
               fontSize: '20px'
             }

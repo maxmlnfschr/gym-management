@@ -83,24 +83,18 @@ export const AccessList = () => {
   return (
     <Box>
       <Stack spacing={3}>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Box sx={{ flex: 1 }}>
-            <SearchBar
-              placeholder="Buscar accesos..."
-              value={filterValues.search}
-              onChange={(value) => handleFilter({ search: value })}
-              onFilterClick={() => setShowFilters(!showFilters)}
-              isFilterActive={showFilters}
-            />
-          </Box>
-        </Stack>
-
+        <SearchBar
+          placeholder="Buscar accesos..."
+          value={filterValues.search}
+          onChange={(value) => handleFilter({ search: value })}
+          onFilterClick={() => setShowFilters(!showFilters)}
+          isFilterActive={showFilters}
+        />
         <AccessFilters
           filterValues={filterValues}
           onFilterChange={handleFilter}
           show={showFilters}
         />
-
         <Stack spacing={2}>
           {filteredAccesses.map((access) => (
             <Paper
