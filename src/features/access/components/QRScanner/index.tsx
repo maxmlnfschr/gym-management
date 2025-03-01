@@ -69,6 +69,12 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
     if (!file || !qrRef.current) return;
 
     try {
+      // Detener el escaneo si está activo
+      if (qrRef.current.isScanning) {
+        await qrRef.current.stop();
+        setIsScanning(false);
+      }
+      
       setStatus("Analizando imagen...");
       setUploadedImage(URL.createObjectURL(file));
       const result = await qrRef.current.scanFile(file, true);
