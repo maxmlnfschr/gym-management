@@ -82,7 +82,6 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
     <Paper
       elevation={0}
       sx={{
-        p: 3,
         backgroundColor: "background.default",
         borderRadius: 2,
       }}
@@ -99,8 +98,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
           id="qr-reader"
           sx={{
             width: "100%",
-            maxWidth: 350,
-            aspectRatio: "1/1", // Forzar proporción cuadrada
+            aspectRatio: "1/1",
             borderRadius: 2,
             overflow: "hidden",
             position: "relative",
@@ -113,24 +111,32 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
             {status}
           </Typography>
         )}
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Button
-            variant="contained"
-            onClick={isScanning ? stopScanning : startScanning}
-            sx={{ minWidth: 160 }}
-          >
-            {isScanning ? "Detener Escaneo" : "Usar Cámara"}
-          </Button>
-          <Button variant="outlined" component="label" sx={{ minWidth: 160 }}>
-            Subir Imagen
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={handleFileUpload}
-            />
-          </Button>
-        </Box>
+        <Box sx={{ 
+              display: "flex", 
+              gap: 2,
+              width: '100%',
+            }}>
+              <Button
+                variant="contained"
+                onClick={isScanning ? stopScanning : startScanning}
+                fullWidth
+              >
+                {isScanning ? "Detener Escaneo" : "Usar Cámara"}
+              </Button>
+              <Button 
+                variant="outlined" 
+                component="label"
+                fullWidth
+              >
+                Subir Imagen
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
+              </Button>
+            </Box>
       </Box>
     </Paper>
   );
