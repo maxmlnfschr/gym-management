@@ -11,6 +11,7 @@ interface QRScannerProps {
 export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
   const [isScanning, setIsScanning] = useState(false);
   const [status, setStatus] = useState<string>("");
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const qrRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
@@ -62,14 +63,13 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
       console.error(err);
     }
   };
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !qrRef.current) return;
 
     try {
       setStatus("Analizando imagen...");
+      setUploadedImage(URL.createObjectURL(file));
       const result = await qrRef.current.scanFile(file, true);
       setStatus("¡QR detectado!");
       onScanSuccess(result);
@@ -79,44 +79,69 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
     }
   };
 
+  // Limpiar la URL cuando el componente se desmonte
+  useEffect(() => {
+    return () => {
+      if (uploadedImage) {
+        URL.revokeObjectURL(uploadedImage);
+      }
+    };
+  }, [uploadedImage]);
+
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        backgroundColor: "background.default",
-        borderRadius: 2,
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 2,
-        }}
-      >
-        <Box
-          id="qr-reader"
-          sx={{
-            width: "100%",
-            aspectRatio: "1/1",
-            borderRadius: 2,
-            overflow: "hidden",
-            position: "relative",
-            border: "1px solid",
-            borderColor: "divider",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {!isScanning && (
-            <Box sx={{ textAlign: "center", color: "text.secondary", p: 3 }}>
-              <QrCode2 sx={{ fontSize: 64, mb: 2, opacity: 0.5 }} />
-              <Typography variant="body2">
+    <Paper elevation={0} sx={{ backgroundColor: "background.default", borderRadius: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+        <Box sx={{ width: "100%", position: "relative" }}>
+          <Box
+            id="qr-reader"
+            sx={{
+              width: "100%",
+              aspectRatio: "1/1",
+              borderRadius: 2,
+              overflow: "hidden",
+              position: "relative",
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          />
+          {!isScanning && !uploadedImage && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 1,
+                left: 1,
+                right: 1,
+                bottom: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "background.paper",
+                borderRadius: 1.5,
+              }}
+            >
+              <QrCode2 sx={{ fontSize: 80, mb: 2, color: "text.disabled" }} />
+              <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ px: 2 }}>
                 Presiona "Usar Cámara" para escanear un código QR
               </Typography>
             </Box>
+          )}
+          {uploadedImage && (
+            <Box
+              component="img"
+              src={uploadedImage}
+              sx={{
+                position: "absolute",
+                top: 1,
+                left: 1,
+                right: 1,
+                bottom: 1,
+                width: "calc(100% - 2px)",
+                height: "calc(100% - 2px)",
+                objectFit: "contain",
+                borderRadius: 1.5,
+              }}
+            />
           )}
         </Box>
         {status && (
