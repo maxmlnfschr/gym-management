@@ -34,7 +34,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: 250,  // Cambiado a un número en lugar de objeto para forzar cuadrado
+          qrbox: { width: 250, height: 350 },
           aspectRatio: 1,
         },
         (decodedText) => {
@@ -65,7 +65,9 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
       console.error(err);
     }
   };
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file || !qrRef.current) return;
 
@@ -75,7 +77,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
         await qrRef.current.stop();
         setIsScanning(false);
       }
-      
+
       setStatus("Analizando imagen...");
       setUploadedImage(URL.createObjectURL(file));
       const result = await qrRef.current.scanFile(file, true);
@@ -97,8 +99,18 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
   }, [uploadedImage]);
 
   return (
-    <Paper elevation={0} sx={{ backgroundColor: "background.default", borderRadius: 2 }}>
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+    <Paper
+      elevation={0}
+      sx={{ backgroundColor: "background.default", borderRadius: 2 }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+        }}
+      >
         <Box sx={{ width: "100%", position: "relative" }}>
           <Box
             id="qr-reader"
@@ -129,7 +141,12 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
               }}
             >
               <QrCode2 sx={{ fontSize: 80, mb: 2, color: "text.disabled" }} />
-              <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ px: 2 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                textAlign="center"
+                sx={{ px: 2 }}
+              >
                 Presiona "Usar Cámara" para escanear un código QR
               </Typography>
             </Box>
@@ -157,32 +174,30 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
             {status}
           </Typography>
         )}
-        <Box sx={{ 
-              display: "flex", 
-              gap: 2,
-              width: '100%',
-            }}>
-              <Button
-                variant="contained"
-                onClick={isScanning ? stopScanning : startScanning}
-                fullWidth
-              >
-                {isScanning ? "Detener Escaneo" : "Usar Cámara"}
-              </Button>
-              <Button 
-                variant="outlined" 
-                component="label"
-                fullWidth
-              >
-                Subir Imagen
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                />
-              </Button>
-            </Box>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            width: "100%",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={isScanning ? stopScanning : startScanning}
+            fullWidth
+          >
+            {isScanning ? "Detener Escaneo" : "Usar Cámara"}
+          </Button>
+          <Button variant="outlined" component="label" fullWidth>
+            Subir Imagen
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleFileUpload}
+            />
+          </Button>
+        </Box>
       </Box>
     </Paper>
   );
