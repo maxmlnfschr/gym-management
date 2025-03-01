@@ -10,12 +10,29 @@ export const useMember = (id?: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("members")
-        .select("*")
+        .select(`
+          *,
+          current_membership:memberships(
+            id,
+            start_date,
+            end_date,
+            payment_status
+          )
+        `)
         .eq("id", id)
+        .order('created_at', { foreignTable: 'memberships', ascending: false })
+        .limit(1, { foreignTable: 'memberships' })
         .single();
 
       if (error) throw error;
-      return data as Member;
+      
+      // Transform the data to match our Member type
+      const member = {
+        ...data,
+        current_membership: data.current_membership?.[0] || null
+      };
+      
+      return member as Member;
     },
     enabled: !!id,
   });

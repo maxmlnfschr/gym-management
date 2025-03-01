@@ -25,8 +25,7 @@ import {
 import { useMemberStore } from "@/features/shared/stores/memberStore";
 import { useNavigate } from "react-router-dom";
 import { MemberFilters } from "@/features/members/components/MemberFilters";
-import type { Member } from "@/features/members/types";
-import type { FilterValues } from "@/features/members/components/MemberFilters";
+import type { FilterValues, Member } from "@/features/members/types";
 import { FileDownload as DownloadIcon } from "@mui/icons-material";
 import { exportToCsv } from "@/features/members/utils/exportToCsv";
 import {
@@ -78,11 +77,31 @@ export const MemberList = () => {
     }
 
     if (newFilters.status !== "all") {
-      filtered = filtered.filter(
-        (member) => member.status === newFilters.status
-      );
+      filtered = filtered.filter((member) => {
+        // Añadir console.log para debug
+        console.log('Filtering member:', member.first_name, member.current_membership);
+        
+        const membership = member.current_membership;
+        switch (newFilters.status) {
+          case "active_membership":
+            const isActive = membership && 
+                   membership.payment_status === "paid" && 
+                   new Date(membership.end_date) > new Date();
+            console.log('Is active?', isActive);
+            return isActive;
+          case "overdue":
+            const isOverdue = membership && 
+                   (new Date(membership.end_date) < new Date() || 
+                    membership.payment_status === "pending");
+            console.log('Is overdue?', isOverdue);
+            return isOverdue;
+          case "no_membership":
+            return !membership;
+          default:
+            return true;
+        }
+      });
     }
-
     filtered.sort((a, b) => {
       switch (newFilters.sortBy) {
         case "name":
@@ -94,7 +113,15 @@ export const MemberList = () => {
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
         case "status":
-          return a.status.localeCompare(b.status);
+          const getMembershipStatus = (member: Member) => {
+            const membership = member.current_membership;
+            if (!membership) return "3_no_membership";
+            if (membership.payment_status === "pending" || new Date(membership.end_date) < new Date()) {
+              return "2_overdue"; // Pago vencido
+            }
+            return "1_active_membership"; // Membresía activa
+          };
+          return getMembershipStatus(a).localeCompare(getMembershipStatus(b));
         default:
           return 0;
       }
@@ -187,23 +214,22 @@ export const MemberList = () => {
                 <FilterChip
                   label="Todos"
                   isSelected={filterValues.status === "all"}
-                  onSelect={() =>
-                    handleFilter({ ...filterValues, status: "all" })
-                  }
+                  onSelect={() => handleFilter({ ...filterValues, status: "all" })}
                 />
                 <FilterChip
-                  label="Activos"
-                  isSelected={filterValues.status === "active"}
-                  onSelect={() =>
-                    handleFilter({ ...filterValues, status: "active" })
-                  }
+                  label="Membresía activa"
+                  isSelected={filterValues.status === "active_membership"}
+                  onSelect={() => handleFilter({ ...filterValues, status: "active_membership" })}
                 />
                 <FilterChip
-                  label="Inactivos"
-                  isSelected={filterValues.status === "inactive"}
-                  onSelect={() =>
-                    handleFilter({ ...filterValues, status: "inactive" })
-                  }
+                  label="Pago vencido"
+                  isSelected={filterValues.status === "overdue"}
+                  onSelect={() => handleFilter({ ...filterValues, status: "overdue" })}
+                />
+                <FilterChip
+                  label="Sin membresía"
+                  isSelected={filterValues.status === "no_membership"}
+                  onSelect={() => handleFilter({ ...filterValues, status: "no_membership" })}
                 />
               </Stack>
             </Stack>

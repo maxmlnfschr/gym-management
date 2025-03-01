@@ -39,11 +39,28 @@ export const useMemberStore = create<MemberState>((set) => ({
       set({ loading: true, error: null });
       const { data, error } = await supabase
         .from('members')
-        .select('*')
-        .eq('status', 'active');
+        .select(`
+          *,
+          current_membership:memberships(
+            id,
+            start_date,
+            end_date,
+            payment_status
+          )
+        `)
+        .eq('status', 'active')
+        .order('created_at', { foreignTable: 'memberships', ascending: false })
+        .limit(1, { foreignTable: 'memberships' });
 
       if (error) throw error;
-      set({ members: data });
+
+      // Transform the data to include current_membership as a single object instead of an array
+      const transformedData = data.map(member => ({
+        ...member,
+        current_membership: member.current_membership?.[0] || null
+      }));
+
+      set({ members: transformedData });
     } catch (error) {
       const pgError = error as PostgrestError;
       set({ error: pgError.message });

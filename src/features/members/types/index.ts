@@ -4,10 +4,24 @@ export interface Member {
   last_name: string;
   email: string;
   phone?: string;
-  status: 'active' | 'inactive' | 'deleted';
+  deleted_at?: string;
   notes?: string;
   created_at: string;
-  deleted_at?: string;
+  current_membership?: {
+    id: string;
+    start_date: string;
+    end_date: string;
+    payment_status: 'pending' | 'paid';
+  };
+}
+
+export type MembershipStatusFilter = 'all' | 'active_membership' | 'overdue' | 'no_membership';
+
+export interface FilterValues {
+  search: string;
+  status: MembershipStatusFilter;
+  sortBy: 'name' | 'date' | 'status';
+  sortDirection: 'asc' | 'desc';
 }
 
 export interface MemberFormData {
