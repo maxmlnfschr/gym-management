@@ -5,7 +5,6 @@ import { CheckInResponse } from '../types';
 
 export const useCheckIn = () => {
   const queryClient = useQueryClient();
-
   const checkInMutation = useMutation<CheckInResponse, Error, string>({
     mutationFn: async (memberId: string) => {
       // Asegurémonos de usar la fecha local correcta
@@ -77,10 +76,11 @@ export const useCheckIn = () => {
       } as CheckInResponse;
     },
     onSuccess: () => {
+      // Invalidar tanto access-logs como accesses
       queryClient.invalidateQueries({ queryKey: ['access-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['accesses'] });
     },
   });
-
   return {
     checkIn: checkInMutation.mutateAsync,
     isLoading: checkInMutation.isPending,
