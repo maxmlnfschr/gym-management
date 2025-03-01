@@ -147,7 +147,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
                 textAlign="center"
                 sx={{ px: 2 }}
               >
-                Presiona "Usar Cámara" para escanear un código QR
+                Presiona "Usar cámara" para escanear un código QR
               </Typography>
             </Box>
           )}
@@ -186,10 +186,10 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
             onClick={isScanning ? stopScanning : startScanning}
             fullWidth
           >
-            {isScanning ? "Detener Escaneo" : "Usar Cámara"}
+            {isScanning ? "Detener escaneo" : "Usar cámara"}
           </Button>
           <Button variant="outlined" component="label" fullWidth>
-            Subir Imagen
+            Subir imagen
             <input
               type="file"
               hidden
