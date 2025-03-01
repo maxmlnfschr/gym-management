@@ -34,7 +34,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
+          qrbox: 250,  // Cambiado a un número en lugar de objeto para forzar cuadrado
           aspectRatio: 1,
         },
         (decodedText) => {
