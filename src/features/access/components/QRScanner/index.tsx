@@ -29,6 +29,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
 
     try {
       setStatus("Solicitando acceso a la cámara...");
+      setUploadedImage(null); // Limpiar la imagen subida antes de iniciar el escaneo
       await qrRef.current.start(
         { facingMode: "environment" },
         {
