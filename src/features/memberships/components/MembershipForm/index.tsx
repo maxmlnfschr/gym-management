@@ -4,6 +4,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { PlanSelector } from '../PlanSelector';
 import { MembershipFormData, PlanType } from '../../types';
 import { addMonths } from 'date-fns';
+const paymentStatusOptions = [
+  { value: 'pending', label: 'Pendiente' },
+  { value: 'paid', label: 'Pagado' },
+];
 
 interface MembershipFormProps {
   onSubmit: (data: MembershipFormData) => void;
@@ -13,7 +17,7 @@ interface MembershipFormProps {
 export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) => {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>(initialData?.planType || 'monthly');
   const [startDate, setStartDate] = useState<Date | null>(initialData?.startDate || new Date());
-  const [paymentStatus, setPaymentStatus] = useState(initialData?.paymentStatus || 'pending');
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid'>(initialData?.paymentStatus || 'pending');
 
   const handlePlanSelect = (plan: PlanType) => {
     setSelectedPlan(plan);
@@ -71,17 +75,18 @@ export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) =
         select
         label="Estado de pago"
         value={paymentStatus}
-        onChange={(e) => setPaymentStatus(e.target.value as 'pending' | 'paid' | 'overdue')}
+        onChange={(e) => setPaymentStatus(e.target.value as 'pending' | 'paid')}
         fullWidth
         SelectProps={{
           native: true,
         }}
       >
-        <option value="pending">Pendiente</option>
-        <option value="paid">Pagado</option>
-        <option value="overdue">Vencido</option>
+        {paymentStatusOptions.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </TextField>
-
       <Button 
         variant="contained" 
         onClick={handleSubmit}

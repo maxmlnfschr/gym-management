@@ -1,5 +1,5 @@
 export type PlanType = 'monthly' | 'quarterly' | 'annual';
-export type PaymentStatus = 'pending' | 'paid' | 'overdue';
+export type PaymentStatus = 'pending' | 'paid';  // Removido 'overdue'
 
 export interface Membership {
   id: string;
