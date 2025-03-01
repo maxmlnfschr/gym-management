@@ -60,16 +60,25 @@ export const useCheckIn = () => {
       const membershipEndDate = new Date(latestMembership.end_date);
       membershipEndDate.setHours(0, 0, 0, 0);
       const isLastDay = latestMembership.end_date === today.toISOString().split('T')[0];
-      // Allow access if membership ends today or is future
-      if (membershipEndDate < today && !isLastDay) {
-        throw new Error('La membresía está vencida');
-      }
 
       console.log('Membership check:', {
         now,
         memberships,
-        membershipError
+        membershipError,
+        membershipEndDate: membershipEndDate.toISOString(),
+        todayDate: today.toISOString(),
+        isLastDay,
+        comparison: {
+          endDateTimestamp: membershipEndDate.getTime(),
+          todayTimestamp: today.getTime(),
+          isExpired: membershipEndDate < today
+        }
       });
+
+      // Allow access if membership ends today or is future
+      if (membershipEndDate < today && !isLastDay) {
+        throw new Error('La membresía está vencida');
+      }
 
       const activeMembership = latestMembership;
 
