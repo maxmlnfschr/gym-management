@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Box, Paper, Typography, Button } from "@mui/material";
+import { QrCode2 } from "@mui/icons-material"; // Añadir este import
 
 interface QRScannerProps {
   onScanSuccess: (memberId: string) => void;
@@ -104,39 +105,50 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
             position: "relative",
             border: "1px solid",
             borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: "action.hover",
           }}
-        />
+        >
+          {!isScanning && (
+            <Box sx={{ textAlign: "center", color: "text.secondary", p: 3 }}>
+              <QrCode2 sx={{ fontSize: 64, mb: 2, opacity: 0.5 }} />
+              <Typography variant="body2">
+                Presiona "Usar cámara" para escanear un código QR
+              </Typography>
+            </Box>
+          )}
+        </Box>
         {status && (
           <Typography color="text.secondary" align="center">
             {status}
           </Typography>
         )}
-        <Box sx={{ 
-              display: "flex", 
-              gap: 2,
-              width: '100%',
-            }}>
-              <Button
-                variant="contained"
-                onClick={isScanning ? stopScanning : startScanning}
-                fullWidth
-              >
-                {isScanning ? "Detener Escaneo" : "Usar Cámara"}
-              </Button>
-              <Button 
-                variant="outlined" 
-                component="label"
-                fullWidth
-              >
-                Subir Imagen
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                />
-              </Button>
-            </Box>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            width: "100%",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={isScanning ? stopScanning : startScanning}
+            fullWidth
+          >
+            {isScanning ? "Detener escaneo" : "Usar cámara"}
+          </Button>
+          <Button variant="outlined" component="label" fullWidth>
+            Subir imagen
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleFileUpload}
+            />
+          </Button>
+        </Box>
       </Box>
     </Paper>
   );
