@@ -29,12 +29,13 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
 
     try {
       setStatus("Solicitando acceso a la cámara...");
-      setUploadedImage(null); // Limpiar la imagen subida antes de iniciar el escaneo
+      setUploadedImage(null);
       await qrRef.current.start(
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: { width: 300, height: 300 },
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1,
         },
         (decodedText) => {
           setStatus("¡QR detectado!");
