@@ -7,19 +7,33 @@ export const useCheckIn = () => {
   const queryClient = useQueryClient();
   const checkInMutation = useMutation<CheckInResponse, Error, string>({
     mutationFn: async (memberId: string) => {
+      
       // Asegurémonos de usar la fecha local correcta
       const now = new Date();
-      const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
-      const nowISOString = localDate.toISOString();
+      // Establecer la hora a 00:00:00 para comparar solo fechas
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const nowISOString = today.toISOString();
 
       console.log('Fecha actual:', {
         javascriptDate: now,
-        localDate: localDate,
+        today,
         isoString: nowISOString,
         timezoneOffset: now.getTimezoneOffset()
       });
 
-      // Verificación de membresía activa
+      // Primero verificamos si el miembro tiene alguna membresía
+      const { data: allMemberships, error: checkError } = await supabase
+        .from('memberships')
+        .select('*')
+        .eq('member_id', memberId);
+
+      if (checkError) throw checkError;
+
+      if (!allMemberships || allMemberships.length === 0) {
+        throw new Error('El miembro no tiene ninguna membresía registrada');
+      }
+
+      // Luego verificamos membresía activa
       const { data: memberships, error: membershipError } = await supabase
         .from('memberships')
         .select(`
@@ -28,30 +42,36 @@ export const useCheckIn = () => {
           start_date,
           end_date,
           plan_type,
-          created_at
+          created_at,
+          payment_status
         `)
         .eq('member_id', memberId)
-        .lte('start_date', nowISOString)
-        .gte('end_date', nowISOString)
+        .eq('payment_status', 'paid')
         .order('created_at', { ascending: false })
         .limit(1);
+
+      if (membershipError) throw membershipError;
       
+      if (!memberships || memberships.length === 0) {
+        throw new Error('La membresía está vencida');
+      }
+
+      const latestMembership = memberships[0];
+      const membershipEndDate = new Date(latestMembership.end_date);
+      membershipEndDate.setHours(0, 0, 0, 0);
+      const isLastDay = latestMembership.end_date === today.toISOString().split('T')[0];
+      // Allow access if membership ends today or is future
+      if (membershipEndDate < today && !isLastDay) {
+        throw new Error('La membresía está vencida');
+      }
+
       console.log('Membership check:', {
         now,
         memberships,
         membershipError
       });
 
-      if (membershipError) {
-        console.error('Membership error:', membershipError);
-        throw new Error('Error al verificar membresía');
-      }
-      
-      if (!memberships || memberships.length === 0) {
-        throw new Error('No hay membresía activa para este miembro');
-      }
-
-      const activeMembership = memberships[0];
+      const activeMembership = latestMembership;
 
       // Then create access log
       const { data: accessLog, error: accessError } = await supabase
@@ -70,7 +90,7 @@ export const useCheckIn = () => {
         ...accessLog,
         membership: {
           id: activeMembership.id,
-          status: 'active',
+          status: isLastDay ? 'last_day' : 'active',
           end_date: activeMembership.end_date
         }
       } as CheckInResponse;

@@ -18,7 +18,12 @@ export const CheckInScanner = () => {
     try {
       const response: CheckInResponse = await checkIn(memberId);
       
-      if (response.membership?.status === 'active') {
+      if (response.membership?.status === 'last_day') {
+        warning(
+          'Acceso permitido - Último día',
+          'Tu membresía vence hoy'
+        );
+      } else if (response.membership?.status === 'active') {
         // Convertir las fechas a medianoche en la zona horaria local
         const endDate = new Date(response.membership.end_date);
         const today = new Date();
@@ -36,10 +41,10 @@ export const CheckInScanner = () => {
           daysLeft
         });
 
-        if (daysLeft <= 7) {
+        if (daysLeft <= 7 && daysLeft > 1) {
           warning(
             'Acceso permitido - Membresía por vencer',
-            `${daysLeft === 1 ? 'Queda 1 día' : `Quedan ${daysLeft} días`} de membresía`
+            `Quedan ${daysLeft} días de membresía`
           );
         } else {
           success(
