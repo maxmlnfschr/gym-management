@@ -3,9 +3,9 @@ CREATE OR REPLACE FUNCTION calculate_end_date(start_date date, plan_type text)
 RETURNS date AS $$
 BEGIN
   RETURN CASE plan_type
-    WHEN 'monthly' THEN start_date + INTERVAL '1 month'
-    WHEN 'quarterly' THEN start_date + INTERVAL '3 months'
-    WHEN 'annual' THEN start_date + INTERVAL '1 year'
+    WHEN 'monthly' THEN start_date + interval '1 month'
+    WHEN 'quarterly' THEN start_date + interval '3 months'
+    WHEN 'annual' THEN start_date + interval '1 year'
   END;
 END;
 $$ LANGUAGE plpgsql;

@@ -1,63 +1,80 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-
-interface AccessLog {
-  id: string;
-  member_id: string;
-  check_in: string;
-}
+import { CheckInResponse } from '../types';
 
 export const useCheckIn = () => {
   const queryClient = useQueryClient();
 
-  const checkInMutation = useMutation<AccessLog, Error, string>({
+  const checkInMutation = useMutation<CheckInResponse, Error, string>({
     mutationFn: async (memberId: string) => {
-      const now = new Date().toISOString();
-      console.log('Checking access for member:', memberId);
-      console.log('Current datetime:', now);
-    
+      // Asegurémonos de usar la fecha local correcta
+      const now = new Date();
+      const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+      const nowISOString = localDate.toISOString();
+
+      console.log('Fecha actual:', {
+        javascriptDate: now,
+        localDate: localDate,
+        isoString: nowISOString,
+        timezoneOffset: now.getTimezoneOffset()
+      });
+
       // Verificación de membresía activa
       const { data: memberships, error: membershipError } = await supabase
         .from('memberships')
         .select(`
-          *,
-          members:member_id (
-            first_name,
-            last_name
-          )
+          id,
+          member_id,
+          start_date,
+          end_date,
+          plan_type,
+          created_at
         `)
         .eq('member_id', memberId)
-        .lte('start_date', now)
-        .gte('end_date', now)
-        .order('end_date', { ascending: false });  // Obtener la membresía más reciente primero
-    
-      console.log('Membership query result:', { memberships, membershipError });
-    
+        .lte('start_date', nowISOString)
+        .gte('end_date', nowISOString)
+        .order('created_at', { ascending: false })
+        .limit(1);
+      
+      console.log('Membership check:', {
+        now,
+        memberships,
+        membershipError
+      });
+
       if (membershipError) {
-        console.error('Membership error details:', membershipError);
+        console.error('Membership error:', membershipError);
         throw new Error('Error al verificar membresía');
       }
-    
+      
       if (!memberships || memberships.length === 0) {
-        throw new Error('No hay membresía activa');
+        throw new Error('No hay membresía activa para este miembro');
       }
 
-      const activeMembership = memberships[0]; // Usar la membresía más reciente
-    
-      // Si llegamos aquí, la membresía está activa, registramos el acceso
+      const activeMembership = memberships[0];
+
+      // Then create access log
       const { data: accessLog, error: accessError } = await supabase
         .from('access_logs')
-        .insert([
-          {
-            member_id: memberId,
-            check_in: new Date().toISOString(),
-          },
-        ])
+        .insert([{
+          member_id: memberId,
+          check_in: now,
+        }])
         .select()
         .single();
-    
+
       if (accessError) throw accessError;
-      return accessLog;
+
+      // Return combined data
+      return {
+        ...accessLog,
+        membership: {
+          id: activeMembership.id,
+          status: 'active',
+          end_date: activeMembership.end_date
+        }
+      } as CheckInResponse;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['access-logs'] });

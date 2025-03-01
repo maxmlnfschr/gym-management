@@ -1,8 +1,9 @@
-import { Paper, Typography, Stack, Chip, Button } from '@mui/material';
+import { Paper, Typography, Stack, Chip } from '@mui/material';
 import { useMemberships } from '@/features/memberships/hooks/useMemberships';
-import { format, isAfter } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { CheckCircle, Warning, Block } from '@mui/icons-material';
+import { formatMembershipDate } from '@/utils/dateUtils';
 
 interface MembershipStatusProps {
   memberId: string;
@@ -14,6 +15,12 @@ export const MembershipStatus = ({ memberId }: MembershipStatusProps) => {
   if (isLoading) {
     return null;
   }
+
+  console.log('Current Membership:', {
+    membership: currentMembership,
+    startDate: currentMembership?.start_date,
+    endDate: currentMembership?.end_date
+  });
 
   const getStatusInfo = () => {
     if (!currentMembership) {
@@ -51,7 +58,7 @@ export const MembershipStatus = ({ memberId }: MembershipStatusProps) => {
         />
         {currentMembership && (
           <Typography variant="body2">
-            Vence: {format(new Date(currentMembership.end_date), 'dd/MM/yyyy', { locale: es })}
+            Vence: {formatMembershipDate(currentMembership.end_date)}
           </Typography>
         )}
       </Stack>

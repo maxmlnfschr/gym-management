@@ -2,6 +2,8 @@ import { Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHe
 import { useMemberships } from '@/features/memberships/hooks/useMemberships';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { parseISO } from 'date-fns';
+import { formatMembershipDate } from '@/utils/dateUtils';
 
 interface PaymentHistoryProps {
   memberId: string;
@@ -12,7 +14,6 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Ordenar las membresías por fecha de registro, de más reciente a más antigua
   const sortedMemberships = [...memberships].sort((a, b) => {
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
@@ -23,7 +24,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
         {sortedMemberships.map((membership) => (
           <Paper key={membership.id} sx={{ p: 2, mb: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Fecha: {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })}
+              Fecha: {formatMembershipDate(membership.start_date)}
             </Typography>
             <Typography variant="body2" gutterBottom>
               Plan: {membership.plan_type === 'monthly' 
@@ -33,8 +34,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
                 : 'Anual'}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              Período: {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })} - 
-              {format(new Date(membership.end_date), 'dd/MM/yyyy', { locale: es })}
+              Período: {formatMembershipDate(membership.start_date)} - {formatMembershipDate(membership.end_date)}
             </Typography>
             <Chip
               label={membership.payment_status === 'paid' ? 'Pagado' : membership.payment_status === 'pending' ? 'Pendiente' : 'Vencido'}
@@ -63,7 +63,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
           {sortedMemberships.map((membership) => (
             <TableRow key={membership.id}>
               <TableCell sx={{ py: 1 }}>
-                {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })}
+                {formatMembershipDate(membership.start_date)}
               </TableCell>
               <TableCell sx={{ py: 1 }}>
                 {membership.plan_type === 'monthly' 
@@ -73,7 +73,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
                   : 'Anual'}
               </TableCell>
               <TableCell sx={{ py: 1 }}>
-                {format(new Date(membership.start_date), 'dd/MM/yyyy', { locale: es })} - {format(new Date(membership.end_date), 'dd/MM/yyyy', { locale: es })}
+                {formatMembershipDate(membership.start_date)} - {formatMembershipDate(membership.end_date)}
               </TableCell>
               <TableCell sx={{ py: 1 }}>
                 <Chip

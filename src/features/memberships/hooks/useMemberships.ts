@@ -28,20 +28,29 @@ export const useMemberships = (memberId?: string) => {
         .eq("member_id", data.memberId)
         .gte("end_date", new Date().toISOString());
 
-      // Si hay membresías activas, actualizamos su fecha de inicio para que termine hoy
+      // Si hay membresías activas, actualizamos su fecha de fin
       if (activeMemberships && activeMemberships.length > 0) {
-        const adjustedStartDate = new Date();
-        adjustedStartDate.setMonth(adjustedStartDate.getMonth() - 1);
+        const startDate = new Date(data.startDate);
+        startDate.setDate(startDate.getDate() - 1);
+        startDate.setHours(23, 59, 59, 999);
 
         await supabase
           .from("memberships")
-          .update({ start_date: adjustedStartDate.toISOString() })
+          .update({ 
+            end_date: startDate.toISOString(),
+            payment_status: 'overdue'
+          })
           .eq("member_id", data.memberId)
           .gte("end_date", new Date().toISOString());
       }
 
-      // Crear nueva membresía
-      const startDate = new Date(data.startDate).toISOString();
+      // Crear la nueva membresía
+      const startDate = new Date(data.startDate);
+      const localDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+      );
 
       const { data: membership, error } = await supabase
         .from("memberships")
@@ -49,7 +58,7 @@ export const useMemberships = (memberId?: string) => {
           {
             member_id: data.memberId,
             plan_type: data.planType,
-            start_date: startDate,
+            start_date: localDate.toISOString().split('T')[0],
             payment_status: data.paymentStatus,
           },
         ])
@@ -68,14 +77,12 @@ export const useMemberships = (memberId?: string) => {
   });
   const getCurrentMembership = () => {
     if (!getMemberships.data) return null;
-    const now = new Date();
-    return getMemberships.data.find(
-      (membership) =>
-        new Date(membership.start_date) <= now && // Changed from startDate
-        new Date(membership.end_date) >= now // Changed from endDate
-    );
+    
+    // Ordenar por fecha de creación, la más reciente primero
+    return getMemberships.data.sort((a, b) => {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    })[0];
   };
-
   return {
     memberships: getMemberships.data || [],
     currentMembership: getCurrentMembership(),

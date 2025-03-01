@@ -22,9 +22,16 @@ export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) =
   const handleSubmit = () => {
     if (!startDate) return;
 
+    // Crear una nueva fecha usando solo año, mes y día
+    const localDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate()
+    );
+
     onSubmit({
       planType: selectedPlan,
-      startDate,
+      startDate: localDate,
       paymentStatus,
     });
   };
@@ -39,7 +46,19 @@ export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) =
       <DatePicker
         label="Fecha de inicio"
         value={startDate}
-        onChange={(newValue: Date | null) => setStartDate(newValue)}
+        onChange={(newValue: Date | null) => {
+          if (newValue) {
+            // Asegurarnos de que la fecha se guarde correctamente
+            const localDate = new Date(
+              newValue.getFullYear(),
+              newValue.getMonth(),
+              newValue.getDate()
+            );
+            setStartDate(localDate);
+          } else {
+            setStartDate(null);
+          }
+        }}
         slotProps={{
           textField: {
             fullWidth: true,
