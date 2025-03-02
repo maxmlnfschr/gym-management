@@ -11,11 +11,12 @@ export const useExpirationNotifications = () => {
       const nextWeek = addDays(today, 7);
       today.setHours(0, 0, 0, 0);
       
-      const { data, error } = await supabase
+      // Obtener membresías con información de miembros
+      const { data: memberships, error } = await supabase
         .from('memberships')
         .select(`
           *,
-          members!inner(
+          members (
             first_name,
             last_name,
             email,
@@ -23,32 +24,28 @@ export const useExpirationNotifications = () => {
             status
           )
         `)
-        .order('created_at', { ascending: false })
-        .limit(1, { foreignTable: 'members' })
-        .lte('end_date', nextWeek.toISOString().split('T')[0]);
-
+        .order('created_at', { ascending: false });
+      
       if (error) throw error;
       
-      // Filtrar miembros eliminados
-      const filteredData = data?.filter(membership => 
+      // Agrupar por miembro y obtener la más reciente
+      const membershipMap = new Map();
+      memberships?.forEach(membership => {
+        if (!membershipMap.has(membership.member_id) || 
+            new Date(membership.created_at) > new Date(membershipMap.get(membership.member_id).created_at)) {
+          membershipMap.set(membership.member_id, membership);
+        }
+      });
+      
+      // Filtrar por fecha y miembros activos
+      const filteredData = Array.from(membershipMap.values()).filter(membership => 
         !membership.members.deleted_at && 
-        membership.members.status !== 'deleted'
+        membership.members.status !== 'deleted' &&
+        new Date(membership.end_date) <= nextWeek
       );
       
-      type MembershipWithMember = Membership & {
-        members: {
-          first_name: string;
-          last_name: string;
-          email: string;
-          deleted_at: string | null;
-        }
-      };
-      
       // Separar membresías vencidas y por vencer
-      const { expired, expiring } = filteredData?.reduce((acc: {
-        expired: MembershipWithMember[];
-        expiring: MembershipWithMember[];
-      }, membership: MembershipWithMember) => {
+      const { expired, expiring } = filteredData.reduce((acc, membership) => {
         const endDate = new Date(membership.end_date);
         endDate.setHours(0, 0, 0, 0);
         
