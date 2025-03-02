@@ -7,11 +7,21 @@ export const useMemberships = (memberId?: string) => {
   const getMemberships = useQuery({
     queryKey: ["memberships", memberId],
     queryFn: async () => {
+      // Cambiamos a latest_memberships para obtener las membresías más recientes
       const { data, error } = await supabase
-        .from("memberships")
-        .select("*")
+        .from("latest_memberships")
+        .select(`
+          *,
+          members!inner(
+            first_name,
+            last_name,
+            email,
+            deleted_at,
+            status
+          )
+        `)
         .eq("member_id", memberId)
-        .order("start_date", { ascending: false }); // Changed from startDate
+        .order("start_date", { ascending: false });
 
       if (error) throw error;
       return data as Membership[];

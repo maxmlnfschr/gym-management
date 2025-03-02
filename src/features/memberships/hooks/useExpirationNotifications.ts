@@ -11,12 +11,12 @@ export const useExpirationNotifications = () => {
       const nextWeek = addDays(today, 7);
       today.setHours(0, 0, 0, 0);
       
-      // Obtener membresías con información de miembros
+      // Usar la vista latest_memberships en lugar de la tabla memberships
       const { data: memberships, error } = await supabase
-        .from('memberships')
+        .from('latest_memberships')
         .select(`
           *,
-          members (
+          members!inner(
             first_name,
             last_name,
             email,
@@ -24,28 +24,18 @@ export const useExpirationNotifications = () => {
             status
           )
         `)
-        .order('created_at', { ascending: false });
+        .lte('end_date', nextWeek.toISOString().split('T')[0]);
       
       if (error) throw error;
       
-      // Agrupar por miembro y obtener la más reciente
-      const membershipMap = new Map();
-      memberships?.forEach(membership => {
-        if (!membershipMap.has(membership.member_id) || 
-            new Date(membership.created_at) > new Date(membershipMap.get(membership.member_id).created_at)) {
-          membershipMap.set(membership.member_id, membership);
-        }
-      });
-      
-      // Filtrar por fecha y miembros activos
-      const filteredData = Array.from(membershipMap.values()).filter(membership => 
+      // Filtrar miembros eliminados
+      const filteredData = memberships?.filter(membership => 
         !membership.members.deleted_at && 
-        membership.members.status !== 'deleted' &&
-        new Date(membership.end_date) <= nextWeek
+        membership.members.status !== 'deleted'
       );
       
       // Separar membresías vencidas y por vencer
-      const { expired, expiring } = filteredData.reduce((acc, membership) => {
+      const { expired, expiring } = filteredData?.reduce((acc, membership) => {
         const endDate = new Date(membership.end_date);
         endDate.setHours(0, 0, 0, 0);
         
