@@ -20,6 +20,7 @@ export const useMember = (id?: string) => {
           )
         `)
         .eq("id", id)
+        .is("deleted_at", null)  // Agregar este filtro
         .order('created_at', { foreignTable: 'memberships', ascending: false })
         .limit(1, { foreignTable: 'memberships' })
         .single();
@@ -36,13 +37,14 @@ export const useMember = (id?: string) => {
     },
     enabled: !!id,
   });
-
+  
   const deleteMember = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("members")
-        .delete()
-        .eq("id", id);
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", id)
+        .is("deleted_at", null); // Solo actualizar si no está ya borrado
 
       if (error) throw error;
     },
@@ -50,7 +52,7 @@ export const useMember = (id?: string) => {
       queryClient.invalidateQueries({ queryKey: ["members"] });
     },
   });
-
+  
   return {
     member: getMember.data,
     isLoading: getMember.isLoading,

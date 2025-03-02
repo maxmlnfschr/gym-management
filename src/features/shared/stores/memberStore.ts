@@ -49,6 +49,7 @@ export const useMemberStore = create<MemberState>((set) => ({
           )
         `)
         .eq('status', 'active')
+        .is('deleted_at', null)  // Agregar este filtro
         .order('created_at', { foreignTable: 'memberships', ascending: false })
         .limit(1, { foreignTable: 'memberships' });
 
