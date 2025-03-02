@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { Box, Typography, Paper, Grid } from '@mui/material';
-import { useAuthStore } from '@/features/shared/stores/authStore';
-import { PageContainer } from '@/components/common/PageContainer';
-import { ExpirationNotifications } from '@/features/memberships/components/ExpirationNotifications';
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from "react";
+import { Box, Typography, Paper, Grid } from "@mui/material";
+import { useAuthStore } from "@/features/shared/stores/authStore";
+import { PageContainer } from "@/components/common/PageContainer";
+import { useQueryClient } from "@tanstack/react-query";
+import { MembershipStatusMonitor } from "@/features/memberships/components/MembershipStatusMonitor";
 
 export const DashboardPage = () => {
   const { user } = useAuthStore();
@@ -22,11 +22,10 @@ export const DashboardPage = () => {
             ¡Bienvenido de nuevo!
           </Typography>
           <Box>
-            <Typography variant="body1">
-              Correo: {user?.email}
-            </Typography>
+            <Typography variant="body1">Correo: {user?.email}</Typography>
             <Typography variant="body2" color="text.secondary">
-              Último ingreso: {new Date(user?.last_sign_in_at || '').toLocaleString()}
+              Último ingreso:{" "}
+              {new Date(user?.last_sign_in_at || "").toLocaleString()}
             </Typography>
           </Box>
         </Paper>
@@ -35,9 +34,9 @@ export const DashboardPage = () => {
       <Grid item xs={12}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Notificaciones
+            Membresías
           </Typography>
-          <ExpirationNotifications />
+          <MembershipStatusMonitor />
         </Paper>
       </Grid>
     </Grid>

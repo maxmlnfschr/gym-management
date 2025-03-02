@@ -6,7 +6,7 @@ import { Membership } from "../../types";
 import { useState } from "react";
 import { TabPanel } from "@/components/common/TabPanel";
 
-export const ExpirationNotifications = () => {
+export const MembershipStatusMonitor = () => {
   const [tabValue, setTabValue] = useState(0);
   const { expiringMemberships, expiredMemberships, isLoading } = useExpirationNotifications();
 
@@ -29,14 +29,28 @@ export const ExpirationNotifications = () => {
 
   return (
     <Stack spacing={2}>
-      <Tabs value={tabValue} onChange={handleTabChange}>
+      <Tabs 
+        value={tabValue} 
+        onChange={handleTabChange}
+        TabIndicatorProps={{
+          sx: {
+            backgroundColor: tabValue === 0 ? 'error.main' : 'warning.main'
+          }
+        }}
+        sx={{
+          '& .MuiTab-root': {
+            color: 'text.primary',
+            '&.Mui-selected': {
+              color: 'text.primary'
+            }
+          }
+        }}
+      >
         <Tab 
           label={`Vencidos (${sortedExpired.length})`} 
-          sx={{ color: 'error.main' }}
         />
         <Tab 
           label={`Por vencer (${sortedExpiring.length})`}
-          sx={{ color: 'warning.main' }}
         />
       </Tabs>
 
