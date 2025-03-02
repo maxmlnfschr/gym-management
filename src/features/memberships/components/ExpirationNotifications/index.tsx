@@ -5,24 +5,34 @@ import { es } from "date-fns/locale";
 import { Membership } from "../../types";
 
 export const ExpirationNotifications = () => {
-  const { expiringMemberships, isLoading } = useExpirationNotifications();
-
-  if (isLoading || expiringMemberships.length === 0) {
+  const { expiringMemberships, expiredMemberships, isLoading } = useExpirationNotifications();
+  if (isLoading || (expiringMemberships.length === 0 && expiredMemberships.length === 0)) {
     return null;
   }
-
   return (
-    <Stack 
-      spacing={2} 
-      sx={{ 
-        maxWidth: '100%',
-        mx: 'auto',
-        '& .MuiAlert-root': {
-          mx: 0,
-          borderRadius: 1
-        }
-      }}
-    >
+    <Stack spacing={2}>
+      {expiredMemberships.map((membership: Membership & { 
+        members: { 
+          first_name: string; 
+          last_name: string; 
+          email: string 
+        } 
+      }) => (
+        <Alert 
+          key={membership.id} 
+          severity="error" 
+          sx={{ 
+            backgroundColor: 'rgba(253, 237, 237, 0.8)',
+            '& .MuiAlert-icon': {
+              color: 'error.main'
+            }
+          }}
+        >
+          <AlertTitle>Membresía vencida</AlertTitle>
+          {membership.members.first_name} {membership.members.last_name} - Venció hace{" "}
+          {formatDistanceToNow(new Date(membership.end_date), { locale: es })}
+        </Alert>
+      ))}
       {expiringMemberships.map((membership: Membership & { 
         members: { 
           first_name: string; 
@@ -34,8 +44,10 @@ export const ExpirationNotifications = () => {
           key={membership.id} 
           severity="warning" 
           sx={{ 
-            width: 'auto',
-            margin: '0 !important'
+            backgroundColor: 'rgba(255, 244, 229, 0.8)',
+            '& .MuiAlert-icon': {
+              color: 'warning.main'
+            }
           }}
         >
           <AlertTitle>Membresía por vencer</AlertTitle>

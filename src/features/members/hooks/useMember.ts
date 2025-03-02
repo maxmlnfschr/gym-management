@@ -9,7 +9,7 @@ export const useMember = (id?: string) => {
     queryKey: ["member", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("members")
+        .from('members')
         .select(`
           *,
           current_membership:memberships(
@@ -19,10 +19,7 @@ export const useMember = (id?: string) => {
             payment_status
           )
         `)
-        .eq("id", id)
-        .is("deleted_at", null)  // Agregar este filtro
-        .order('created_at', { foreignTable: 'memberships', ascending: false })
-        .limit(1, { foreignTable: 'memberships' })
+        .eq('id', id)
         .single();
 
       if (error) throw error;
@@ -43,8 +40,7 @@ export const useMember = (id?: string) => {
       const { error } = await supabase
         .from("members")
         .update({ deleted_at: new Date().toISOString() })
-        .eq("id", id)
-        .is("deleted_at", null); // Solo actualizar si no está ya borrado
+        .eq("id", id);
 
       if (error) throw error;
     },

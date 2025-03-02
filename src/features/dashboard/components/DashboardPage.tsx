@@ -1,10 +1,18 @@
+import { useEffect } from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import { useAuthStore } from '@/features/shared/stores/authStore';
 import { PageContainer } from '@/components/common/PageContainer';
 import { ExpirationNotifications } from '@/features/memberships/components/ExpirationNotifications';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const DashboardPage = () => {
   const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  // Forzar refresco al montar el componente
+  useEffect(() => {
+    queryClient.invalidateQueries();
+  }, []);
 
   return (
     <Grid container spacing={3}>

@@ -64,8 +64,12 @@ export const MemberList = () => {
     };
     setFilterValues(newFilters);
 
-    let filtered = [...members];
+    // Primero filtramos los miembros eliminados
+    let filtered = [...members].filter(member => 
+      !member.deleted_at && member.status !== 'deleted'
+    );
 
+    // Luego aplicamos los demás filtros
     if (newFilters.search) {
       const searchLower = newFilters.search.toLowerCase();
       filtered = filtered.filter(
@@ -136,7 +140,11 @@ export const MemberList = () => {
     fetchMembers();
   }, [fetchMembers]);
   useEffect(() => {
-    setFilteredMembers(members);
+    // Filtrar miembros eliminados al inicializar
+    const activeMembers = members.filter(member => 
+      !member.deleted_at && member.status !== 'deleted'
+    );
+    setFilteredMembers(activeMembers);
   }, [members]);
   // Añadir estas definiciones antes del return
   const paginatedMembers = filteredMembers.slice(0, page * itemsPerPage);

@@ -7,6 +7,7 @@ export interface Member {
   deleted_at?: string;
   notes?: string;
   created_at: string;
+  status: 'active' | 'deleted';
   current_membership?: {
     id: string;
     start_date: string;

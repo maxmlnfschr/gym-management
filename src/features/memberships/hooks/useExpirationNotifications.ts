@@ -11,29 +11,44 @@ export const useExpirationNotifications = () => {
       const nextWeek = addDays(today, 7);
       today.setHours(0, 0, 0, 0);
       
-      // Primero obtenemos las últimas membresías de cada miembro
-      const { data: latestMemberships, error } = await supabase
+      const { data, error } = await supabase
         .from('memberships')
-        .select('*, members(first_name, last_name, email)')
+        .select(`
+          *,
+          members!inner(
+            first_name,
+            last_name,
+            email,
+            deleted_at,
+            status
+          )
+        `)
         .order('created_at', { ascending: false })
-        .then(({ data, error }) => {
-          if (error) throw error;
-          
-          // Agrupar por member_id y tomar solo la más reciente
-          const memberMap = new Map();
-          data?.forEach(membership => {
-            if (!memberMap.has(membership.member_id)) {
-              memberMap.set(membership.member_id, membership);
-            }
-          });
-          
-          return { data: Array.from(memberMap.values()), error };
-        });
+        .limit(1, { foreignTable: 'members' })
+        .lte('end_date', nextWeek.toISOString().split('T')[0]);
 
       if (error) throw error;
       
+      // Filtrar miembros eliminados
+      const filteredData = data?.filter(membership => 
+        !membership.members.deleted_at && 
+        membership.members.status !== 'deleted'
+      );
+      
+      type MembershipWithMember = Membership & {
+        members: {
+          first_name: string;
+          last_name: string;
+          email: string;
+          deleted_at: string | null;
+        }
+      };
+      
       // Separar membresías vencidas y por vencer
-      const { expired, expiring } = latestMemberships?.reduce((acc, membership) => {
+      const { expired, expiring } = filteredData?.reduce((acc: {
+        expired: MembershipWithMember[];
+        expiring: MembershipWithMember[];
+      }, membership: MembershipWithMember) => {
         const endDate = new Date(membership.end_date);
         endDate.setHours(0, 0, 0, 0);
         
@@ -43,10 +58,7 @@ export const useExpirationNotifications = () => {
           acc.expiring.push(membership);
         }
         return acc;
-      }, { expired: [], expiring: [] } as { 
-        expired: typeof latestMemberships, 
-        expiring: typeof latestMemberships 
-      });
+      }, { expired: [], expiring: [] });
       
       return {
         expired,

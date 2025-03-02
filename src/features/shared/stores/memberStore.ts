@@ -49,7 +49,6 @@ export const useMemberStore = create<MemberState>((set) => ({
           )
         `)
         .eq('status', 'active')
-        .is('deleted_at', null)  // Agregar este filtro
         .order('created_at', { foreignTable: 'memberships', ascending: false })
         .limit(1, { foreignTable: 'memberships' });
 
@@ -121,13 +120,12 @@ export const useMemberStore = create<MemberState>((set) => ({
       set({ loading: false });
     }
   },
-
   deleteMember: async (id: string) => {
     try {
       set({ loading: true, error: null });
       const { error } = await supabase
         .from('members')
-        .update({ status: 'deleted', deleted_at: new Date().toISOString() })
+        .update({ deleted_at: new Date().toISOString() })  // Ya no necesitamos actualizar el status
         .eq('id', id);
 
       if (error) throw error;
