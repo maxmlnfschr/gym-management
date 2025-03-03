@@ -2,17 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { addDays } from 'date-fns';
 import { Membership } from '../types';
+import { useMemberships } from './useMemberships';
 
 export const useExpirationNotifications = () => {
-  const getExpiringMemberships = useQuery({
-    queryKey: ['expiring-memberships'],
+  const { data: memberships, isLoading } = useQuery({
+    queryKey: ['memberships'],
     queryFn: async () => {
-      const today = new Date();
-      const nextWeek = addDays(today, 7);
-      today.setHours(0, 0, 0, 0);
-      
-      // Usar la vista latest_memberships en lugar de la tabla memberships
-      const { data: memberships, error } = await supabase
+      const { data, error } = await supabase
         .from('latest_memberships')
         .select(`
           *,
@@ -23,41 +19,36 @@ export const useExpirationNotifications = () => {
             deleted_at,
             status
           )
-        `)
-        .lte('end_date', nextWeek.toISOString().split('T')[0]);
+        `);
       
       if (error) throw error;
-      
-      // Filtrar miembros eliminados
-      const filteredData = memberships?.filter(membership => 
-        !membership.members.deleted_at && 
-        membership.members.status !== 'deleted'
-      );
-      
-      // Separar membresías vencidas y por vencer
-      const { expired, expiring } = filteredData?.reduce((acc, membership) => {
-        const endDate = new Date(membership.end_date);
-        endDate.setHours(0, 0, 0, 0);
-        
-        if (endDate < today) {
-          acc.expired.push(membership);
-        } else if (endDate <= nextWeek) {
-          acc.expiring.push(membership);
-        }
-        return acc;
-      }, { expired: [], expiring: [] });
-      
-      return {
-        expired,
-        expiring
-      };
-    },
-    refetchInterval: 1000 * 60 * 60,
+      return data;
+    }
   });
-
+  const today = new Date();
+  const sevenDaysFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  // Filtrar primero los miembros eliminados
+  const activeMembers = memberships?.filter(membership => 
+    !membership.members.deleted_at && membership.members.status !== 'deleted'
+  ) || [];
+  
+  const expiredMemberships = activeMembers.filter(membership => 
+    new Date(membership.end_date) < today && membership.payment_status === "paid"
+  );
+  
+  const expiringMemberships = activeMembers.filter(membership => {
+    const endDate = new Date(membership.end_date);
+    return endDate > today && endDate <= sevenDaysFromNow && membership.payment_status === "paid";
+  });
+  
+  const pendingMemberships = activeMembers.filter(membership => 
+    membership.payment_status === "pending"
+  );
   return {
-    expiredMemberships: getExpiringMemberships.data?.expired || [],
-    expiringMemberships: getExpiringMemberships.data?.expiring || [],
-    isLoading: getExpiringMemberships.isLoading,
+    expiredMemberships,
+    expiringMemberships,
+    pendingMemberships,
+    isLoading
   };
 };
