@@ -7,9 +7,9 @@ export const useMemberships = (memberId?: string) => {
   const getMemberships = useQuery({
     queryKey: ["memberships", memberId],
     queryFn: async () => {
-      // Cambiamos a latest_memberships para obtener las membresías más recientes
+      // Obtener todas las membresías para el historial
       const { data, error } = await supabase
-        .from("latest_memberships")
+        .from("memberships")  // Cambiamos de latest_memberships a memberships
         .select(`
           *,
           members!inner(

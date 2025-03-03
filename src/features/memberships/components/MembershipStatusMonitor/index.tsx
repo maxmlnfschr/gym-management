@@ -26,7 +26,6 @@ export const MembershipStatusMonitor = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-
   return (
     <Stack spacing={2}>
       <Tabs 
@@ -34,7 +33,7 @@ export const MembershipStatusMonitor = () => {
         onChange={handleTabChange}
         TabIndicatorProps={{
           sx: {
-            backgroundColor: tabValue === 0 ? 'error.main' : 'warning.main'
+            backgroundColor: tabValue === 0 ? '#f44336' : '#ff9800'
           }
         }}
         sx={{
@@ -46,12 +45,8 @@ export const MembershipStatusMonitor = () => {
           }
         }}
       >
-        <Tab 
-          label={`Vencidos (${sortedExpired.length})`} 
-        />
-        <Tab 
-          label={`Por vencer (${sortedExpiring.length})`}
-        />
+        <Tab label={`Vencidos (${sortedExpired.length})`} />
+        <Tab label={`Por vencer (${sortedExpiring.length})`} />
       </Tabs>
 
       <TabPanel value={tabValue} index={0}>
@@ -61,9 +56,9 @@ export const MembershipStatusMonitor = () => {
             severity="error" 
             sx={{ 
               mb: 1,
-              backgroundColor: 'rgba(253, 237, 237, 0.8)',
+              backgroundColor: 'rgba(244, 67, 54, 0.08)',
               '& .MuiAlert-icon': {
-                color: 'error.main'
+                color: '#f44336'
               }
             }}
           >
@@ -81,9 +76,9 @@ export const MembershipStatusMonitor = () => {
             severity="warning"
             sx={{ 
               mb: 1,
-              backgroundColor: 'rgba(255, 244, 229, 0.8)',
+              backgroundColor: 'rgba(255, 152, 0, 0.08)',
               '& .MuiAlert-icon': {
-                color: 'warning.main'
+                color: '#ff9800'
               }
             }}
           >

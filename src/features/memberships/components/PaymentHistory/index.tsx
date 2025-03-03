@@ -1,4 +1,5 @@
 import { Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Box, useTheme, useMediaQuery } from '@mui/material';
+import { CheckCircle, Warning } from '@mui/icons-material';
 import { useMemberships } from '@/features/memberships/hooks/useMemberships';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -18,6 +19,40 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
+  const renderPaymentChip = (status: string) => {
+    const config = {
+      paid: {
+        color: '#4caf50',
+        label: 'Pagado',
+        icon: <CheckCircle fontSize="small" />
+      },
+      pending: {
+        color: '#ff9800',
+        label: 'Pendiente',
+        icon: <Warning fontSize="small" />
+      }
+    };
+
+    const statusConfig = config[status as keyof typeof config] || config.pending;
+
+    return (
+      <Chip
+        icon={statusConfig.icon}
+        label={statusConfig.label}
+        sx={{
+          backgroundColor: `${statusConfig.color}15`,
+          color: statusConfig.color,
+          border: 'none',
+          '& .MuiChip-icon': {
+            color: 'inherit'
+          },
+          fontWeight: 500
+        }}
+        size="small"
+      />
+    );
+  };
+
   if (isMobile) {
     return (
       <Box>
@@ -36,12 +71,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
             <Typography variant="body2" gutterBottom>
               Período: {formatMembershipDate(membership.start_date)} - {formatMembershipDate(membership.end_date)}
             </Typography>
-            <Chip
-              label={membership.payment_status === 'paid' ? 'Pagado' : membership.payment_status === 'pending' ? 'Pendiente' : 'Vencido'}
-              color={membership.payment_status === 'paid' ? 'success' : membership.payment_status === 'pending' ? 'warning' : 'error'}
-              size="small"
-              sx={{ mt: 1 }}
-            />
+            {renderPaymentChip(membership.payment_status)}  {/* Aquí usamos la nueva función */}
           </Paper>
         ))}
       </Box>
@@ -76,11 +106,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
                 {formatMembershipDate(membership.start_date)} - {formatMembershipDate(membership.end_date)}
               </TableCell>
               <TableCell sx={{ py: 1 }}>
-                <Chip
-                  label={membership.payment_status === 'paid' ? 'Pagado' : membership.payment_status === 'pending' ? 'Pendiente' : 'Vencido'}
-                  color={membership.payment_status === 'paid' ? 'success' : membership.payment_status === 'pending' ? 'warning' : 'error'}
-                  size="small"
-                />
+                {renderPaymentChip(membership.payment_status)}
               </TableCell>
             </TableRow>
           ))}
