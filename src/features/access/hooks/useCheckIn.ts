@@ -12,7 +12,7 @@ export const useCheckIn = () => {
       const nowISOString = today.toISOString();
 
       // Verificar membresía usando latest_memberships
-      const { data: membership, error: membershipError } = await supabase
+      const { data: memberships, error: membershipError } = await supabase
         .from('latest_memberships')
         .select(`
           id,
@@ -25,10 +25,14 @@ export const useCheckIn = () => {
         `)
         .eq('member_id', memberId)
         .eq('payment_status', 'paid')
-        .single();
-
+        .order('created_at', { ascending: false });
       if (membershipError) throw membershipError;
       
+      const membership = memberships?.[0];
+      
+      if (!membership) {
+        throw new Error('No se encontró una membresía activa');
+      }
       if (!membership) {
         throw new Error('La membresía está vencida');
       }
