@@ -28,20 +28,43 @@ export const MembershipStatusMonitor = () => {
     setTabValue(newValue);
   };
   return (
-    <Stack spacing={2}>
+    <Stack spacing={1}>  {/* Reducido de 2 a 1 */}
       <Tabs 
         value={tabValue} 
         onChange={handleTabChange}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
         TabIndicatorProps={{
-          sx: {
-            backgroundColor: tabValue === 0 ? '#f44336' : tabValue === 1 ? '#ff9800' : '#9e9e9e'
-          }
+          sx: { display: 'none' }
         }}
         sx={{
           '& .MuiTab-root': {
-            color: 'text.primary',
+            color: '#666',
+            borderRadius: '6px',
+            marginRight: 1,
+            minHeight: '32px',
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            minWidth: { xs: '100px', sm: 160 },
+            padding: { xs: '6px 12px', sm: '8px 20px' },
+            backgroundColor: 'transparent',
+            border: '1px solid #e0e0e0',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+            },
             '&.Mui-selected': {
-              color: 'text.primary'
+              color: '#fff',
+              backgroundColor: 'black',
+              border: '1px solid black',
+              fontWeight: 500,
+              transition: 'all 0.2s ease-in-out'
+            }
+          },
+          '& .MuiTabs-scrollButtons': {
+            width: '20px',
+            '&.Mui-disabled': {
+              display: 'none'
             }
           }
         }}
@@ -53,7 +76,6 @@ export const MembershipStatusMonitor = () => {
       <TabPanel value={tabValue} index={0}>
         {sortedExpired.length > 0 ? (
           <>
-            <AlertTitle sx={{ mb: 2 }}>Membresías vencidas</AlertTitle>
             {sortedExpired.map((membership) => (
               <Alert 
                 key={membership.id} 
@@ -71,13 +93,22 @@ export const MembershipStatusMonitor = () => {
             ))}
           </>
         ) : (
-          <Alert severity="info">No hay membresías vencidas</Alert>
+          <Alert 
+            severity="success"
+            sx={{ 
+              backgroundColor: 'rgba(46, 125, 50, 0.08)',
+              '& .MuiAlert-icon': {
+                color: '#2e7d32'
+              }
+            }}
+          >
+            No hay membresías vencidas
+          </Alert>
         )}
       </TabPanel>
       <TabPanel value={tabValue} index={1}>
         {sortedExpiring.length > 0 ? (
           <>
-            <AlertTitle sx={{ mb: 2 }}>Membresías por vencer</AlertTitle>
             {sortedExpiring.map((membership) => (
               <Alert 
                 key={membership.id} 
@@ -95,25 +126,27 @@ export const MembershipStatusMonitor = () => {
             ))}
           </>
         ) : (
-          <Alert severity="info">No hay membresías por vencer</Alert>
+          <Alert 
+            severity="success"
+            sx={{ 
+              backgroundColor: 'rgba(46, 125, 50, 0.08)',
+              '& .MuiAlert-icon': {
+                color: '#2e7d32'
+              }
+            }}
+          >
+            No hay membresías por vencer
+          </Alert>
         )}
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
         {sortedPending.length > 0 ? (
           <>
-            <AlertTitle sx={{ mb: 2 }}>Pagos pendientes</AlertTitle>
             {sortedPending.map((membership) => (
-              // En cada Alert, modificar la parte del nombre:
               <Alert 
                 key={membership.id} 
                 severity="info"
-                sx={{ 
-                  mb: 1,
-                  backgroundColor: 'rgba(158, 158, 158, 0.08)',
-                  '& .MuiAlert-icon': {
-                    color: '#9e9e9e'
-                  }
-                }}
+                sx={{ mb: 1, backgroundColor: 'rgba(158, 158, 158, 0.08)', '& .MuiAlert-icon': { color: '#9e9e9e' } }}
               >
                 <Link 
                   to={`/members/${membership.member_id}`} 
@@ -137,7 +170,17 @@ export const MembershipStatusMonitor = () => {
             ))}
           </>
         ) : (
-          <Alert severity="info">No hay pagos pendientes</Alert>
+          <Alert 
+            severity="success"
+            sx={{ 
+              backgroundColor: 'rgba(46, 125, 50, 0.08)',
+              '& .MuiAlert-icon': {
+                color: '#2e7d32'
+              }
+            }}
+          >
+            No hay pagos pendientes
+          </Alert>
         )}
       </TabPanel>
     </Stack>
