@@ -34,23 +34,64 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: { width: 250, height: 350 },
-          aspectRatio: 1,
+          qrbox: { width: 300, height: 300 }, // Aumentado el tamaño
+          aspectRatio: 1.0,
         },
         (decodedText) => {
+          console.log("QR detectado:", decodedText);
           setStatus("¡QR detectado!");
           onScanSuccess(decodedText);
         },
         (errorMessage) => {
-          setStatus("Escaneando...");
+          console.log("Error de escaneo:", errorMessage);
           onScanError?.(errorMessage);
+          setStatus("Escaneando...");
         }
       );
       setIsScanning(true);
       setStatus("Escaneando...");
     } catch (err) {
+      console.error("Error al iniciar el escaneo:", err);
       setStatus("Error: Por favor, permite el acceso a la cámara");
-      console.error(err);
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !qrRef.current) return;
+
+    try {
+      if (qrRef.current.isScanning) {
+        await qrRef.current.stop();
+        setIsScanning(false);
+      }
+
+      setStatus("Analizando imagen...");
+      setUploadedImage(URL.createObjectURL(file));
+      
+      // Intentar múltiples veces con diferentes configuraciones
+      try {
+        const result = await qrRef.current.scanFile(file, true);
+        console.log("QR detectado exitosamente:", result);
+        setStatus("¡QR detectado!");
+        onScanSuccess(result);
+      } catch (firstError) {
+        console.log("Primer intento fallido, reintentando con otra configuración...");
+        
+        // Segundo intento con otra configuración
+        try {
+          const result = await qrRef.current.scanFile(file, false);
+          console.log("QR detectado en segundo intento:", result);
+          setStatus("¡QR detectado!");
+          onScanSuccess(result);
+        } catch (secondError) {
+          throw new Error("No se pudo detectar el código QR después de múltiples intentos");
+        }
+      }
+    } catch (err) {
+      console.error("Error completo:", err);
+      setStatus("No se pudo detectar un código QR en la imagen");
+      onScanError?.(err instanceof Error ? err.message : "Error desconocido");
     }
   };
 
@@ -62,29 +103,6 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
       setIsScanning(false);
       setStatus("");
     } catch (err) {
-      console.error(err);
-    }
-  };
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file || !qrRef.current) return;
-
-    try {
-      // Detener el escaneo si está activo
-      if (qrRef.current.isScanning) {
-        await qrRef.current.stop();
-        setIsScanning(false);
-      }
-
-      setStatus("Analizando imagen...");
-      setUploadedImage(URL.createObjectURL(file));
-      const result = await qrRef.current.scanFile(file, true);
-      setStatus("¡QR detectado!");
-      onScanSuccess(result);
-    } catch (err) {
-      setStatus("No se pudo detectar un código QR en la imagen");
       console.error(err);
     }
   };
