@@ -36,5 +36,6 @@ create table access_logs (
   id uuid default uuid_generate_v4() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   member_id uuid references members(id),
-  check_in timestamp with time zone not null
+  check_in timestamp with time zone not null,
+  status text default 'allowed'
 );

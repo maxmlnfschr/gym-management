@@ -9,7 +9,7 @@ export const getMembershipStatus = (membership: any): MembershipStatusInfo => {
     return {
       color: '#9e9e9e',
       status: 'Sin membresía',
-      severity: 'error'
+      severity: 'default'  // Cambiado de 'error' a 'default'
     };
   }
 

@@ -1,28 +1,41 @@
 import { Chip, ChipProps } from "@mui/material";
 
-interface StatusChipProps extends Omit<ChipProps, 'label'> {
-  status: 'active' | 'inactive' | 'deleted';
+type StatusType = 'success' | 'warning' | 'error' | 'info' | 'default';
+
+interface StatusChipProps extends Omit<ChipProps, 'color'> {
+  status: StatusType | string;
+  customLabel?: string;
 }
 
-export const StatusChip = ({ status, ...props }: StatusChipProps) => {
+export const StatusChip = ({ status, customLabel, ...props }: StatusChipProps) => {
+  const getStatusConfig = (status: string): { color: StatusType, label: string } => {
+    switch (status) {
+      case 'active':
+      case 'paid':
+      case 'allowed':
+      case 'success':
+        return { color: 'success', label: customLabel || 'Activo' };
+      case 'pending':
+        return { color: 'warning', label: customLabel || 'Pendiente' };
+      case 'overdue':
+      case 'expired':
+      case 'denied':
+      case 'error':
+        return { color: 'error', label: customLabel || 'Vencido' };
+      case 'inactive':
+        return { color: 'default', label: customLabel || 'Inactivo' };
+      default:
+        return { color: 'default', label: customLabel || status };
+    }
+  };
+
+  const { color, label } = getStatusConfig(status);
+
   return (
     <Chip
-      label={
-        status === 'active' ? 'Activo' : 
-        status === 'inactive' ? 'Inactivo' : 
-        'Eliminado'
-      }
+      label={label}
+      color={color as ChipProps['color']}
       size="small"
-      sx={{
-        height: '24px',
-        fontSize: '0.75rem',
-        bgcolor: status === 'active' ? '#0070F3' : 
-                status === 'inactive' ? '#F81CE5' : 
-                '#666666',
-        color: 'white',
-        fontWeight: 500,
-        ...props.sx
-      }}
       {...props}
     />
   );

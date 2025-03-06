@@ -30,6 +30,7 @@ import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { useTheme, useMediaQuery } from "@mui/material"; // Añadir estos imports
 // Agregar este import junto a los demás
 import { useMemberships } from "@/features/memberships/hooks/useMemberships";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 
 export const MemberDetails = () => {
   const theme = useTheme();
@@ -41,6 +42,7 @@ export const MemberDetails = () => {
   const { member, isLoading } = useMember(id);
   const { deleteMember } = useMember();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   // Agregar este hook junto a los demás hooks
   const { currentMembership } = useMemberships(id!);
   // Agregar esta función antes del return
@@ -57,10 +59,15 @@ export const MemberDetails = () => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    handleMenuClose();
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
       await deleteMember(id!);
-      handleMenuClose();
+      setConfirmDialogOpen(false);
       navigate("/members");
     } catch (error) {
       console.error("Error deleting member:", error);
@@ -209,7 +216,7 @@ export const MemberDetails = () => {
           <Edit sx={{ mr: 1 }} fontSize="small" />
           Editar
         </MenuItem>
-        <MenuItem onClick={handleDelete}>
+        <MenuItem onClick={handleDeleteClick}>
           <Delete sx={{ mr: 1 }} fontSize="small" />
           Eliminar
         </MenuItem>
@@ -223,6 +230,17 @@ export const MemberDetails = () => {
           <QRCodeSVG value={id || ""} size={256} />
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Eliminar miembro"
+        message="¿Estás seguro de que deseas eliminar este miembro? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDialogOpen(false)}
+        severity="error"
+      />
     </>
   );
 };

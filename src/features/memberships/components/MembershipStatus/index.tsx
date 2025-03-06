@@ -1,46 +1,28 @@
-import { Paper, Typography, Stack, Chip } from "@mui/material";
+import { Paper, Typography, Stack } from "@mui/material";
 import { useMemberships } from "@/features/memberships/hooks/useMemberships";
-import { format, parseISO } from "date-fns";
-import { es } from "date-fns/locale";
-import { CheckCircle, Warning, Block } from "@mui/icons-material";
 import { formatMembershipDate } from "@/utils/dateUtils";
 import { getMembershipStatus } from "../../utils/membershipStatus";
+import { StatusChip } from "@/components/common/StatusChip";
 
 interface MembershipStatusProps {
   memberId: string;
-  variant?: 'default' | 'plain' | 'chip-only';  // Añadimos la nueva variante
+  variant?: 'default' | 'plain' | 'chip-only';
 }
 
 export const MembershipStatus = ({ memberId, variant = 'default' }: MembershipStatusProps) => {
   const { currentMembership, isLoading } = useMemberships(memberId);
   if (isLoading) return null;
-  const { status, color, severity } = getMembershipStatus(currentMembership);
-  const getIcon = () => {
-    switch (severity) {
-      case 'success':
-        return <CheckCircle />;
-      case 'warning':
-        return <Warning />;
-      case 'error':
-        return <Block />;
-      default:
-        return <Block />;
-    }
-  };
+  
+  const { status, severity } = getMembershipStatus(currentMembership);
+  
   const chipContent = (
-    <Chip
-      icon={getIcon()}
-      label={status}
-      sx={{
-        backgroundColor: variant === 'plain' ? 'transparent' : `${color}15`,
-        color: color,
-        border: variant === 'plain' ? `1px solid ${color}` : 'none',
-        '& .MuiChip-icon': {
-          color: 'inherit'
-        }
-      }}
+    <StatusChip
+      status={severity}
+      customLabel={status}
+      variant={variant === 'plain' ? "outlined" : "filled"}
     />
   );
+
   if (variant === 'default') {
     return (
       <Paper sx={{ p: 2, mb: 2 }}>
@@ -57,7 +39,7 @@ export const MembershipStatus = ({ memberId, variant = 'default' }: MembershipSt
   }
 
   if (variant === 'chip-only') {
-    return chipContent;  // Solo retornamos el chip
+    return chipContent;
   }
 
   return (

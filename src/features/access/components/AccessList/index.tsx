@@ -7,8 +7,13 @@ import { useAccess } from "../../hooks/useAccess";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
+import { DataTable } from "@/components/common/DataTable";
+import { StatusChip } from "@/components/common/StatusChip";
+import { useTheme, useMediaQuery } from "@mui/material";
 
 export const AccessList = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { accesses, isLoading } = useAccess();
   const [showFilters, setShowFilters] = useState(false);
   const [filterValues, setFilterValues] = useState<AccessFilterValues>({
@@ -79,7 +84,6 @@ export const AccessList = () => {
       </Box>
     );
   }
-
   return (
     <Box>
       <Stack spacing={3}>
@@ -95,30 +99,72 @@ export const AccessList = () => {
           onFilterChange={handleFilter}
           show={showFilters}
         />
-        <Stack spacing={2}>
-          {filteredAccesses.map((access) => (
-            <Paper
-              key={access.id}
-              sx={{
-                p: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography variant="subtitle1">
-                  {access.member.first_name} {access.member.last_name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {format(new Date(access.check_in), "dd/MM/yyyy HH:mm", {
-                    locale: es,
-                  })}
-                </Typography>
-              </Box>
-            </Paper>
-          ))}
-        </Stack>
+        
+        {isMobile ? (
+          <Stack spacing={2}>
+            {filteredAccesses.map((access) => {
+              console.log('Mobile access status:', access.status, access);
+              return (
+                <Paper
+                  key={access.id}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box>
+                    <Typography variant="subtitle1">
+                      {access.member.first_name} {access.member.last_name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {format(new Date(access.check_in), "dd/MM/yyyy HH:mm", {
+                        locale: es,
+                      })}
+                    </Typography>
+                  </Box>
+                  <StatusChip 
+                    status="success" 
+                    customLabel="Permitido"
+                  />
+                </Paper>
+              );
+            })}
+          </Stack>
+        ) : (
+          <DataTable
+            columns={[
+              {
+                id: 'date',
+                label: 'Fecha',
+                render: (access) => format(new Date(access.check_in), "dd/MM/yyyy HH:mm", { locale: es })
+              },
+              {
+                id: 'member',
+                label: 'Miembro',
+                render: (access) => `${access.member.first_name} ${access.member.last_name}`
+              },
+              {
+                id: 'status',
+                label: 'Estado',
+                render: (access) => {
+                  console.log('Desktop access status:', access.status, access);
+                  return (
+                    <StatusChip 
+                      status="success" 
+                      customLabel="Permitido"
+                    />
+                  );
+                }
+              }
+            ]}
+            data={filteredAccesses}
+            keyExtractor={(access) => access.id}
+            isLoading={isLoading}
+            emptyMessage="No hay registros de acceso"
+          />
+        )}
       </Stack>
     </Box>
   );

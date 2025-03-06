@@ -28,6 +28,8 @@ import { MemberFilters } from "@/features/members/components/MemberFilters";
 import type { FilterValues, Member } from "@/features/members/types";
 import { FileDownload as DownloadIcon } from "@mui/icons-material";
 import { exportToCsv } from "@/features/members/utils/exportToCsv";
+import { DataTable } from "@/components/common/DataTable";
+import { formatMembershipDate } from "@/utils/dateUtils";
 import {
   ResponsiveCard,
   ResponsiveCardContent,
@@ -42,11 +44,21 @@ import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { FloatingActions } from "@/components/common/FloatingActions";
 import { useTheme } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+import { StatusChip } from "@/components/common/StatusChip";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 
 export const MemberList = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const { members, loading, fetchMembers, deleteMember } = useMemberStore();
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
@@ -62,6 +74,10 @@ export const MemberList = () => {
     sortBy: "name",
     sortDirection: "asc",
   });
+  // Agregar estos estados aquí, fuera de handleFilter
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
+
   const handleFilter = (newValues: Partial<FilterValues>) => {
     const newFilters: FilterValues = {
       ...filterValues,
@@ -70,8 +86,8 @@ export const MemberList = () => {
     setFilterValues(newFilters);
 
     // Primero filtramos los miembros eliminados
-    let filtered = [...members].filter(member => 
-      !member.deleted_at && member.status !== 'deleted'
+    let filtered = [...members].filter(
+      (member) => !member.deleted_at && member.status !== "deleted"
     );
 
     // Luego aplicamos los demás filtros
@@ -88,21 +104,27 @@ export const MemberList = () => {
     if (newFilters.status !== "all") {
       filtered = filtered.filter((member) => {
         // Añadir console.log para debug
-        console.log('Filtering member:', member.first_name, member.current_membership);
-        
+        console.log(
+          "Filtering member:",
+          member.first_name,
+          member.current_membership
+        );
+
         const membership = member.current_membership;
         switch (newFilters.status) {
           case "active_membership":
-            const isActive = membership && 
-                   membership.payment_status === "paid" && 
-                   new Date(membership.end_date) > new Date();
-            console.log('Is active?', isActive);
+            const isActive =
+              membership &&
+              membership.payment_status === "paid" &&
+              new Date(membership.end_date) > new Date();
+            console.log("Is active?", isActive);
             return isActive;
           case "overdue":
-            const isOverdue = membership && 
-                   (new Date(membership.end_date) < new Date() || 
-                    membership.payment_status === "pending");
-            console.log('Is overdue?', isOverdue);
+            const isOverdue =
+              membership &&
+              (new Date(membership.end_date) < new Date() ||
+                membership.payment_status === "pending");
+            console.log("Is overdue?", isOverdue);
             return isOverdue;
           case "no_membership":
             return !membership;
@@ -125,7 +147,10 @@ export const MemberList = () => {
           const getMembershipStatus = (member: Member) => {
             const membership = member.current_membership;
             if (!membership) return "3_no_membership";
-            if (membership.payment_status === "pending" || new Date(membership.end_date) < new Date()) {
+            if (
+              membership.payment_status === "pending" ||
+              new Date(membership.end_date) < new Date()
+            ) {
               return "2_overdue"; // Pago vencido
             }
             return "1_active_membership"; // Membresía activa
@@ -138,6 +163,25 @@ export const MemberList = () => {
 
     setFilteredMembers(filtered);
   };
+
+  // Agregar estas funciones aquí
+  const handleDeleteClick = (memberId: string) => {
+    setMemberToDelete(memberId);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (memberToDelete) {
+      try {
+        await deleteMember(memberToDelete);
+        // La lista se actualizará automáticamente gracias al store
+      } catch (error) {
+        console.error("Error al eliminar miembro:", error);
+      }
+    }
+    setConfirmDialogOpen(false);
+    setMemberToDelete(null);
+  };
   const handleFilterClick = (event: React.MouseEvent<HTMLElement>) => {
     setShowFilters(!showFilters);
   };
@@ -146,8 +190,8 @@ export const MemberList = () => {
   }, [fetchMembers]);
   useEffect(() => {
     // Filtrar miembros eliminados al inicializar
-    const activeMembers = members.filter(member => 
-      !member.deleted_at && member.status !== 'deleted'
+    const activeMembers = members.filter(
+      (member) => !member.deleted_at && member.status !== "deleted"
     );
     setFilteredMembers(activeMembers);
   }, [members]);
@@ -187,11 +231,11 @@ export const MemberList = () => {
                 color: "white",
                 width: 48,
                 height: 48,
-                borderRadius: '50%', // Hacemos el botón redondo
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                borderRadius: "50%", // Hacemos el botón redondo
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                 "&:hover": {
                   backgroundColor: "primary.dark",
-                  boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                  boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
                 },
               }}
             >
@@ -226,22 +270,33 @@ export const MemberList = () => {
                   <FilterChip
                     label="Todos"
                     isSelected={filterValues.status === "all"}
-                    onSelect={() => handleFilter({ ...filterValues, status: "all" })}
+                    onSelect={() =>
+                      handleFilter({ ...filterValues, status: "all" })
+                    }
                   />
                   <FilterChip
                     label="Membresía activa"
                     isSelected={filterValues.status === "active_membership"}
-                    onSelect={() => handleFilter({ ...filterValues, status: "active_membership" })}
+                    onSelect={() =>
+                      handleFilter({
+                        ...filterValues,
+                        status: "active_membership",
+                      })
+                    }
                   />
                   <FilterChip
                     label="Pago vencido"
                     isSelected={filterValues.status === "overdue"}
-                    onSelect={() => handleFilter({ ...filterValues, status: "overdue" })}
+                    onSelect={() =>
+                      handleFilter({ ...filterValues, status: "overdue" })
+                    }
                   />
                   <FilterChip
                     label="Sin membresía"
                     isSelected={filterValues.status === "no_membership"}
-                    onSelect={() => handleFilter({ ...filterValues, status: "no_membership" })}
+                    onSelect={() =>
+                      handleFilter({ ...filterValues, status: "no_membership" })
+                    }
                   />
                 </Stack>
               </Stack>
@@ -260,20 +315,24 @@ export const MemberList = () => {
                   <Chip
                     label="Nombre"
                     size="small"
-                    onClick={() => handleFilter({ ...filterValues, sortBy: "name" })}
+                    onClick={() =>
+                      handleFilter({ ...filterValues, sortBy: "name" })
+                    }
                     sx={{
                       height: "24px",
                       fontSize: "0.75rem",
-                      backgroundColor: filterValues.sortBy === "name" 
-                        ? `${theme.palette.text.primary}15`
-                        : "grey.100",
+                      backgroundColor:
+                        filterValues.sortBy === "name"
+                          ? `${theme.palette.text.primary}15`
+                          : "grey.100",
                       color: theme.palette.text.primary,
-                      border: 'none',
+                      border: "none",
                       fontWeight: 500,
-                      '&:hover': {
-                        backgroundColor: filterValues.sortBy === "name"
-                          ? `${theme.palette.text.primary}25`
-                          : "grey.200",
+                      "&:hover": {
+                        backgroundColor:
+                          filterValues.sortBy === "name"
+                            ? `${theme.palette.text.primary}25`
+                            : "grey.200",
                       },
                     }}
                   />
@@ -281,40 +340,48 @@ export const MemberList = () => {
                   <Chip
                     label="Fecha"
                     size="small"
-                    onClick={() => handleFilter({ ...filterValues, sortBy: "date" })}
+                    onClick={() =>
+                      handleFilter({ ...filterValues, sortBy: "date" })
+                    }
                     sx={{
                       height: "24px",
                       fontSize: "0.75rem",
-                      backgroundColor: filterValues.sortBy === "date" 
-                        ? `${theme.palette.text.primary}15`
-                        : "grey.100",
+                      backgroundColor:
+                        filterValues.sortBy === "date"
+                          ? `${theme.palette.text.primary}15`
+                          : "grey.100",
                       color: theme.palette.text.primary,
-                      border: 'none',
+                      border: "none",
                       fontWeight: 500,
-                      '&:hover': {
-                        backgroundColor: filterValues.sortBy === "date"
-                          ? `${theme.palette.text.primary}25`
-                          : "grey.200",
+                      "&:hover": {
+                        backgroundColor:
+                          filterValues.sortBy === "date"
+                            ? `${theme.palette.text.primary}25`
+                            : "grey.200",
                       },
                     }}
                   />
                   <Chip
                     label="Estado"
                     size="small"
-                    onClick={() => handleFilter({ ...filterValues, sortBy: "status" })}
+                    onClick={() =>
+                      handleFilter({ ...filterValues, sortBy: "status" })
+                    }
                     sx={{
                       height: "24px",
                       fontSize: "0.75rem",
-                      backgroundColor: filterValues.sortBy === "status" 
-                        ? `${theme.palette.text.primary}15`
-                        : "grey.100",
+                      backgroundColor:
+                        filterValues.sortBy === "status"
+                          ? `${theme.palette.text.primary}15`
+                          : "grey.100",
                       color: theme.palette.text.primary,
-                      border: 'none',
+                      border: "none",
                       fontWeight: 500,
-                      '&:hover': {
-                        backgroundColor: filterValues.sortBy === "status"
-                          ? `${theme.palette.text.primary}25`
-                          : "grey.200",
+                      "&:hover": {
+                        backgroundColor:
+                          filterValues.sortBy === "status"
+                            ? `${theme.palette.text.primary}25`
+                            : "grey.200",
                       },
                     }}
                   />
@@ -328,23 +395,38 @@ export const MemberList = () => {
               <Box
                 key={member.id}
                 onClick={() => navigate(`/members/${member.id}`)}
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
               >
                 <MemberCard
                   key={member.id}
                   member={member}
                   onEdit={(id: string) => navigate(`/members/edit/${id}`)}
-                  onDelete={(id: string) => deleteMember(id)}
+                  onDelete={(id: string) => handleDeleteClick(id)}
                 />
               </Box>
             ))}
             {hasMore && (
-              <Box ref={ref} display="flex" justifyContent="center" sx={{ mt: 2 }}>
+              <Box
+                ref={ref}
+                display="flex"
+                justifyContent="center"
+                sx={{ mt: 2 }}
+              >
                 <CircularProgress size={24} />
               </Box>
             )}
           </Stack>
         </Stack>
+        <ConfirmDialog
+          open={confirmDialogOpen}
+          title="Eliminar miembro"
+          message="¿Estás seguro de que deseas eliminar este miembro? Esta acción no se puede deshacer."
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setConfirmDialogOpen(false)}
+          severity="error"
+        />
         <FloatingActions />
       </Box>
     );
@@ -376,11 +458,11 @@ export const MemberList = () => {
               color: "white",
               width: 48,
               height: 48,
-              borderRadius: '50%', // Hacemos el botón redondo
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              borderRadius: "50%", // Hacemos el botón redondo
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               "&:hover": {
                 backgroundColor: "primary.dark",
-                boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
               },
             }}
           >
@@ -391,38 +473,98 @@ export const MemberList = () => {
         <Collapse in={showFilters}>
           {/* ... contenido existente de los filtros ... */}
         </Collapse>
-        {/* Tabla para escritorio */}
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Teléfono</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell>Vencimiento</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedMembers.map((member: Member) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  onClick={() => navigate(`/members/${member.id}`)}
-                  onEdit={(id: string) => navigate(`/members/edit/${id}`)}
-                  onDelete={(id: string) => deleteMember(id)}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
+        {/* Tabla de miembros para desktop */}
+        {!isMobile && (
+          <DataTable
+            columns={[
+              {
+                id: "name",
+                label: "Nombre",
+                render: (member: Member) =>
+                  `${member.first_name} ${member.last_name}`,
+              },
+              {
+                id: "email",
+                label: "Email",
+                render: (member: Member) => member.email,
+              },
+              {
+                id: "phone",
+                label: "Teléfono",
+                render: (member: Member) => member.phone || "-",
+              },
+              {
+                id: "status",
+                label: "Estado",
+                render: (member: Member) => (
+                  <StatusChip
+                    status={
+                      member.current_membership?.payment_status ||
+                      "no_membership"
+                    }
+                    customLabel={
+                      member.current_membership ? undefined : "Sin membresía"
+                    }
+                  />
+                ),
+              },
+              {
+                id: "expiration",
+                label: "Vencimiento",
+                render: (member: Member) =>
+                  member.current_membership
+                    ? formatMembershipDate(member.current_membership.end_date)
+                    : "-",
+              },
+              {
+                id: "actions",
+                label: "Acciones",
+                render: (member: Member) => (
+                  <>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/members/edit/${member.id}`);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(member.id);
+                      }}
+                      color="error"
+                      size="small"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </>
+                ),
+              },
+            ]}
+            data={paginatedMembers}
+            keyExtractor={(member) => member.id}
+            isLoading={loading}
+            emptyMessage="No hay miembros registrados"
+          />
+        )}
         {hasMore && (
           <Box ref={ref} display="flex" justifyContent="center" sx={{ mt: 2 }}>
             <CircularProgress size={24} />
           </Box>
         )}
       </Stack>
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Eliminar miembro"
+        message="¿Estás seguro de que deseas eliminar este miembro? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDialogOpen(false)}
+        severity="error"
+      />
       <FloatingActions />
     </Box>
   );

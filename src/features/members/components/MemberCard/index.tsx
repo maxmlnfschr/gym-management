@@ -94,11 +94,18 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
                 {member.phone}
               </Typography>
             )}
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
+              <StatusChip 
+                status={member.current_membership?.payment_status || 'no_membership'} 
+                customLabel={member.current_membership ? undefined : 'Sin membresía'} 
+              />
+            </Stack>
           </Box>
         </CardContent>
       </Card>
     );
   }
+  
   return (
     <TableRow 
       onClick={onClick}
@@ -113,9 +120,9 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
       <TableCell>{member.email}</TableCell>
       <TableCell>{member.phone || '-'}</TableCell>
       <TableCell>
-        <MembershipStatus 
-          memberId={member.id}
-          variant="chip-only"
+        <StatusChip 
+          status={member.current_membership?.payment_status || 'no_membership'} 
+          customLabel={member.current_membership ? undefined : 'Sin membresía'} 
         />
       </TableCell>
       <TableCell>
