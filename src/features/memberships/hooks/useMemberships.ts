@@ -48,7 +48,8 @@ export const useMemberships = (memberId?: string) => {
           .from("memberships")
           .update({ 
             end_date: startDate.toISOString(),
-            payment_status: 'overdue'
+            // Eliminamos esta línea para mantener el estado de pago original
+            // payment_status: 'overdue'
           })
           .eq("member_id", data.memberId)
           .gte("end_date", new Date().toISOString());
