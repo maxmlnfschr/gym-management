@@ -35,7 +35,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
             <Typography variant="body2" gutterBottom>
               Período: {formatMembershipDate(membership.start_date)} - {formatMembershipDate(membership.end_date)}
             </Typography>
-            <StatusChip status={membership.payment_status} />
+            <StatusChip status={membership.payment_status} context="payment" />
           </Paper>
         ))}
       </Box>
@@ -74,7 +74,7 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
             id: 'status',
             label: 'Estado',
             render: (membership) => (
-              <StatusChip status={membership.payment_status} />
+              <StatusChip status={membership.payment_status} context="payment" />
             )
           }
         ]}

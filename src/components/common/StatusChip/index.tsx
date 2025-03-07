@@ -5,16 +5,27 @@ type StatusType = 'success' | 'warning' | 'error' | 'info' | 'default';
 interface StatusChipProps extends Omit<ChipProps, 'color'> {
   status: StatusType | string;
   customLabel?: string;
+  context?: 'membership' | 'payment';
 }
 
-export const StatusChip = ({ status, customLabel, ...props }: StatusChipProps) => {
+export const StatusChip = ({ status, customLabel, context = 'membership', ...props }: StatusChipProps) => {
   const getStatusConfig = (status: string): { color: StatusType, label: string } => {
+    // Para estados de pago - solo paid y pending
+    if (context === 'payment') {
+      switch (status) {
+        case 'paid':
+          return { color: 'success', label: customLabel || 'Pagado' };
+        case 'pending':
+        default:
+          return { color: 'warning', label: customLabel || 'Pendiente' };
+      }
+    }
+    // Para estados de membresía (default)
     switch (status) {
       case 'active':
-      case 'paid':
       case 'allowed':
       case 'success':
-        return { color: 'success', label: customLabel || 'Activo' };
+        return { color: 'success', label: customLabel || 'Membresía activa' }; // Cambiado de 'Activo' a 'Membresía activa'
       case 'pending':
         return { color: 'warning', label: customLabel || 'Pendiente' };
       case 'overdue':

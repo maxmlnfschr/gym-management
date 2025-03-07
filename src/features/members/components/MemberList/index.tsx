@@ -24,10 +24,8 @@ import {
 } from "@mui/icons-material";
 import { useMemberStore } from "@/features/shared/stores/memberStore";
 import { useNavigate } from "react-router-dom";
-import { MemberFilters } from "@/features/members/components/MemberFilters";
 import type { FilterValues, Member } from "@/features/members/types";
 import { FileDownload as DownloadIcon } from "@mui/icons-material";
-import { exportToCsv } from "@/features/members/utils/exportToCsv";
 import { DataTable } from "@/components/common/DataTable";
 import { formatMembershipDate } from "@/utils/dateUtils";
 import {
@@ -493,20 +491,44 @@ export const MemberList = () => {
                 label: "Teléfono",
                 render: (member: Member) => member.phone || "-",
               },
+              // En la definición de columnas para la tabla de escritorio
               {
                 id: "status",
-                label: "Estado",
-                render: (member: Member) => (
-                  <StatusChip
-                    status={
-                      member.current_membership?.payment_status ||
-                      "no_membership"
+                label: "Membresías",
+                render: (member: Member) => {
+                  // Determinar el estado real de la membresía
+                  let status = "no_membership";
+                  let customLabel;
+
+                  if (member.current_membership) {
+                    const endDate = new Date(
+                      member.current_membership.end_date
+                    );
+                    const today = new Date();
+
+                    if (
+                      member.current_membership.payment_status === "paid" &&
+                      endDate > today
+                    ) {
+                      status = "active";
+                    } else if (
+                      member.current_membership.payment_status === "pending" ||
+                      endDate < today
+                    ) {
+                      status = "expired";
                     }
-                    customLabel={
-                      member.current_membership ? undefined : "Sin membresía"
-                    }
-                  />
-                ),
+                  } else {
+                    customLabel = "Sin membresía";
+                  }
+
+                  return (
+                    <StatusChip
+                      status={status}
+                      customLabel={customLabel}
+                      // No pasamos context porque queremos usar el contexto de membresía por defecto
+                    />
+                  );
+                },
               },
               {
                 id: "expiration",
@@ -515,6 +537,23 @@ export const MemberList = () => {
                   member.current_membership
                     ? formatMembershipDate(member.current_membership.end_date)
                     : "-",
+              },
+              {
+                id: "payment",
+                label: "Pago",
+                render: (member: Member) => {
+                  if (!member.current_membership) {
+                    return "-";
+                  }
+                  return (
+                    <StatusChip
+                      status={
+                        member.current_membership.payment_status || "pending"
+                      }
+                      context="payment"
+                    />
+                  );
+                },
               },
               {
                 id: "actions",

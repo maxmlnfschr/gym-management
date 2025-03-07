@@ -28,7 +28,8 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
     if (!membership) {
       return {
         color: "#9e9e9e",
-        status: "Sin membresía",
+        status: "inactive",
+        label: "Sin membresía",
       };
     }
 
@@ -41,24 +42,27 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
     if (membership.payment_status === "pending" || endDate < today) {
       return {
         color: "#f44336",
-        status: "Membresía vencida",
+        status: "expired",
+        label: "Membresía vencida",
       };
     }
 
     if (endDate <= sevenDaysFromNow) {
       return {
         color: "#ff9800",
-        status: "Por vencer",
+        status: "pending",
+        label: "Por vencer",
       };
     }
 
     return {
       color: "#4caf50",
-      status: "Membresía activa",
+      status: "active",
+      label: "Membresía activa",
     };
   };
 
-  const { color, status } = getStatusConfig();
+  const { color, status, label } = getStatusConfig();
 
   if (isMobile) {
     return (
@@ -96,8 +100,8 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
             )}
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
               <StatusChip 
-                status={member.current_membership?.payment_status || 'no_membership'} 
-                customLabel={member.current_membership ? undefined : 'Sin membresía'} 
+                status={status} 
+                customLabel={label} 
               />
             </Stack>
           </Box>
@@ -121,9 +125,17 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
       <TableCell>{member.phone || '-'}</TableCell>
       <TableCell>
         <StatusChip 
-          status={member.current_membership?.payment_status || 'no_membership'} 
-          customLabel={member.current_membership ? undefined : 'Sin membresía'} 
+          status={status} 
+          customLabel={label} 
         />
+      </TableCell>
+      <TableCell>
+        {member.current_membership && (
+          <StatusChip 
+            status={member.current_membership.payment_status || 'pending'} 
+            context="payment" 
+          />
+        )}
       </TableCell>
       <TableCell>
         {member.current_membership ? (
