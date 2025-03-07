@@ -88,8 +88,6 @@ export const AccessList = () => {
           placeholder="Buscar accesos..."
           value={filterValues.search}
           onChange={(value) => handleFilter({ search: value })}
-          onFilterClick={() => setShowFilters(!showFilters)}
-          isFilterActive={showFilters}
         />
         <AccessFilters
           filterValues={filterValues}

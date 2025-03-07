@@ -53,7 +53,7 @@ import {
 } from "@mui/material";
 import { StatusChip } from "@/components/common/StatusChip";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { LoadingScreen } from '@/components/common/LoadingScreen';
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -212,6 +212,7 @@ export const MemberList = () => {
       <Box>
         <Stack spacing={3}>
           {/* Barra de búsqueda y botón */}
+          {/* En la versión móvil */}
           <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{ flex: 1 }}>
               <SearchBar
@@ -223,8 +224,6 @@ export const MemberList = () => {
                     search: value,
                   })
                 }
-                onFilterClick={handleFilterClick}
-                isFilterActive={showFilters}
               />
             </Box>
             <IconButton
@@ -450,8 +449,6 @@ export const MemberList = () => {
                   search: value,
                 })
               }
-              onFilterClick={handleFilterClick}
-              isFilterActive={showFilters}
             />
           </Box>
           <IconButton

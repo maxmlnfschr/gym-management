@@ -1,5 +1,5 @@
 import { InputBase, Paper, IconButton, styled } from "@mui/material";
-import { Search as SearchIcon, Cancel as CancelIcon, Tune as TuneIcon } from "@mui/icons-material";
+import { Search as SearchIcon, Cancel as CancelIcon } from "@mui/icons-material";
 
 const SearchWrapper = styled(Paper)(({ theme }) => ({
   padding: '4px 0',  // Añadimos padding vertical pero mantenemos 0 en horizontal
@@ -18,16 +18,12 @@ interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  onFilterClick?: (event: React.MouseEvent<HTMLElement>) => void;
-  isFilterActive?: boolean;
 }
 
 export const SearchBar = ({
   value,
   onChange,
   placeholder = "Buscar...",
-  onFilterClick,
-  isFilterActive = false,
 }: SearchBarProps) => {
   const handleClear = () => {
     onChange("");
@@ -58,22 +54,6 @@ export const SearchBar = ({
           <CancelIcon />
         </IconButton>
       )}
-      <IconButton
-        type="button"
-        sx={{
-          p: "10px",
-          color: isFilterActive ? "text.primary" : "text.secondary",
-          '&:hover': {
-            bgcolor: 'transparent',
-            color: 'text.primary'
-          },
-          transition: 'color 0.2s ease-in-out'
-        }}
-        aria-label="filters"
-        onClick={onFilterClick}
-      >
-        <TuneIcon />
-      </IconButton>
     </SearchWrapper>
   );
 };
