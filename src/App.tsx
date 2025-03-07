@@ -24,6 +24,7 @@ import { MemberDetails } from "@/features/members/components/MemberDetails";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AccessControlPage } from "@/features/access/components/AccessControlPage";
 import { AccessList } from "@/features/access/components/AccessList";
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,17 +64,7 @@ function AppContent() {
   }, [initialized]);
 
   if (!isReady) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-        bgcolor="#fff"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingScreen message="Cargando..." />;
   }
 
   return (

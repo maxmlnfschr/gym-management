@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/features/shared/stores/authStore';
-import { CircularProgress, Box } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from '@/App';  // Changed from 'import App' to 'import { App }'
+import { LoadingScreen } from '@/components/common/LoadingScreen';
 
 export const RouterProvider = () => {
   const { initialized } = useAuthStore();
@@ -18,17 +18,7 @@ export const RouterProvider = () => {
   }, [initialized]);
 
   if (!isReady) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="100vh"
-        bgcolor="#fff"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingScreen message="Iniciando aplicación..." />;
   }
 
   return (

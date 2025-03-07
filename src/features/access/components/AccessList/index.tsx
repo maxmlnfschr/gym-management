@@ -10,6 +10,7 @@ import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
 import { DataTable } from "@/components/common/DataTable";
 import { StatusChip } from "@/components/common/StatusChip";
 import { useTheme, useMediaQuery } from "@mui/material";
+import { LoadingScreen } from '@/components/common/LoadingScreen';
 
 export const AccessList = () => {
   const theme = useTheme();
@@ -78,11 +79,7 @@ export const AccessList = () => {
   }, [accesses, filterValues]);
 
   if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" p={3}>
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingScreen fullScreen={false} message="Cargando registros de acceso..." />;
   }
   return (
     <Box>

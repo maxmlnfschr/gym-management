@@ -53,6 +53,7 @@ import {
 } from "@mui/material";
 import { StatusChip } from "@/components/common/StatusChip";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { LoadingScreen } from '@/components/common/LoadingScreen';
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -201,6 +202,11 @@ export const MemberList = () => {
       setPage((prevPage) => prevPage + 1);
     }
   }, [inView, hasMore]);
+  // Replace loading indicators with LoadingScreen
+  if (loading) {
+    return <LoadingScreen fullScreen={false} message="Cargando miembros..." />;
+  }
+
   if (isMobile) {
     return (
       <Box>

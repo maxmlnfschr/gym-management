@@ -31,6 +31,7 @@ import { useTheme, useMediaQuery } from "@mui/material"; // Añadir estos import
 // Agregar este import junto a los demás
 import { useMemberships } from "@/features/memberships/hooks/useMemberships";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { LoadingScreen } from '@/components/common/LoadingScreen';
 
 export const MemberDetails = () => {
   const theme = useTheme();
@@ -82,7 +83,7 @@ export const MemberDetails = () => {
     setAnchorEl(null);
   };
   if (isLoading) {
-    return <Typography>Cargando...</Typography>;
+    return <LoadingScreen fullScreen={false} message="Cargando información del miembro..." />;
   }
 
   if (!member) {
