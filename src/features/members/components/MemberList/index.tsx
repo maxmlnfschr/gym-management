@@ -494,33 +494,24 @@ export const MemberList = () => {
               // En la definición de columnas para la tabla de escritorio
               {
                 id: "status",
-                label: "Membresías",
+                label: "Membresía",
                 render: (member: Member) => {
-                  // Determinar el estado real de la membresía
+                  // Determinar el estado real de la membresía basado solo en la fecha
                   let status = "no_membership";
                   let customLabel;
-
                   if (member.current_membership) {
                     const endDate = new Date(
                       member.current_membership.end_date
                     );
                     const today = new Date();
-
-                    if (
-                      member.current_membership.payment_status === "paid" &&
-                      endDate > today
-                    ) {
+                    if (endDate > today) {
                       status = "active";
-                    } else if (
-                      member.current_membership.payment_status === "pending" ||
-                      endDate < today
-                    ) {
+                    } else {
                       status = "expired";
                     }
                   } else {
                     customLabel = "Sin membresía";
                   }
-
                   return (
                     <StatusChip
                       status={status}
@@ -528,6 +519,36 @@ export const MemberList = () => {
                       // No pasamos context porque queremos usar el contexto de membresía por defecto
                     />
                   );
+                },
+              },
+              {
+                id: "plan_type",
+                label: "Plan",
+                render: (member: Member) => {
+                  // Añadir console.log para depuración
+                  console.log(
+                    "Member plan type:",
+                    member.current_membership?.plan_type
+                  );
+
+                  if (!member.current_membership) return "-";
+
+                  // Convertir el plan_type a un formato más legible
+                  const planTypeMap: Record<string, string> = {
+                    monthly: "Mensual",
+                    quarterly: "Trimestral",
+                    annual: "Anual",
+                  };
+
+                  const planType = member.current_membership.plan_type;
+
+                  // Si planType es undefined o null, mostrar un mensaje más descriptivo
+                  if (!planType) {
+                    console.log("Plan type is missing for member:", member.id);
+                    return "No especificado";
+                  }
+
+                  return planTypeMap[planType] || planType;
                 },
               },
               {

@@ -45,7 +45,8 @@ export const useMemberStore = create<MemberState>((set) => ({
             id,
             start_date,
             end_date,
-            payment_status
+            payment_status,
+            plan_type
           )
         `)
         .eq('status', 'active')

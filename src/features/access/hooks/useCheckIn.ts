@@ -24,28 +24,30 @@ export const useCheckIn = () => {
           payment_status
         `)
         .eq('member_id', memberId)
-        .eq('payment_status', 'paid')
         .order('created_at', { ascending: false });
       if (membershipError) throw membershipError;
       
       const membership = memberships?.[0];
       
       if (!membership) {
-        throw new Error('No se encontró una membresía activa');
+        throw new Error('No se encontró una membresía');
       }
-      if (!membership) {
-        throw new Error('La membresía está vencida');
-      }
-
+      
+      // Verificar si la membresía está vencida (por fecha)
       const membershipEndDate = new Date(membership.end_date);
       membershipEndDate.setHours(0, 0, 0, 0);
       const isLastDay = membership.end_date === today.toISOString().split('T')[0];
-
+      
       // Allow access if membership ends today or is future
       if (membershipEndDate < today && !isLastDay) {
         throw new Error('La membresía está vencida');
       }
-
+      
+      // Verificar si el pago está pendiente (separado de la fecha)
+      if (membership.payment_status === 'pending') {
+        throw new Error('El pago de la membresía está pendiente');
+      }
+      
       // Then create access log
       const { data: accessLog, error: accessError } = await supabase
         .from('access_logs')

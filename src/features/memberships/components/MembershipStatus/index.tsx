@@ -11,45 +11,37 @@ interface MembershipStatusProps {
 
 export const MembershipStatus = ({ memberId, variant = 'default' }: MembershipStatusProps) => {
   const { currentMembership, isLoading } = useMemberships(memberId);
+  
   if (isLoading) return null;
   
+  // Obtener el estado de la membresía usando la función centralizada
   const { status, severity } = getMembershipStatus(currentMembership);
   
-  const chipContent = (
+  // Crear el chip de estado de membresía
+  const membershipChip = (
     <StatusChip
       status={severity}
       customLabel={status}
       variant={variant === 'plain' ? "outlined" : "filled"}
     />
   );
-
+  
   if (variant === 'default') {
     return (
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Stack direction="row" spacing={2} alignItems="center">
-          {chipContent}
-          {currentMembership && (
-            <Typography variant="body2">
-              Vence: {formatMembershipDate(currentMembership.end_date)}
-            </Typography>
-          )}
+        <Typography variant="subtitle2" gutterBottom>
+          Estado de membresía
+        </Typography>
+        <Stack direction="row" spacing={1}>
+          {membershipChip}
         </Stack>
       </Paper>
     );
   }
-
-  if (variant === 'chip-only') {
-    return chipContent;
-  }
-
+  
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
-      {chipContent}
-      {currentMembership && (
-        <Typography variant="body2">
-          Vence: {formatMembershipDate(currentMembership.end_date)}
-        </Typography>
-      )}
+    <Stack direction="row" spacing={1}>
+      {membershipChip}
     </Stack>
   );
 };

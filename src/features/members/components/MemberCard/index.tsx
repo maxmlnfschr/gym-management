@@ -39,7 +39,8 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
       today.getTime() + 7 * 24 * 60 * 60 * 1000
     );
 
-    if (membership.payment_status === "pending" || endDate < today) {
+    // Verificar primero si está vencida por fecha (independiente del pago)
+    if (endDate < today) {
       return {
         color: "#f44336",
         status: "expired",
@@ -47,6 +48,7 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
       };
     }
 
+    // Luego verificar si está por vencer
     if (endDate <= sevenDaysFromNow) {
       return {
         color: "#ff9800",
@@ -55,6 +57,7 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
       };
     }
 
+    // Membresía activa
     return {
       color: "#4caf50",
       status: "active",
@@ -128,14 +131,6 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
           status={status} 
           customLabel={label} 
         />
-      </TableCell>
-      <TableCell>
-        {member.current_membership && (
-          <StatusChip 
-            status={member.current_membership.payment_status || 'pending'} 
-            context="payment" 
-          />
-        )}
       </TableCell>
       <TableCell>
         {member.current_membership ? (

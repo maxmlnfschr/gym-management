@@ -10,7 +10,7 @@ interface StatusChipProps extends Omit<ChipProps, 'color'> {
 
 export const StatusChip = ({ status, customLabel, context = 'membership', ...props }: StatusChipProps) => {
   const getStatusConfig = (status: string): { color: StatusType, label: string } => {
-    // Para estados de pago - solo paid y pending
+    // Para estados de pago
     if (context === 'payment') {
       switch (status) {
         case 'paid':
@@ -20,21 +20,24 @@ export const StatusChip = ({ status, customLabel, context = 'membership', ...pro
           return { color: 'warning', label: customLabel || 'Pendiente' };
       }
     }
+    
     // Para estados de membresía (default)
     switch (status) {
       case 'active':
       case 'allowed':
       case 'success':
-        return { color: 'success', label: customLabel || 'Membresía activa' }; // Cambiado de 'Activo' a 'Membresía activa'
+        return { color: 'success', label: customLabel || 'Membresía activa' };
+      case 'expiring':
       case 'pending':
-        return { color: 'warning', label: customLabel || 'Pendiente' };
-      case 'overdue':
+        return { color: 'warning', label: customLabel || 'Por vencer' };
       case 'expired':
       case 'denied':
       case 'error':
-        return { color: 'error', label: customLabel || 'Vencido' };
+        return { color: 'error', label: customLabel || 'Vencida' };
+      case 'no_membership':
+        return { color: 'default', label: customLabel || 'Sin membresía' };
       case 'inactive':
-        return { color: 'default', label: customLabel || 'Inactivo' };
+        return { color: 'default', label: customLabel || 'Inactiva' };
       default:
         return { color: 'default', label: customLabel || status };
     }

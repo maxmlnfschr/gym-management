@@ -12,7 +12,8 @@ export interface Member {
     id: string;
     start_date: string;
     end_date: string;
-    payment_status: 'pending' | 'paid';
+    payment_status: "pending" | "paid";
+    plan_type: string; // Añadir esta propiedad
   };
 }
 

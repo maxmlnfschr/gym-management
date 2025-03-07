@@ -2,6 +2,7 @@ interface MembershipStatusInfo {
   color: string;
   status: string;
   severity: 'success' | 'warning' | 'error' | 'default';
+  paymentStatus?: string;
 }
 
 export const getMembershipStatus = (membership: any): MembershipStatusInfo => {
@@ -9,7 +10,7 @@ export const getMembershipStatus = (membership: any): MembershipStatusInfo => {
     return {
       color: '#9e9e9e',
       status: 'Sin membresía',
-      severity: 'default'  // Cambiado de 'error' a 'default'
+      severity: 'default'
     };
   }
 
@@ -17,25 +18,31 @@ export const getMembershipStatus = (membership: any): MembershipStatusInfo => {
   const endDate = new Date(membership.end_date);
   const sevenDaysFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-  if (membership.payment_status === 'pending' || endDate < today) {
+  // Verificar primero si está vencida por fecha (independiente del pago)
+  if (endDate < today) {
     return {
       color: '#f44336',
       status: 'Membresía vencida',
-      severity: 'error'
+      severity: 'error',
+      paymentStatus: membership.payment_status
     };
   }
 
+  // Luego verificar si está por vencer
   if (endDate <= sevenDaysFromNow) {
     return {
       color: '#ff9800',
       status: 'Por vencer',
-      severity: 'warning'
+      severity: 'warning',
+      paymentStatus: membership.payment_status
     };
   }
 
+  // Membresía activa (con información de pago separada)
   return {
     color: '#4caf50',
     status: 'Membresía activa',
-    severity: 'success'
+    severity: 'success',
+    paymentStatus: membership.payment_status
   };
 };

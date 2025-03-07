@@ -16,7 +16,8 @@ export const useMember = (id?: string) => {
             id,
             start_date,
             end_date,
-            payment_status
+            payment_status,
+            plan_type
           )
         `)
         .eq('id', id)

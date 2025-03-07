@@ -13,6 +13,7 @@ import { es } from "date-fns/locale";
 import { Membership } from "../../types";
 import { useState } from "react";
 import { TabPanel } from "@/components/common/TabPanel";
+import { formatRelativeDate } from "@/utils/dateUtils";
 
 export const MembershipStatusMonitor = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -98,8 +99,8 @@ export const MembershipStatusMonitor = () => {
         <Tab
           label={
             sortedPending.length > 0
-              ? `Pendientes (${sortedPending.length})`
-              : "Pendientes"
+              ? `Pagos pendientes (${sortedPending.length})`
+              : "Pagos pendientes"
           }
         />
       </Tabs>
@@ -210,8 +211,8 @@ export const MembershipStatusMonitor = () => {
                 severity="info"
                 sx={{
                   mb: 1,
-                  backgroundColor: "rgba(158, 158, 158, 0.08)",
-                  "& .MuiAlert-icon": { color: "#9e9e9e" },
+                  backgroundColor: "rgba(255, 152, 0, 0.08)",
+                  "& .MuiAlert-icon": { color: "#ff9800" },
                 }}
               >
                 <Link
@@ -222,18 +223,17 @@ export const MembershipStatusMonitor = () => {
                     component="span"
                     sx={{
                       cursor: "pointer",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      },
+                      "&:hover": { textDecoration: "underline" },
                     }}
                   >
                     {membership.members.first_name}{" "}
                     {membership.members.last_name}
                   </MuiLink>
                 </Link>{" "}
-                - Vence el{" "}
+                - Pago pendiente - Vence{" "}
                 {formatDistanceToNow(new Date(membership.end_date), {
                   locale: es,
+                  addSuffix: true
                 })}
               </Alert>
             ))}
