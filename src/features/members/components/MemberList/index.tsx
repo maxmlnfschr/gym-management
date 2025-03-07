@@ -592,6 +592,8 @@ export const MemberList = () => {
                         e.stopPropagation();
                         navigate(`/members/edit/${member.id}`);
                       }}
+                      color="inherit"
+                      size="small"
                     >
                       <EditIcon />
                     </IconButton>
@@ -600,7 +602,7 @@ export const MemberList = () => {
                         e.stopPropagation();
                         handleDeleteClick(member.id);
                       }}
-                      color="error"
+                      color="inherit"
                       size="small"
                     >
                       <DeleteIcon />

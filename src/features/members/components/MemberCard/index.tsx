@@ -1,5 +1,23 @@
-import { Typography, Stack, IconButton, useTheme, useMediaQuery, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from "@mui/material";
-import { Info } from "@mui/icons-material";
+import {
+  Typography,
+  Stack,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Chip,
+} from "@mui/material";
+import {
+  Info,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import {
   ResponsiveCard,
   ResponsiveCardContent,
@@ -10,6 +28,7 @@ import { StatusChip } from "@/components/common/StatusChip";
 import { Card, CardContent, Box, Avatar } from "@mui/material";
 import { MembershipStatus } from "@/features/memberships/components/MembershipStatus";
 import { formatMembershipDate } from "@/utils/dateUtils";
+import { ActionMenu } from "@/components/common/ActionMenu";
 
 interface MemberCardProps {
   member: Member;
@@ -18,9 +37,14 @@ interface MemberCardProps {
   onDelete?: (id: string) => void;
 }
 
-export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProps) => {
+export const MemberCard = ({
+  member,
+  onClick,
+  onEdit,
+  onDelete,
+}: MemberCardProps) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const getStatusConfig = () => {
     const membership = member.current_membership;
@@ -69,18 +93,18 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
 
   if (isMobile) {
     return (
-      <Card 
-        onClick={onClick} 
-        sx={{ 
-          cursor: onClick ? 'pointer' : 'default',
-          '&:hover': onClick ? { bgcolor: 'action.hover' } : {},
-          position: 'relative',
-          overflow: 'hidden'
+      <Card
+        onClick={onClick}
+        sx={{
+          cursor: onClick ? "pointer" : "default",
+          "&:hover": onClick ? { bgcolor: "action.hover" } : {},
+          position: "relative",
+          overflow: "hidden",
         }}
       >
         <Box
           sx={{
-            position: 'absolute',
+            position: "absolute",
             left: 0,
             top: 0,
             bottom: 0,
@@ -88,57 +112,127 @@ export const MemberCard = ({ member, onClick, onEdit, onDelete }: MemberCardProp
             backgroundColor: color,
           }}
         />
-        <CardContent sx={{ pt: 1.5, pb: 2, px: 2, '&:last-child': { pb: 2 } }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        <CardContent sx={{ pt: 1.5, pb: 2, px: 2, "&:last-child": { pb: 2 } }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
             <Typography variant="h6" component="div">
               {`${member.first_name} ${member.last_name}`}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+            >
               {member.email}
             </Typography>
             {member.phone && (
-              <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+              >
                 {member.phone}
               </Typography>
             )}
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-              <StatusChip 
-                status={status} 
-                customLabel={label} 
-              />
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{ mt: 1 }}
+            >
+              <StatusChip status={status} customLabel={label} />
             </Stack>
           </Box>
+          {/* En la versión móvil */}
+          {(onEdit || onDelete) && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ActionMenu
+                actions={[
+                  ...(onEdit
+                    ? [
+                        {
+                          label: "Editar",
+                          icon: <EditIcon fontSize="small" />,
+                          onClick: () => onEdit(member.id),
+                          color: "inherit" as const,
+                        },
+                      ]
+                    : []),
+                  ...(onDelete
+                    ? [
+                        {
+                          label: "Eliminar",
+                          icon: <DeleteIcon fontSize="small" />,
+                          onClick: () => onDelete(member.id),
+                          color: "inherit" as const,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            </Box>
+          )}
         </CardContent>
       </Card>
     );
   }
-  
+
   return (
-    <TableRow 
+    <TableRow
       onClick={onClick}
-      sx={{ 
-        cursor: onClick ? 'pointer' : 'default',
-        '&:hover': onClick ? { bgcolor: 'action.hover' } : {},
+      sx={{
+        cursor: onClick ? "pointer" : "default",
+        "&:hover": onClick ? { bgcolor: "action.hover" } : {},
       }}
     >
       <TableCell sx={{ borderLeft: `4px solid ${color}` }}>
         {`${member.first_name} ${member.last_name}`}
       </TableCell>
       <TableCell>{member.email}</TableCell>
-      <TableCell>{member.phone || '-'}</TableCell>
+      <TableCell>{member.phone || "-"}</TableCell>
       <TableCell>
-        <StatusChip 
-          status={status} 
-          customLabel={label} 
-        />
+        <StatusChip status={status} customLabel={label} />
       </TableCell>
       <TableCell>
-        {member.current_membership ? (
-          formatMembershipDate(member.current_membership.end_date)
-        ) : (
-          '-'
-        )}
+        {member.current_membership
+          ? formatMembershipDate(member.current_membership.end_date)
+          : "-"}
       </TableCell>
+      {/* En la versión de escritorio, necesitamos usar TableCell en lugar de Box */}
+      {(onEdit || onDelete) && (
+        <TableCell align="right" onClick={(e) => e.stopPropagation()}>
+          <ActionMenu
+            actions={[
+              ...(onEdit
+                ? [
+                    {
+                      label: "Editar",
+                      icon: <EditIcon fontSize="small" />,
+                      onClick: () => onEdit(member.id),
+                      color: "inherit" as const,
+                    },
+                  ]
+                : []),
+              ...(onDelete
+                ? [
+                    {
+                      label: "Eliminar",
+                      icon: <DeleteIcon fontSize="small" />,
+                      onClick: () => onDelete(member.id),
+                      color: "inherit" as const,
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        </TableCell>
+      )}
     </TableRow>
   );
 };

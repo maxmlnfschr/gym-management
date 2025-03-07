@@ -11,8 +11,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useState } from "react"; // Added this import
-// Modificar el import para solo traer lo necesario
+import { useState } from "react";
 import { MembershipList } from "@/features/memberships/components/MembershipList";
 import { MembershipStatus } from "@/features/memberships/components/MembershipStatus";
 import { PaymentHistory } from "@/features/memberships/components/PaymentHistory";
@@ -20,18 +19,17 @@ import { useMember } from "@/features/members/hooks/useMember";
 import {
   Email,
   Phone,
-  Edit,
-  MoreVert,
-  Delete,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
   Payment,
 } from "@mui/icons-material";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
-import { useTheme, useMediaQuery } from "@mui/material"; // Añadir estos imports
-// Agregar este import junto a los demás
+import { useTheme, useMediaQuery } from "@mui/material";
 import { useMemberships } from "@/features/memberships/hooks/useMemberships";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { LoadingScreen } from '@/components/common/LoadingScreen';
+import { ActionMenu } from "@/components/common/ActionMenu";
 
 export const MemberDetails = () => {
   const theme = useTheme();
@@ -106,9 +104,22 @@ export const MemberDetails = () => {
                   <Typography variant="h5">
                     {member?.first_name} {member?.last_name}
                   </Typography>
-                  <IconButton onClick={handleMenuClick}>
-                    <MoreVert />
-                  </IconButton>
+                  <ActionMenu
+                    actions={[
+                      {
+                        label: "Editar",
+                        icon: <EditIcon fontSize="small" />,
+                        onClick: () => navigate(`/members/edit/${id}`),
+                        color: "inherit" as const
+                      },
+                      {
+                        label: "Eliminar",
+                        icon: <DeleteIcon fontSize="small" />,
+                        onClick: handleDeleteClick,
+                        color: "inherit" as const
+                      }
+                    ]}
+                  />
                 </Stack>
                 <MembershipStatus memberId={id!} />
                 <Stack direction="row" spacing={2}>
@@ -165,9 +176,22 @@ export const MemberDetails = () => {
                   >
                     Ver pagos
                   </Button>
-                  <IconButton onClick={handleMenuClick}>
-                    <MoreVert />
-                  </IconButton>
+                  <ActionMenu
+                    actions={[
+                      {
+                        label: "Editar",
+                        icon: <EditIcon fontSize="small" />,
+                        onClick: () => navigate(`/members/edit/${id}`),
+                        color: "inherit" as const
+                      },
+                      {
+                        label: "Eliminar",
+                        icon: <DeleteIcon fontSize="small" />,
+                        onClick: handleDeleteClick,
+                        color: "inherit" as const
+                      }
+                    ]}
+                  />
                 </Stack>
               </Stack>
             )}
@@ -214,11 +238,11 @@ export const MemberDetails = () => {
             handleMenuClose();
           }}
         >
-          <Edit sx={{ mr: 1 }} fontSize="small" />
+          <EditIcon sx={{ mr: 1 }} fontSize="small" />
           Editar
         </MenuItem>
         <MenuItem onClick={handleDeleteClick}>
-          <Delete sx={{ mr: 1 }} fontSize="small" />
+          <DeleteIcon sx={{ mr: 1 }} fontSize="small" />
           Eliminar
         </MenuItem>
       </Menu>
