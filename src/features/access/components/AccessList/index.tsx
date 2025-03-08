@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
-import { Box, Stack, Paper, Typography, CircularProgress } from "@mui/material";
+import { Box, Stack, Paper, Typography } from "@mui/material";
 import { SearchBar } from "@/components/common/SearchBar";
-import { AccessFilters } from "../AccessFilters";
 import { AccessFilterValues } from "../../types";
 import { useAccess } from "../../hooks/useAccess";
 import { format } from "date-fns";
@@ -10,13 +9,12 @@ import { startOfDay, startOfWeek, startOfMonth } from "date-fns";
 import { DataTable } from "@/components/common/DataTable";
 import { StatusChip } from "@/components/common/StatusChip";
 import { useTheme, useMediaQuery } from "@mui/material";
-import { LoadingScreen } from '@/components/common/LoadingScreen';
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 
 export const AccessList = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { accesses, isLoading } = useAccess();
-  const [showFilters, setShowFilters] = useState(false);
   const [filterValues, setFilterValues] = useState<AccessFilterValues>({
     search: "",
     dateRange: "all",
@@ -37,21 +35,22 @@ export const AccessList = () => {
 
     // Filtrar por fecha
     if (filterValues.dateRange !== "all") {
-      const startDate = filterValues.dateRange === "day" 
-        ? startOfDay(now)
-        : filterValues.dateRange === "week"
-        ? startOfWeek(now, { locale: es })
-        : startOfMonth(now);
+      const startDate =
+        filterValues.dateRange === "day"
+          ? startOfDay(now)
+          : filterValues.dateRange === "week"
+          ? startOfWeek(now, { locale: es })
+          : startOfMonth(now);
 
-      filtered = filtered.filter(access => 
-        new Date(access.check_in) >= startDate
+      filtered = filtered.filter(
+        (access) => new Date(access.check_in) >= startDate
       );
     }
 
     // Filtrar por búsqueda
     if (filterValues.search) {
       const searchLower = filterValues.search.toLowerCase();
-      filtered = filtered.filter(access => 
+      filtered = filtered.filter((access) =>
         `${access.member.first_name} ${access.member.last_name}`
           .toLowerCase()
           .includes(searchLower)
@@ -79,7 +78,12 @@ export const AccessList = () => {
   }, [accesses, filterValues]);
 
   if (isLoading) {
-    return <LoadingScreen fullScreen={false} message="Cargando registros de acceso..." />;
+    return (
+      <LoadingScreen
+        fullScreen={false}
+        message="Cargando registros de acceso..."
+      />
+    );
   }
   return (
     <Box>
@@ -89,16 +93,11 @@ export const AccessList = () => {
           value={filterValues.search}
           onChange={(value) => handleFilter({ search: value })}
         />
-        <AccessFilters
-          filterValues={filterValues}
-          onFilterChange={handleFilter}
-          show={showFilters}
-        />
-        
+
         {isMobile ? (
           <Stack spacing={2}>
             {filteredAccesses.map((access) => {
-              console.log('Mobile access status:', access.status, access);
+              console.log("Mobile access status:", access.status, access);
               return (
                 <Paper
                   key={access.id}
@@ -119,10 +118,7 @@ export const AccessList = () => {
                       })}
                     </Typography>
                   </Box>
-                  <StatusChip 
-                    status="success" 
-                    customLabel="Permitido"
-                  />
+                  <StatusChip status="success" customLabel="Permitido" />
                 </Paper>
               );
             })}
@@ -131,28 +127,29 @@ export const AccessList = () => {
           <DataTable
             columns={[
               {
-                id: 'date',
-                label: 'Fecha',
-                render: (access) => format(new Date(access.check_in), "dd/MM/yyyy HH:mm", { locale: es })
+                id: "date",
+                label: "Fecha",
+                render: (access) =>
+                  format(new Date(access.check_in), "dd/MM/yyyy HH:mm", {
+                    locale: es,
+                  }),
               },
               {
-                id: 'member',
-                label: 'Miembro',
-                render: (access) => `${access.member.first_name} ${access.member.last_name}`
+                id: "member",
+                label: "Miembro",
+                render: (access) =>
+                  `${access.member.first_name} ${access.member.last_name}`,
               },
               {
-                id: 'status',
-                label: 'Estado',
+                id: "status",
+                label: "Estado",
                 render: (access) => {
-                  console.log('Desktop access status:', access.status, access);
+                  console.log("Desktop access status:", access.status, access);
                   return (
-                    <StatusChip 
-                      status="success" 
-                      customLabel="Permitido"
-                    />
+                    <StatusChip status="success" customLabel="Permitido" />
                   );
-                }
-              }
+                },
+              },
             ]}
             data={filteredAccesses}
             keyExtractor={(access) => access.id}

@@ -36,7 +36,6 @@ import { TextField } from "@mui/material"; // Añadir esta importación
 import { SearchBar } from "@/components/common/SearchBar";
 import { MemberCard } from "@/features/members/components/MemberCard";
 import { Chip } from "@mui/material";
-import { Collapse } from "@mui/material";
 import { FilterChip } from "@/components/common/FilterChip";
 import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { FloatingActions } from "@/components/common/FloatingActions";
@@ -66,14 +65,12 @@ export const MemberList = () => {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const { ref, inView } = useInView();
   const itemsPerPage = 10;
-  const [showFilters, setShowFilters] = useState(false);
   const [filterValues, setFilterValues] = useState<FilterValues>({
     search: "",
     status: "all",
     sortBy: "name",
     sortDirection: "asc",
   });
-  // Agregar estos estados aquí, fuera de handleFilter
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
@@ -181,9 +178,7 @@ export const MemberList = () => {
     setConfirmDialogOpen(false);
     setMemberToDelete(null);
   };
-  const handleFilterClick = (event: React.MouseEvent<HTMLElement>) => {
-    setShowFilters(!showFilters);
-  };
+
   useEffect(() => {
     fetchMembers();
   }, [fetchMembers]);
@@ -202,7 +197,7 @@ export const MemberList = () => {
       setPage((prevPage) => prevPage + 1);
     }
   }, [inView, hasMore]);
-  // Replace loading indicators with LoadingScreen
+
   if (loading) {
     return <LoadingScreen fullScreen={false} message="Cargando miembros..." />;
   }
@@ -245,153 +240,6 @@ export const MemberList = () => {
               <AddIcon fontSize="medium" />
             </IconButton>
           </Stack>
-          {/* Filtros en línea */}
-          <Collapse in={showFilters}>
-            <Stack
-              spacing={2}
-              sx={{
-                backgroundColor: "background.paper",
-                borderRadius: 1.5,
-                p: 2,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                border: "1px solid",
-                borderColor: "divider",
-              }}
-            >
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    minWidth: "auto",
-                    fontWeight: 500,
-                  }}
-                >
-                  Estado:
-                </Typography>
-                <Stack direction="row" spacing={0.5}>
-                  <FilterChip
-                    label="Todos"
-                    isSelected={filterValues.status === "all"}
-                    onSelect={() =>
-                      handleFilter({ ...filterValues, status: "all" })
-                    }
-                  />
-                  <FilterChip
-                    label="Membresía activa"
-                    isSelected={filterValues.status === "active_membership"}
-                    onSelect={() =>
-                      handleFilter({
-                        ...filterValues,
-                        status: "active_membership",
-                      })
-                    }
-                  />
-                  <FilterChip
-                    label="Pago vencido"
-                    isSelected={filterValues.status === "overdue"}
-                    onSelect={() =>
-                      handleFilter({ ...filterValues, status: "overdue" })
-                    }
-                  />
-                  <FilterChip
-                    label="Sin membresía"
-                    isSelected={filterValues.status === "no_membership"}
-                    onSelect={() =>
-                      handleFilter({ ...filterValues, status: "no_membership" })
-                    }
-                  />
-                </Stack>
-              </Stack>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    minWidth: "auto",
-                    fontWeight: 500,
-                  }}
-                >
-                  Ordenar por:
-                </Typography>
-                <Stack direction="row" spacing={0.5}>
-                  <Chip
-                    label="Nombre"
-                    size="small"
-                    onClick={() =>
-                      handleFilter({ ...filterValues, sortBy: "name" })
-                    }
-                    sx={{
-                      height: "24px",
-                      fontSize: "0.75rem",
-                      backgroundColor:
-                        filterValues.sortBy === "name"
-                          ? `${theme.palette.text.primary}15`
-                          : "grey.100",
-                      color: theme.palette.text.primary,
-                      border: "none",
-                      fontWeight: 500,
-                      "&:hover": {
-                        backgroundColor:
-                          filterValues.sortBy === "name"
-                            ? `${theme.palette.text.primary}25`
-                            : "grey.200",
-                      },
-                    }}
-                  />
-                  {/* Aplicar el mismo estilo a los otros chips */}
-                  <Chip
-                    label="Fecha"
-                    size="small"
-                    onClick={() =>
-                      handleFilter({ ...filterValues, sortBy: "date" })
-                    }
-                    sx={{
-                      height: "24px",
-                      fontSize: "0.75rem",
-                      backgroundColor:
-                        filterValues.sortBy === "date"
-                          ? `${theme.palette.text.primary}15`
-                          : "grey.100",
-                      color: theme.palette.text.primary,
-                      border: "none",
-                      fontWeight: 500,
-                      "&:hover": {
-                        backgroundColor:
-                          filterValues.sortBy === "date"
-                            ? `${theme.palette.text.primary}25`
-                            : "grey.200",
-                      },
-                    }}
-                  />
-                  <Chip
-                    label="Estado"
-                    size="small"
-                    onClick={() =>
-                      handleFilter({ ...filterValues, sortBy: "status" })
-                    }
-                    sx={{
-                      height: "24px",
-                      fontSize: "0.75rem",
-                      backgroundColor:
-                        filterValues.sortBy === "status"
-                          ? `${theme.palette.text.primary}15`
-                          : "grey.100",
-                      color: theme.palette.text.primary,
-                      border: "none",
-                      fontWeight: 500,
-                      "&:hover": {
-                        backgroundColor:
-                          filterValues.sortBy === "status"
-                            ? `${theme.palette.text.primary}25`
-                            : "grey.200",
-                      },
-                    }}
-                  />
-                </Stack>
-              </Stack>
-            </Stack>
-          </Collapse>
           {/* Lista de miembros */}
           <Stack spacing={2}>
             {paginatedMembers.map((member: Member) => (
@@ -470,10 +318,6 @@ export const MemberList = () => {
             <AddIcon fontSize="medium" />
           </IconButton>
         </Stack>
-        {/* Filtros en línea */}
-        <Collapse in={showFilters}>
-          {/* ... contenido existente de los filtros ... */}
-        </Collapse>
         {/* Tabla de miembros para desktop */}
         {!isMobile && (
           <DataTable
