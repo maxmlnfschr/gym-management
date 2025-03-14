@@ -16,8 +16,12 @@ import { TabPanel } from "@/components/common/TabPanel";
 import { formatRelativeDate } from "@/utils/dateUtils";
 import { FitnessCenter } from "@mui/icons-material";
 import { EmptyState } from "@/components/common/EmptyState";
+import { useTheme, useMediaQuery } from "@mui/material"; // Agregar estos imports
+import { ResponsiveTabs } from "@/components/common/ResponsiveTabs";
 
 export const MembershipStatusMonitor = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [tabValue, setTabValue] = useState(0);
   const {
     expiringMemberships,
@@ -78,70 +82,19 @@ export const MembershipStatusMonitor = () => {
     return null;
   };
 
+  const tabs = [
+    { label: "Vencidos", count: sortedExpired.length },
+    { label: "Por vencer", count: sortedExpiring.length },
+    { label: "Pendientes", count: sortedPending.length }
+  ];
+
   return (
     <Stack spacing={1}>
-      <Tabs
+      <ResponsiveTabs
         value={tabValue}
         onChange={handleTabChange}
-        variant="scrollable"
-        scrollButtons="auto"
-        allowScrollButtonsMobile
-        TabIndicatorProps={{
-          sx: { display: "none" },
-        }}
-        sx={{
-          "& .MuiTab-root": {
-            color: "#666",
-            borderRadius: "6px",
-            marginRight: 1,
-            minHeight: "32px",
-            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-            minWidth: { xs: "100px", sm: 160 },
-            padding: { xs: "6px 12px", sm: "8px 20px" },
-            backgroundColor: "transparent",
-            border: "1px solid #e0e0e0",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "rgba(0, 0, 0, 0.04)",
-            },
-            "&.Mui-selected": {
-              color: "#fff",
-              backgroundColor: "black",
-              border: "1px solid black",
-              fontWeight: 500,
-              transition: "all 0.2s ease-in-out",
-            },
-          },
-          "& .MuiTabs-scrollButtons": {
-            width: "20px",
-            "&.Mui-disabled": {
-              display: "none",
-            },
-          },
-        }}
-      >
-        <Tab
-          label={
-            sortedExpired.length > 0
-              ? `Vencidos (${sortedExpired.length})`
-              : "Vencidos"
-          }
-        />
-        <Tab
-          label={
-            sortedExpiring.length > 0
-              ? `Por vencer (${sortedExpiring.length})`
-              : "Por vencer"
-          }
-        />
-        <Tab
-          label={
-            sortedPending.length > 0
-              ? `Pagos pendientes (${sortedPending.length})`
-              : "Pagos pendientes"
-          }
-        />
-      </Tabs>
+        tabs={tabs}
+      />
       <TabPanel value={tabValue} index={0}>
         {sortedExpired.length === 0 ? (
           renderEmptyState()
