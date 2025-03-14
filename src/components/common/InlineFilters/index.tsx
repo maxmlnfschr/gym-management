@@ -7,7 +7,7 @@ export interface FilterOption {
   label: string;
 }
 
-interface FilterGroup {
+export interface FilterGroup {
   name: string;
   options: FilterOption[];
 }
@@ -52,13 +52,23 @@ export const InlineFilters = ({ filterGroups, onFilterChange }: InlineFiltersPro
   };
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={{ mb: 2, overflow: 'hidden' }}>
       {filterGroups.map((group) => (
         <Box key={group.name} sx={{ mb: 1 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-            {group.name}
-          </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+          <Box 
+            sx={{ 
+              display: 'flex',
+              gap: 0.5,
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              '&::-webkit-scrollbar': {
+                display: 'none'
+              },
+              pb: 1,
+            }}
+          >
             {group.options.map((option) => (
               <FilterChip
                 key={option.id}

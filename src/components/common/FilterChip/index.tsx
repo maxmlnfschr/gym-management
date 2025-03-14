@@ -1,27 +1,28 @@
-import { Chip, ChipProps } from "@mui/material";
+import { Chip } from "@mui/material";
 
-interface FilterChipProps extends Omit<ChipProps, 'onClick'> {
-  isSelected?: boolean;
-  onSelect?: () => void;
+interface FilterChipProps {
+  label: string;
+  isSelected: boolean;
+  onSelect: () => void;
 }
 
-export const FilterChip = ({ isSelected, onSelect, ...props }: FilterChipProps) => {
+export const FilterChip = ({ label, isSelected, onSelect }: FilterChipProps) => {
   return (
     <Chip
-      size="small"
+      label={label}
       onClick={onSelect}
       sx={{
-        height: '24px',
-        fontSize: '0.75rem',
-        bgcolor: isSelected ? 'text.primary' : 'grey.100',
-        color: isSelected ? 'white' : 'text.primary',
-        fontWeight: 500,
+        backgroundColor: isSelected ? 'primary.main' : 'grey.300',
+        color: isSelected ? 'primary.contrastText' : 'text.primary',
+        border: 'none',
         '&:hover': {
-          bgcolor: isSelected ? 'text.primary' : 'grey.200',
+          backgroundColor: isSelected ? 'primary.dark' : 'grey.400',
         },
-        ...props.sx
+        fontWeight: isSelected ? 500 : 400,
+        transition: 'all 0.2s ease-in-out',
+        height: '32px',
+        fontSize: '0.875rem',
       }}
-      {...props}
     />
   );
 };

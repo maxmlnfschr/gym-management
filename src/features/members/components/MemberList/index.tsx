@@ -55,6 +55,8 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { People } from "@mui/icons-material";
 import { EmptyState } from "@/components/common/EmptyState";
+import { InlineFilters } from "@/components/common/InlineFilters";
+import { MEMBERSHIP_STATUS_FILTERS } from "@/features/memberships/constants/filters";
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -211,11 +213,48 @@ export const MemberList = () => {
   //   );
   // }
 
+  // Primero añadimos el manejador después de los estados existentes
+  const handleInlineFilterChange = (groupName: string, selectedFilters: string[]) => {
+    let filtered = [...members].filter(
+      (member) => !member.deleted_at && member.status !== "deleted"
+    );
+  
+    if (selectedFilters.length > 0) {
+      filtered = filtered.filter(member => {
+        const membership = member.current_membership;
+        return selectedFilters.some(filter => {
+          switch (filter) {
+            case 'active':
+              return membership && 
+                     membership.payment_status === "paid" && 
+                     new Date(membership.end_date) > new Date();
+            case 'expiring':
+              const endDate = membership ? new Date(membership.end_date) : null;
+              const today = new Date();
+              const daysUntilExpiration = endDate ? 
+                Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+              return daysUntilExpiration <= 7 && daysUntilExpiration > 0;
+            case 'expired':
+              return membership && new Date(membership.end_date) < new Date();
+            case 'pending':
+              return membership && membership.payment_status === "pending";
+            case 'no_membership':
+              return !membership;
+            default:
+              return false;
+          }
+        });
+      });
+    }
+    
+    setFilteredMembers(filtered);
+  };
+  
+  // En la vista móvil, después del SearchBar y antes del EmptyState:
   if (isMobile) {
     return (
       <Box>
         <Stack spacing={3}>
-          {/* Mantenemos la barra de búsqueda */}
           <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{ flex: 1 }}>
               <SearchBar
@@ -248,7 +287,13 @@ export const MemberList = () => {
               <AddIcon fontSize="medium" />
             </IconButton>
           </Stack>
-          
+  
+          {/* Añadir InlineFilters aquí */}
+          <InlineFilters 
+            filterGroups={[MEMBERSHIP_STATUS_FILTERS]}
+            onFilterChange={handleInlineFilterChange}
+          />
+  
           {/* Lista de miembros o EmptyState */}
           {filteredMembers.length === 0 ? (
             <EmptyState
@@ -343,6 +388,12 @@ export const MemberList = () => {
             <AddIcon fontSize="medium" />
           </IconButton>
         </Stack>
+
+        {/* Añadir InlineFilters aquí */}
+        <InlineFilters 
+          filterGroups={[MEMBERSHIP_STATUS_FILTERS]}
+          onFilterChange={handleInlineFilterChange}
+        />
 
         {/* Table or EmptyState for desktop */}
         {filteredMembers.length === 0 ? (
