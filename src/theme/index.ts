@@ -15,8 +15,8 @@ export const theme = createTheme({
       contrastText: '#fff',
     },
     background: {
-      default: '#fff',
-      paper: '#ffffff',
+      default: '#f5f5f5', // Cambiado de '#fff' a un gris muy suave
+      paper: '#ffffff',   // Mantenemos el blanco para las tarjetas
     },
   },
   components: {

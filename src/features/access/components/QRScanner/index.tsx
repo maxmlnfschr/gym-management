@@ -119,7 +119,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
   return (
     <Paper
       elevation={0}
-      sx={{ backgroundColor: "background.default", borderRadius: 2 }}
+      sx={{ backgroundColor: "background.paper", borderRadius: 2 }}
     >
       <Box
         sx={{
@@ -127,6 +127,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
           flexDirection: "column",
           alignItems: "center",
           gap: 2,
+          backgroundColor: "background.paper"
         }}
       >
         <Box sx={{ width: "100%", position: "relative" }}>

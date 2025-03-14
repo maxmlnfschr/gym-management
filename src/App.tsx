@@ -25,6 +25,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AccessControlPage } from "@/features/access/components/AccessControlPage";
 import { AccessList } from "@/features/access/components/AccessList";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
+import { CssBaseline } from '@mui/material';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
           <AuthProvider>
             <AppContent />
