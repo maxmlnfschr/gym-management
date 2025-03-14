@@ -53,6 +53,8 @@ import {
 import { StatusChip } from "@/components/common/StatusChip";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
+import { People } from "@mui/icons-material";
+import { EmptyState } from "@/components/common/EmptyState";
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -202,12 +204,18 @@ export const MemberList = () => {
     return <LoadingScreen fullScreen={false} message="Cargando miembros..." />;
   }
 
+  // Eliminamos este bloque de código que retornaba solo el EmptyState
+  // if (!loading && filteredMembers.length === 0) {
+  //   return (
+  //     <EmptyState ... />
+  //   );
+  // }
+
   if (isMobile) {
     return (
       <Box>
         <Stack spacing={3}>
-          {/* Barra de búsqueda y botón */}
-          {/* En la versión móvil */}
+          {/* Mantenemos la barra de búsqueda */}
           <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{ flex: 1 }}>
               <SearchBar
@@ -240,33 +248,48 @@ export const MemberList = () => {
               <AddIcon fontSize="medium" />
             </IconButton>
           </Stack>
-          {/* Lista de miembros */}
-          <Stack spacing={2}>
-            {paginatedMembers.map((member: Member) => (
-              <Box
-                key={member.id}
-                onClick={() => navigate(`/members/${member.id}`)}
-                sx={{ cursor: "pointer" }}
-              >
-                <MemberCard
+          
+          {/* Lista de miembros o EmptyState */}
+          {filteredMembers.length === 0 ? (
+            <EmptyState
+              icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
+              title={filterValues.search ? "No se encontraron resultados" : "No hay miembros"}
+              description={
+                filterValues.search 
+                  ? "Intenta con otros términos de búsqueda"
+                  : "Comienza agregando un nuevo miembro"
+              }
+              actionText={filterValues.search ? undefined : "Agregar miembro"}
+              onAction={filterValues.search ? undefined : () => navigate("/members/add")}
+            />
+          ) : (
+            <Stack spacing={2}>
+              {paginatedMembers.map((member: Member) => (
+                <Box
                   key={member.id}
-                  member={member}
-                  onEdit={(id: string) => navigate(`/members/edit/${id}`)}
-                  onDelete={(id: string) => handleDeleteClick(id)}
-                />
-              </Box>
-            ))}
-            {hasMore && (
-              <Box
-                ref={ref}
-                display="flex"
-                justifyContent="center"
-                sx={{ mt: 2 }}
-              >
-                <CircularProgress size={24} />
-              </Box>
-            )}
-          </Stack>
+                  onClick={() => navigate(`/members/${member.id}`)}
+                  sx={{ cursor: "pointer" }}
+                >
+                  <MemberCard
+                    key={member.id}
+                    member={member}
+                    onEdit={(id: string) => navigate(`/members/edit/${id}`)}
+                    onDelete={(id: string) => handleDeleteClick(id)}
+                  />
+                </Box>
+              ))}
+              {hasMore && (
+                <Box
+                  ref={ref}
+                  display="flex"
+                  justifyContent="center"
+                  sx={{ mt: 2 }}
+                >
+                  <CircularProgress size={24} />
+                </Box>
+              )}
+            </Stack>
+          )}
         </Stack>
         <ConfirmDialog
           open={confirmDialogOpen}
@@ -282,10 +305,12 @@ export const MemberList = () => {
       </Box>
     );
   }
+
+  // Desktop view
   return (
     <Box>
       <Stack spacing={3}>
-        {/* Barra de búsqueda y botón */}
+        {/* Search bar and filters remain the same */}
         <Stack direction="row" spacing={2} alignItems="center">
           <Box sx={{ flex: 1 }}>
             <SearchBar
@@ -318,150 +343,165 @@ export const MemberList = () => {
             <AddIcon fontSize="medium" />
           </IconButton>
         </Stack>
-        {/* Tabla de miembros para desktop */}
-        {!isMobile && (
-          <DataTable
-            columns={[
-              {
-                id: "name",
-                label: "Nombre",
-                render: (member: Member) =>
-                  `${member.first_name} ${member.last_name}`,
-              },
-              {
-                id: "email",
-                label: "Email",
-                render: (member: Member) => member.email,
-              },
-              {
-                id: "phone",
-                label: "Teléfono",
-                render: (member: Member) => member.phone || "-",
-              },
-              // En la definición de columnas para la tabla de escritorio
-              {
-                id: "status",
-                label: "Membresía",
-                render: (member: Member) => {
-                  // Determinar el estado real de la membresía basado solo en la fecha
-                  let status = "no_membership";
-                  let customLabel;
-                  if (member.current_membership) {
-                    const endDate = new Date(
-                      member.current_membership.end_date
-                    );
-                    const today = new Date();
-                    if (endDate > today) {
-                      status = "active";
-                    } else {
-                      status = "expired";
-                    }
-                  } else {
-                    customLabel = "Sin membresía";
-                  }
-                  return (
-                    <StatusChip
-                      status={status}
-                      customLabel={customLabel}
-                      // No pasamos context porque queremos usar el contexto de membresía por defecto
-                    />
-                  );
-                },
-              },
-              {
-                id: "plan_type",
-                label: "Plan",
-                render: (member: Member) => {
-                  // Añadir console.log para depuración
-                  console.log(
-                    "Member plan type:",
-                    member.current_membership?.plan_type
-                  );
 
-                  if (!member.current_membership) return "-";
-
-                  // Convertir el plan_type a un formato más legible
-                  const planTypeMap: Record<string, string> = {
-                    monthly: "Mensual",
-                    quarterly: "Trimestral",
-                    annual: "Anual",
-                  };
-
-                  const planType = member.current_membership.plan_type;
-
-                  // Si planType es undefined o null, mostrar un mensaje más descriptivo
-                  if (!planType) {
-                    console.log("Plan type is missing for member:", member.id);
-                    return "No especificado";
-                  }
-
-                  return planTypeMap[planType] || planType;
-                },
-              },
-              {
-                id: "expiration",
-                label: "Vencimiento",
-                render: (member: Member) =>
-                  member.current_membership
-                    ? formatMembershipDate(member.current_membership.end_date)
-                    : "-",
-              },
-              {
-                id: "payment",
-                label: "Pago",
-                render: (member: Member) => {
-                  if (!member.current_membership) {
-                    return "-";
-                  }
-                  return (
-                    <StatusChip
-                      status={
-                        member.current_membership.payment_status || "pending"
-                      }
-                      context="payment"
-                    />
-                  );
-                },
-              },
-              {
-                id: "actions",
-                label: "Acciones",
-                render: (member: Member) => (
-                  <>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/members/edit/${member.id}`);
-                      }}
-                      color="inherit"
-                      size="small"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(member.id);
-                      }}
-                      color="inherit"
-                      size="small"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </>
-                ),
-              },
-            ]}
-            data={paginatedMembers}
-            keyExtractor={(member) => member.id}
-            isLoading={loading}
-            emptyMessage="No hay miembros registrados"
+        {/* Table or EmptyState for desktop */}
+        {filteredMembers.length === 0 ? (
+          <EmptyState
+            icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
+            title={filterValues.search ? "No se encontraron resultados" : "No hay miembros"}
+            description={
+              filterValues.search 
+                ? "Intenta con otros términos de búsqueda"
+                : "Comienza agregando un nuevo miembro"
+            }
+            actionText={filterValues.search ? undefined : "Agregar miembro"}
+            onAction={filterValues.search ? undefined : () => navigate("/members/add")}
           />
-        )}
-        {hasMore && (
-          <Box ref={ref} display="flex" justifyContent="center" sx={{ mt: 2 }}>
-            <CircularProgress size={24} />
-          </Box>
+        ) : (
+          <>
+            <DataTable
+              columns={[
+                {
+                  id: "name",
+                  label: "Nombre",
+                  render: (member: Member) =>
+                    `${member.first_name} ${member.last_name}`,
+                },
+                {
+                  id: "email",
+                  label: "Email",
+                  render: (member: Member) => member.email,
+                },
+                {
+                  id: "phone",
+                  label: "Teléfono",
+                  render: (member: Member) => member.phone || "-",
+                },
+                // En la definición de columnas para la tabla de escritorio
+                {
+                  id: "status",
+                  label: "Membresía",
+                  render: (member: Member) => {
+                    // Determinar el estado real de la membresía basado solo en la fecha
+                    let status = "no_membership";
+                    let customLabel;
+                    if (member.current_membership) {
+                      const endDate = new Date(
+                        member.current_membership.end_date
+                      );
+                      const today = new Date();
+                      if (endDate > today) {
+                        status = "active";
+                      } else {
+                        status = "expired";
+                      }
+                    } else {
+                      customLabel = "Sin membresía";
+                    }
+                    return (
+                      <StatusChip
+                        status={status}
+                        customLabel={customLabel}
+                        // No pasamos context porque queremos usar el contexto de membresía por defecto
+                      />
+                    );
+                  },
+                },
+                {
+                  id: "plan_type",
+                  label: "Plan",
+                  render: (member: Member) => {
+                    // Añadir console.log para depuración
+                    console.log(
+                      "Member plan type:",
+                      member.current_membership?.plan_type
+                    );
+
+                    if (!member.current_membership) return "-";
+
+                    // Convertir el plan_type a un formato más legible
+                    const planTypeMap: Record<string, string> = {
+                      monthly: "Mensual",
+                      quarterly: "Trimestral",
+                      annual: "Anual",
+                    };
+
+                    const planType = member.current_membership.plan_type;
+
+                    // Si planType es undefined o null, mostrar un mensaje más descriptivo
+                    if (!planType) {
+                      console.log("Plan type is missing for member:", member.id);
+                      return "No especificado";
+                    }
+
+                    return planTypeMap[planType] || planType;
+                  },
+                },
+                {
+                  id: "expiration",
+                  label: "Vencimiento",
+                  render: (member: Member) =>
+                    member.current_membership
+                      ? formatMembershipDate(member.current_membership.end_date)
+                      : "-",
+                },
+                {
+                  id: "payment",
+                  label: "Pago",
+                  render: (member: Member) => {
+                    if (!member.current_membership) {
+                      return "-";
+                    }
+                    return (
+                      <StatusChip
+                        status={
+                          member.current_membership.payment_status || "pending"
+                        }
+                        context="payment"
+                      />
+                    );
+                  },
+                },
+                {
+                  id: "actions",
+                  label: "Acciones",
+                  render: (member: Member) => (
+                    <>
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/members/edit/${member.id}`);
+                        }}
+                        color="inherit"
+                        size="small"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(member.id);
+                        }}
+                        color="inherit"
+                        size="small"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+                  ),
+                },
+              ]}
+              data={paginatedMembers}
+              keyExtractor={(member) => member.id}
+              isLoading={loading}
+              emptyMessage="No hay miembros registrados"
+            />
+            {hasMore && (
+              <Box ref={ref} display="flex" justifyContent="center" sx={{ mt: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
+            )}
+          </>
         )}
       </Stack>
       <ConfirmDialog

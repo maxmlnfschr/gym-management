@@ -10,24 +10,24 @@ import { DataTable } from "@/components/common/DataTable";
 import { StatusChip } from "@/components/common/StatusChip";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
+import { History } from "@mui/icons-material";
+import { EmptyState } from "@/components/common/EmptyState";
+import { type AccessLogWithMember } from "../../types";
 
-export const AccessList = () => {
+interface AccessListProps {
+  accesses: AccessLogWithMember[];
+  emptyState: React.ReactNode;
+}
+
+export const AccessList = ({ accesses, emptyState }: AccessListProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { accesses, isLoading } = useAccess();
   const [filterValues, setFilterValues] = useState<AccessFilterValues>({
     search: "",
     dateRange: "all",
     sortBy: "date",
     sortDirection: "desc",
   });
-
-  const handleFilter = (newValues: Partial<AccessFilterValues>) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      ...newValues,
-    }));
-  };
 
   const filteredAccesses = useMemo(() => {
     let filtered = [...accesses];
@@ -48,43 +48,46 @@ export const AccessList = () => {
     }
 
     // Filtrar por búsqueda
+    // Corregir la referencia a member por members
     if (filterValues.search) {
       const searchLower = filterValues.search.toLowerCase();
       filtered = filtered.filter((access) =>
-        `${access.member.first_name} ${access.member.last_name}`
+        `${access.members.first_name} ${access.members.last_name}`
           .toLowerCase()
           .includes(searchLower)
       );
     }
 
-    // Ordenar
+    // Corregir en el ordenamiento también
     filtered.sort((a, b) => {
       if (filterValues.sortBy === "date") {
         return filterValues.sortDirection === "desc"
           ? new Date(b.check_in).getTime() - new Date(a.check_in).getTime()
           : new Date(a.check_in).getTime() - new Date(b.check_in).getTime();
       }
-      // Ordenar por nombre de miembro
       return filterValues.sortDirection === "desc"
-        ? `${b.member.first_name} ${b.member.last_name}`.localeCompare(
-            `${a.member.first_name} ${a.member.last_name}`
+        ? `${b.members.first_name} ${b.members.last_name}`.localeCompare(
+            `${a.members.first_name} ${a.members.last_name}`
           )
-        : `${a.member.first_name} ${a.member.last_name}`.localeCompare(
-            `${b.member.first_name} ${b.member.last_name}`
+        : `${a.members.first_name} ${a.members.last_name}`.localeCompare(
+            `${b.members.first_name} ${b.members.last_name}`
           );
     });
 
     return filtered;
   }, [accesses, filterValues]);
 
-  if (isLoading) {
-    return (
-      <LoadingScreen
-        fullScreen={false}
-        message="Cargando registros de acceso..."
-      />
-    );
+  if (!accesses || accesses.length === 0) {
+    return emptyState;
   }
+
+  const handleFilter = (newValues: Partial<AccessFilterValues>) => {
+    setFilterValues((prev) => ({
+      ...prev,
+      ...newValues,
+    }));
+  };
+
   return (
     <Box>
       <Stack spacing={3}>
@@ -94,34 +97,37 @@ export const AccessList = () => {
           onChange={(value) => handleFilter({ search: value })}
         />
 
-        {isMobile ? (
+        {filteredAccesses.length === 0 && filterValues.search ? (
+          <EmptyState
+            icon={<History sx={{ fontSize: 40, color: "text.secondary" }} />}
+            title="No se encontraron accesos"
+            description="No hay registros que coincidan con tu búsqueda. Intenta con otros términos."
+          />
+        ) : isMobile ? (
           <Stack spacing={2}>
-            {filteredAccesses.map((access) => {
-              console.log("Mobile access status:", access.status, access);
-              return (
-                <Paper
-                  key={access.id}
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="subtitle1">
-                      {access.member.first_name} {access.member.last_name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {format(new Date(access.check_in), "dd/MM/yyyy HH:mm", {
-                        locale: es,
-                      })}
-                    </Typography>
-                  </Box>
-                  <StatusChip status="success" customLabel="Permitido" />
-                </Paper>
-              );
-            })}
+            {filteredAccesses.map((access) => (
+              <Paper
+                key={access.id}
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Box>
+                  <Typography variant="subtitle1">
+                    {access.members.first_name} {access.members.last_name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {format(new Date(access.check_in), "dd/MM/yyyy HH:mm", {
+                      locale: es,
+                    })}
+                  </Typography>
+                </Box>
+                <StatusChip status="success" customLabel="Permitido" />
+              </Paper>
+            ))}
           </Stack>
         ) : (
           <DataTable
@@ -138,22 +144,19 @@ export const AccessList = () => {
                 id: "member",
                 label: "Miembro",
                 render: (access) =>
-                  `${access.member.first_name} ${access.member.last_name}`,
+                  `${access.members.first_name} ${access.members.last_name}`,
               },
               {
                 id: "status",
                 label: "Estado",
-                render: (access) => {
-                  console.log("Desktop access status:", access.status, access);
-                  return (
-                    <StatusChip status="success" customLabel="Permitido" />
-                  );
-                },
+                render: () => (
+                  <StatusChip status="success" customLabel="Permitido" />
+                ),
               },
             ]}
             data={filteredAccesses}
             keyExtractor={(access) => access.id}
-            isLoading={isLoading}
+            // Eliminar isLoading ya que no lo tenemos
             emptyMessage="No hay registros de acceso"
           />
         )}

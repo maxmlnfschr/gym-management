@@ -1,4 +1,4 @@
-import { Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, useTheme, useMediaQuery } from '@mui/material';
+import { Paper, Typography, Box, useTheme, useMediaQuery } from '@mui/material';
 import { useMemberships } from '@/features/memberships/hooks/useMemberships';
 import { formatMembershipDate } from '@/utils/dateUtils';
 import { StatusChip } from '@/components/common/StatusChip';
@@ -6,9 +6,10 @@ import { DataTable } from "@/components/common/DataTable";
 
 interface PaymentHistoryProps {
   memberId: string;
+  emptyState?: React.ReactNode;
 }
 
-export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
+export const PaymentHistory = ({ memberId, emptyState }: PaymentHistoryProps) => {
   const { memberships } = useMemberships(memberId);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -16,6 +17,10 @@ export const PaymentHistory = ({ memberId }: PaymentHistoryProps) => {
   const sortedMemberships = [...memberships].sort((a, b) => {
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
+
+  if (!memberships || memberships.length === 0) {
+    return emptyState || null;
+  }
 
   if (isMobile) {
     return (

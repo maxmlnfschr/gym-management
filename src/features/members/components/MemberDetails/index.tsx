@@ -30,6 +30,8 @@ import { useMemberships } from "@/features/memberships/hooks/useMemberships";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { LoadingScreen } from '@/components/common/LoadingScreen';
 import { ActionMenu } from "@/components/common/ActionMenu";
+import { CardMembership } from "@mui/icons-material";
+import { EmptyState } from "@/components/common/EmptyState";
 
 export const MemberDetails = () => {
   const theme = useTheme();
@@ -221,7 +223,16 @@ export const MemberDetails = () => {
             <Typography variant="h6">
               Historial de membresías y pagos
             </Typography>
-            <PaymentHistory memberId={id!} />
+            <PaymentHistory 
+              memberId={id!} 
+              emptyState={
+                <EmptyState
+                  icon={<CardMembership sx={{ fontSize: 40, color: "text.secondary" }} />}
+                  title="Sin historial de pagos"
+                  description="Este miembro aún no tiene registros de pagos"
+                />
+              }
+            />
           </Stack>
         </Paper>
       </Stack>

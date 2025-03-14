@@ -14,6 +14,8 @@ import { Membership } from "../../types";
 import { useState } from "react";
 import { TabPanel } from "@/components/common/TabPanel";
 import { formatRelativeDate } from "@/utils/dateUtils";
+import { FitnessCenter } from "@mui/icons-material";
+import { EmptyState } from "@/components/common/EmptyState";
 
 export const MembershipStatusMonitor = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -37,9 +39,45 @@ export const MembershipStatusMonitor = () => {
   if (isLoading) {
     return null;
   }
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  const renderEmptyState = () => {
+    if (tabValue === 0 && sortedExpired.length === 0) {
+      return (
+        <EmptyState
+          icon={<FitnessCenter sx={{ fontSize: 40, color: "success.main" }} />}
+          title="Sin membresías vencidas"
+          description="No hay membresías vencidas en este momento"
+        />
+      );
+    }
+    
+    if (tabValue === 1 && sortedExpiring.length === 0) {
+      return (
+        <EmptyState
+          icon={<FitnessCenter sx={{ fontSize: 40, color: "warning.main" }} />}
+          title="Sin membresías por vencer"
+          description="No hay membresías próximas a vencer"
+        />
+      );
+    }
+    
+    if (tabValue === 2 && sortedPending.length === 0) {
+      return (
+        <EmptyState
+          icon={<FitnessCenter sx={{ fontSize: 40, color: "info.main" }} />}
+          title="Sin pagos pendientes"
+          description="No hay membresías con pagos pendientes"
+        />
+      );
+    }
+    
+    return null;
+  };
+
   return (
     <Stack spacing={1}>
       <Tabs
@@ -105,7 +143,9 @@ export const MembershipStatusMonitor = () => {
         />
       </Tabs>
       <TabPanel value={tabValue} index={0}>
-        {sortedExpired.length > 0 ? (
+        {sortedExpired.length === 0 ? (
+          renderEmptyState()
+        ) : (
           <>
             {sortedExpired.map((membership) => (
               <Alert
@@ -139,22 +179,12 @@ export const MembershipStatusMonitor = () => {
               </Alert>
             ))}
           </>
-        ) : (
-          <Alert
-            severity="success"
-            sx={{
-              backgroundColor: "rgba(46, 125, 50, 0.08)",
-              "& .MuiAlert-icon": {
-                color: "#2e7d32",
-              },
-            }}
-          >
-            No hay membresías vencidas
-          </Alert>
         )}
       </TabPanel>
       <TabPanel value={tabValue} index={1}>
-        {sortedExpiring.length > 0 ? (
+        {sortedExpiring.length === 0 ? (
+          renderEmptyState()
+        ) : (
           <>
             {sortedExpiring.map((membership) => (
               <Alert
@@ -188,22 +218,12 @@ export const MembershipStatusMonitor = () => {
               </Alert>
             ))}
           </>
-        ) : (
-          <Alert
-            severity="success"
-            sx={{
-              backgroundColor: "rgba(46, 125, 50, 0.08)",
-              "& .MuiAlert-icon": {
-                color: "#2e7d32",
-              },
-            }}
-          >
-            No hay membresías por vencer
-          </Alert>
         )}
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
-        {sortedPending.length > 0 ? (
+        {sortedPending.length === 0 ? (
+          renderEmptyState()
+        ) : (
           <>
             {sortedPending.map((membership) => (
               <Alert
@@ -238,18 +258,6 @@ export const MembershipStatusMonitor = () => {
               </Alert>
             ))}
           </>
-        ) : (
-          <Alert
-            severity="success"
-            sx={{
-              backgroundColor: "rgba(46, 125, 50, 0.08)",
-              "& .MuiAlert-icon": {
-                color: "#2e7d32",
-              },
-            }}
-          >
-            No hay pagos pendientes
-          </Alert>
         )}
       </TabPanel>
     </Stack>
