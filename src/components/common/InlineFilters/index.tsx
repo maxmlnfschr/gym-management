@@ -72,6 +72,7 @@ export const InlineFilters = ({ filterGroups, onFilterChange }: InlineFiltersPro
             {group.options.map((option) => (
               <FilterChip
                 key={option.id}
+                id={option.id}
                 label={option.label}
                 isSelected={selectedFilters[group.name].includes(option.id)}
                 onSelect={() => handleFilterToggle(group.name, option.id)}

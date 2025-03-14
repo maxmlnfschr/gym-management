@@ -67,6 +67,7 @@ export const MemberList = () => {
   const [page, setPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});  // Moved here
   const { ref, inView } = useInView();
   const itemsPerPage = 10;
   const [filterValues, setFilterValues] = useState<FilterValues>({
@@ -214,7 +215,16 @@ export const MemberList = () => {
   // }
 
   // Primero añadimos el manejador después de los estados existentes
+  // Remove this duplicate declaration
+  // const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
+
+  // Update the handleInlineFilterChange function
   const handleInlineFilterChange = (groupName: string, selectedFilters: string[]) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [groupName]: selectedFilters
+    }));
+
     let filtered = [...members].filter(
       (member) => !member.deleted_at && member.status !== "deleted"
     );
@@ -298,14 +308,26 @@ export const MemberList = () => {
           {filteredMembers.length === 0 ? (
             <EmptyState
               icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
-              title={filterValues.search ? "No se encontraron resultados" : "No hay miembros"}
+              title={
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                  ? "No se encontraron miembros"
+                  : "No hay miembros"
+              }
               description={
-                filterValues.search 
-                  ? "Intenta con otros términos de búsqueda"
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                  ? "Prueba ajustando los filtros aplicados"
                   : "Comienza agregando un nuevo miembro"
               }
-              actionText={filterValues.search ? undefined : "Agregar miembro"}
-              onAction={filterValues.search ? undefined : () => navigate("/members/add")}
+              actionText={
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                  ? undefined
+                  : "Agregar miembro"
+              }
+              onAction={
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                  ? undefined
+                  : () => navigate("/members/add")
+              }
             />
           ) : (
             <Stack spacing={2}>
