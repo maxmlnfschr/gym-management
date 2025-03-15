@@ -34,20 +34,22 @@ export const InlineFilters = ({
 
   const handleFilterToggle = (groupName: string, filterId: string) => {
     setSelectedFilters((prev) => {
-      const currentSelected = [...prev[groupName]];
-      const filterIndex = currentSelected.indexOf(filterId);
+      const currentSelected = prev[groupName];
+      let newSelected: string[];
 
-      if (filterIndex === -1) {
-        currentSelected.push(filterId);
+      // Si el filtro ya está seleccionado, lo deseleccionamos
+      if (currentSelected.includes(filterId)) {
+        newSelected = [];
       } else {
-        currentSelected.splice(filterIndex, 1);
+        // Si es un nuevo filtro, lo seleccionamos y removemos cualquier otro
+        newSelected = [filterId];
       }
 
-      onFilterChange(groupName, currentSelected);
+      onFilterChange(groupName, newSelected);
 
       return {
         ...prev,
-        [groupName]: currentSelected,
+        [groupName]: newSelected,
       };
     });
   };
