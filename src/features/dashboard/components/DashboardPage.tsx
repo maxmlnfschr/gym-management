@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { Box, Typography, Paper, Grid } from "@mui/material";
 import { useAuthStore } from "@/features/shared/stores/authStore";
-import { PageContainer } from "@/components/common/PageContainer";
 import { useQueryClient } from "@tanstack/react-query";
 import { MembershipStatusMonitor } from "@/features/memberships/components/MembershipStatusMonitor";
 import { DashboardMetrics } from "./DashboardMetrics";
+import { RecentMembershipsCard } from "./cards/RecentMembershipsCard";
 
 export const DashboardPage = () => {
   const { user } = useAuthStore();
@@ -16,9 +16,9 @@ export const DashboardPage = () => {
 
   return (
     <Grid container spacing={3}>
-      {/* Welcome section */}
+      {/* Sección de bienvenida */}
       <Grid item xs={12}>
-        <Paper sx={{ p: 3, mb: 3 }}>
+        <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
             ¡Bienvenido de nuevo!
           </Typography>
@@ -32,16 +32,20 @@ export const DashboardPage = () => {
         </Paper>
       </Grid>
 
-      {/* Metrics section */}
+      {/* Sección de métricas */}
       <Grid item xs={12}>
         <DashboardMetrics />
       </Grid>
 
-      {/* Memberships section */}
-      <Grid item xs={12}>
+      {/* Sección de membresías recientes y monitor de estado */}
+      <Grid item xs={12} md={6}>
+        <RecentMembershipsCard />
+      </Grid>
+
+      <Grid item xs={12} md={6}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Membresías
+            Estado de Membresías
           </Typography>
           <MembershipStatusMonitor />
         </Paper>
