@@ -137,28 +137,33 @@ export const useMemberships = (memberId?: string) => {
 
       const { data: membership, error } = await supabase
         .from("memberships")
-        .insert([{
-          member_id: data.memberId,
-          plan_id: data.planId,
-          plan_type: data.planType, // Aquí también
-          start_date: formattedStartDate,
-          end_date: formattedEndDate,
-          payment_status: data.paymentStatus,
-          amount: Number(plan.price) || 0,
-        }])
-        .select('*')  // Be explicit about what we want to select
+        .insert([membershipData])
+        .select('*')
         .single();
 
-      console.log('Debug - Supabase Request:', {
-        table: 'memberships',
-        method: 'insert',
-        data: membershipData,
-        error
-      });
       if (error) {
         console.error("Error creating membership:", error);
         throw error;
       }
+
+      // Crear el pago si es necesario
+      if (data.payment_method && data.paymentStatus === 'paid') {
+        const { error: paymentError } = await supabase
+          .from('membership_payments')
+          .insert([{
+            membership_id: membership.id,
+            amount: Number(plan.price) || 0,
+            payment_method: data.payment_method,
+            notes: data.payment_notes,
+            status: 'completed'
+          }]);
+
+        if (paymentError) {
+          console.error("Error creating payment:", paymentError);
+          throw paymentError;
+        }
+      }
+
       return membership;
     },
     onSuccess: () => {
@@ -166,6 +171,7 @@ export const useMemberships = (memberId?: string) => {
       queryClient.invalidateQueries({ queryKey: ["memberships", memberId] });
       queryClient.invalidateQueries({ queryKey: ["current-membership", memberId] });
       queryClient.invalidateQueries({ queryKey: ["membership-metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["finance-metrics"] }); // Añadir esta línea
     },
   });
   return {

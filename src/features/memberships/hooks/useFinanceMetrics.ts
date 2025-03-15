@@ -20,31 +20,29 @@ export const useFinanceMetrics = () => {
     queryKey: ['finance-metrics'],
     queryFn: async (): Promise<FinanceMetrics> => {
       const currentDate = new Date();
-      const startDate = startOfMonth(currentDate);
-      const endDate = endOfMonth(currentDate);
+      const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
-      // Get current month payments
+      // Obtener pagos del mes actual
       const { data: monthPayments, error: monthError } = await supabase
         .from('membership_payments')
         .select('amount')
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString());
+        .gte('payment_date', startOfMonth.toISOString())
+        .lte('payment_date', endOfMonth.toISOString())
+        .eq('status', 'completed');
 
       if (monthError) throw monthError;
 
-      // Get pending payments
+      // Obtener pagos pendientes
       const { data: pendingPayments, error: pendingError } = await supabase
-        .from('memberships')
-        .select(`
-          id,
-          plan:membership_plans(price)
-        `)
-        .eq('status', 'pending') as { data: MembershipWithPlan[] | null; error: any };
+        .from('membership_payments')
+        .select('amount')
+        .eq('status', 'pending');
 
       if (pendingError) throw pendingError;
 
       const currentMonthIncome = monthPayments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
-      const pendingAmount = pendingPayments?.reduce((sum, membership) => sum + (membership.plan?.price || 0), 0) || 0;
+      const pendingAmount = pendingPayments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
 
       return {
         currentMonthIncome,
@@ -52,5 +50,6 @@ export const useFinanceMetrics = () => {
         pendingAmount,
       };
     },
+    refetchInterval: 5 * 60 * 1000, // Refrescar cada 5 minutos
   });
 };

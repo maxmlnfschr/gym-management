@@ -1,22 +1,25 @@
-import { create } from 'zustand';
-import { Member, MemberFormData } from '@/features/members/types';
-import { supabase } from '@/lib/supabase';
-import { PostgrestError } from '@supabase/supabase-js';
+import { create } from "zustand";
+import { Member, MemberFormData } from "@/features/members/types";
+import { supabase } from "@/lib/supabase";
+import { PostgrestError } from "@supabase/supabase-js";
 
 interface MemberState {
   members: Member[];
   loading: boolean;
   error: string | null;
   selectedMember: Member | null;
-  
+
   // Métodos de estado
   setMembers: (members: Member[]) => void;
   setSelectedMember: (member: Member | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  getMember: (id: string) => Promise<Member>;  // Add this line
+  getMember: (id: string) => Promise<Member>;
   addMember: (memberData: MemberFormData) => Promise<void>;
-  updateMember: (id: string, memberData: Partial<MemberFormData>) => Promise<void>;
+  updateMember: (
+    id: string,
+    memberData: Partial<MemberFormData>
+  ) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
   fetchMembers: () => Promise<void>;
 }
@@ -38,8 +41,9 @@ export const useMemberStore = create<MemberState>((set) => ({
     try {
       set({ loading: true, error: null });
       const { data, error } = await supabase
-        .from('members')
-        .select(`
+        .from("members")
+        .select(
+          `
           *,
           current_membership:memberships(
             id,
@@ -51,22 +55,24 @@ export const useMemberStore = create<MemberState>((set) => ({
               name
             )
           )
-        `)
-        .eq('status', 'active')
-        .order('created_at', { foreignTable: 'memberships', ascending: false })
-        .limit(1, { foreignTable: 'memberships' });
+        `
+        )
+        .eq("status", "active")
+        .order("created_at", { foreignTable: "memberships", ascending: false })
+        .limit(1, { foreignTable: "memberships" });
 
       if (error) throw error;
 
       // Transform the data to include current_membership as a single object instead of an array
-      const transformedData = data.map(member => ({
+      const transformedData = data.map((member) => ({
         ...member,
-        current_membership: member.current_membership?.[0] 
+        current_membership: member.current_membership?.[0]
           ? {
               ...member.current_membership[0],
-              plan_name: member.current_membership[0].membership_plans?.name || ''
+              plan_name:
+                member.current_membership[0].membership_plans?.name || "",
             }
-          : null
+          : null,
       }));
 
       set({ members: transformedData });
@@ -82,16 +88,18 @@ export const useMemberStore = create<MemberState>((set) => ({
     try {
       set({ loading: true, error: null });
       const { data, error } = await supabase
-        .from('members')
-        .insert([{
-          first_name: memberData.first_name,
-          last_name: memberData.last_name,
-          email: memberData.email,
-          phone: memberData.phone,
-          notes: memberData.notes,
-          status: 'active'
-        }])
-        .select('*')
+        .from("members")
+        .insert([
+          {
+            first_name: memberData.first_name,
+            last_name: memberData.last_name,
+            email: memberData.email,
+            phone: memberData.phone,
+            notes: memberData.notes,
+            status: "active",
+          },
+        ])
+        .select("*")
         .single();
 
       if (error) throw error;
@@ -110,17 +118,17 @@ export const useMemberStore = create<MemberState>((set) => ({
     try {
       set({ loading: true, error: null });
       const { data, error } = await supabase
-        .from('members')
+        .from("members")
         .update(memberData)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
       if (error) throw error;
       set((state) => ({
-        members: state.members.map((member) => 
+        members: state.members.map((member) =>
           member.id === id ? data : member
-        )
+        ),
       }));
     } catch (error) {
       const pgError = error as PostgrestError;
@@ -133,13 +141,13 @@ export const useMemberStore = create<MemberState>((set) => ({
     try {
       set({ loading: true, error: null });
       const { error } = await supabase
-        .from('members')
-        .update({ deleted_at: new Date().toISOString() })  // Ya no necesitamos actualizar el status
-        .eq('id', id);
+        .from("members")
+        .update({ deleted_at: new Date().toISOString() }) // Ya no necesitamos actualizar el status
+        .eq("id", id);
 
       if (error) throw error;
       set((state) => ({
-        members: state.members.filter((member) => member.id !== id)
+        members: state.members.filter((member) => member.id !== id),
       }));
     } catch (error) {
       const pgError = error as PostgrestError;
@@ -150,11 +158,11 @@ export const useMemberStore = create<MemberState>((set) => ({
   },
   getMember: async (id: string) => {
     const { data, error } = await supabase
-      .from('members')
-      .select('*')
-      .eq('id', id)
+      .from("members")
+      .select("*")
+      .eq("id", id)
       .single();
-    
+
     if (error) throw error;
     return data;
   },

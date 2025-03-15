@@ -14,7 +14,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { MembershipList } from "@/features/memberships/components/MembershipList";
 import { MembershipStatus } from "@/features/memberships/components/MembershipStatus";
-import { PaymentHistory } from "@/features/memberships/components/PaymentHistory";
+import { MembershipHistory } from "@/features/memberships/components/MembershipHistory";
 import { useMember } from "@/features/members/hooks/useMember";
 import {
   Email,
@@ -28,7 +28,7 @@ import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useMemberships } from "@/features/memberships/hooks/useMemberships";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { LoadingScreen } from '@/components/common/LoadingScreen';
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { ActionMenu } from "@/components/common/ActionMenu";
 import { CardMembership } from "@mui/icons-material";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -83,7 +83,12 @@ export const MemberDetails = () => {
     setAnchorEl(null);
   };
   if (isLoading) {
-    return <LoadingScreen fullScreen={false} message="Cargando información del miembro..." />;
+    return (
+      <LoadingScreen
+        fullScreen={false}
+        message="Cargando información del miembro..."
+      />
+    );
   }
 
   if (!member) {
@@ -112,14 +117,14 @@ export const MemberDetails = () => {
                         label: "Editar",
                         icon: <EditIcon fontSize="small" />,
                         onClick: () => navigate(`/members/edit/${id}`),
-                        color: "inherit" as const
+                        color: "inherit" as const,
                       },
                       {
                         label: "Eliminar",
                         icon: <DeleteIcon fontSize="small" />,
                         onClick: handleDeleteClick,
-                        color: "inherit" as const
-                      }
+                        color: "inherit" as const,
+                      },
                     ]}
                   />
                 </Stack>
@@ -134,7 +139,9 @@ export const MemberDetails = () => {
                       lineHeight: 1.2,
                     }}
                   >
-                    {currentMembership ? 'Renovar\nmembresía' : 'Nueva\nmembresía'}
+                    {currentMembership
+                      ? "Renovar\nmembresía"
+                      : "Nueva\nmembresía"}
                   </Button>
                   <Button
                     variant="outlined"
@@ -166,7 +173,9 @@ export const MemberDetails = () => {
                 <Stack direction="row" spacing={2} alignItems="center">
                   <MembershipStatus memberId={id!} />
                   <Button variant="contained" onClick={handleMembershipAction}>
-                    {currentMembership ? 'Renovar membresía' : 'Nueva membresía'}
+                    {currentMembership
+                      ? "Renovar membresía"
+                      : "Nueva membresía"}
                   </Button>
                   <Button variant="outlined" onClick={() => setShowQR(true)}>
                     Mostrar QR
@@ -184,14 +193,14 @@ export const MemberDetails = () => {
                         label: "Editar",
                         icon: <EditIcon fontSize="small" />,
                         onClick: () => navigate(`/members/edit/${id}`),
-                        color: "inherit" as const
+                        color: "inherit" as const,
                       },
                       {
                         label: "Eliminar",
                         icon: <DeleteIcon fontSize="small" />,
                         onClick: handleDeleteClick,
-                        color: "inherit" as const
-                      }
+                        color: "inherit" as const,
+                      },
                     ]}
                   />
                 </Stack>
@@ -221,15 +230,15 @@ export const MemberDetails = () => {
         <Paper sx={{ p: 3 }}>
           <Stack spacing={2}>
             <Typography variant="h6">
-              Historial de membresías y pagos
+              Historial de membresías
             </Typography>
-            <PaymentHistory 
+            <MembershipHistory 
               memberId={id!} 
               emptyState={
                 <EmptyState
                   icon={<CardMembership sx={{ fontSize: 40, color: "text.secondary" }} />}
-                  title="Sin historial de pagos"
-                  description="Este miembro aún no tiene registros de pagos"
+                  title="Sin historial de membresías"
+                  description="Este miembro aún no tiene registros de membresías"
                 />
               }
             />

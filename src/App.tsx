@@ -30,6 +30,8 @@ import { SettingsLayout } from '@/features/settings/components/SettingsLayout';
 import { MembershipPlanManagement } from '@/features/memberships/components/MembershipPlanManagement';
 import { GeneralSettings } from '@/features/settings/components/GeneralSettings';
 import { Navigate } from 'react-router-dom';
+// Añadir este import junto a los otros imports
+import { MemberPayments } from "@/features/memberships/pages/MemberPayments";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -93,6 +95,7 @@ function AppContent() {
           path="/members/:id/membership"
           element={<MembershipFormContainer />}
         />
+        <Route path="/members/:id/payments" element={<MemberPayments />} />
         {/* Mover las rutas de settings aquí dentro */}
         <Route path="/settings" element={<SettingsLayout />}>
           <Route index element={<Navigate to="/settings/general" replace />} />

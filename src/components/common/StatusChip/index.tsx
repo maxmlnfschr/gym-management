@@ -13,15 +13,20 @@ export const StatusChip = ({ status, customLabel, context = 'membership', ...pro
     // Para estados de pago
     if (context === 'payment') {
       switch (status) {
-        case 'paid':
-          return { color: 'success', label: customLabel || 'Pagado' };
+        case 'completed':
+          return { color: 'success', label: customLabel || 'Completado' };
         case 'pending':
-        default:
           return { color: 'warning', label: customLabel || 'Pendiente' };
+        case 'failed':
+          return { color: 'error', label: customLabel || 'Fallido' };
+        case 'refunded':
+          return { color: 'info', label: customLabel || 'Reembolsado' };
+        default:
+          return { color: 'default', label: customLabel || status };
       }
     }
     
-    // Para estados de membresía (default)
+    // Para estados de membresía (mantener el switch existente)
     switch (status) {
       case 'active':
       case 'allowed':

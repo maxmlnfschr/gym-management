@@ -15,27 +15,28 @@ const paymentStatusOptions: PaymentOption[] = [
   { value: "paid", label: "Pagado" },
 ];
 
+const paymentMethodOptions = [
+  { value: "cash", label: "Efectivo" },
+  { value: "card", label: "Tarjeta" },
+  { value: "transfer", label: "Transferencia" },
+  { value: "other", label: "Otro" },
+];
+
 interface MembershipFormProps {
-  onSubmit: (data: MembershipFormData) => void;
+  onSubmit: (data: MembershipFormData & {
+    payment_method?: 'cash' | 'card' | 'transfer' | 'other';
+    payment_notes?: string;
+  }) => void;
   initialData?: Partial<MembershipFormData>;
 }
 
-export const MembershipForm = ({
-  onSubmit,
-  initialData,
-}: MembershipFormProps) => {
-  const [selectedPlanId, setSelectedPlanId] = useState<string>(
-    initialData?.planId || ""
-  );
-  const [startDate, setStartDate] = useState<Date | null>(
-    initialData?.startDate || new Date()
-  );
-  const [paymentStatus, setPaymentStatus] = useState<"pending" | "paid">(
-    initialData?.paymentStatus || "pending"
-  );
-  const [planType, setPlanType] = useState<
-    "monthly" | "quarterly" | "annual" | "modify"
-  >(initialData?.planType || "monthly");
+export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) => {
+  const [selectedPlanId, setSelectedPlanId] = useState(initialData?.planId || "");
+  const [startDate, setStartDate] = useState<Date | null>(initialData?.startDate || new Date());
+  const [paymentStatus, setPaymentStatus] = useState(initialData?.paymentStatus || "pending");
+  const [planType, setPlanType] = useState(initialData?.planType || "monthly");
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'transfer' | 'other' | ''>('');
+  const [paymentNotes, setPaymentNotes] = useState('');
 
   const handlePlanSelect = (
     planId: string,
@@ -58,7 +59,11 @@ export const MembershipForm = ({
       planId: selectedPlanId,
       startDate: localDate,
       paymentStatus,
-      planType, // Añadimos el tipo de plan
+      planType,
+      ...(paymentStatus === 'paid' && paymentMethod && {
+        payment_method: paymentMethod,
+        payment_notes: paymentNotes
+      })
     });
   };
 
@@ -74,7 +79,6 @@ export const MembershipForm = ({
         value={startDate}
         onChange={(newValue: Date | null) => {
           if (newValue) {
-            // Asegurarnos de que la fecha se guarde correctamente
             const localDate = new Date(
               newValue.getFullYear(),
               newValue.getMonth(),
@@ -109,7 +113,45 @@ export const MembershipForm = ({
           </option>
         ))}
       </TextField>
-      <Button variant="contained" onClick={handleSubmit} fullWidth>
+
+      {paymentStatus === 'paid' && (
+        <>
+          <TextField
+            select
+            label="Método de pago"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value as 'cash' | 'card' | 'transfer' | 'other')}
+            fullWidth
+            required
+            SelectProps={{
+              native: true,
+            }}
+          >
+            <option value="">Seleccionar método</option>
+            {paymentMethodOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </TextField>
+
+          <TextField
+            label="Notas de pago"
+            value={paymentNotes}
+            onChange={(e) => setPaymentNotes(e.target.value)}
+            fullWidth
+            multiline
+            rows={2}
+          />
+        </>
+      )}
+
+      <Button 
+        variant="contained" 
+        onClick={handleSubmit} 
+        fullWidth
+        disabled={paymentStatus === 'paid' && !paymentMethod}
+      >
         Guardar Membresía
       </Button>
     </Stack>

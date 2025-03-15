@@ -10,7 +10,9 @@ import { useFinanceMetrics } from "@/features/memberships/hooks/useFinanceMetric
 import { formatCurrency } from "@/utils/formatters";
 
 export const FinanceMetricsCard = () => {
-  const { data: metrics, isLoading } = useFinanceMetrics();
+  const { data: metrics, isLoading, error } = useFinanceMetrics();
+
+  console.log('Finance Metrics:', { metrics, isLoading, error }); // Add this line for debugging
 
   if (isLoading || !metrics) {
     return (
@@ -29,6 +31,19 @@ export const FinanceMetricsCard = () => {
               <Skeleton variant="text" width="40%" />
             </Box>
           </Stack>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    console.error('Finance metrics error:', error);
+    return (
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom color="error">
+            Error al cargar métricas financieras
+          </Typography>
         </CardContent>
       </Card>
     );

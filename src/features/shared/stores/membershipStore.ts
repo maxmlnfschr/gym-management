@@ -2,12 +2,17 @@ import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { Membership } from '@/features/memberships/types';
 
+interface CreateMembershipData extends Omit<Membership, 'id' | 'createdAt'> {
+  payment_method?: 'cash' | 'card' | 'transfer' | 'other';
+  payment_notes?: string;
+}
+
 interface MembershipStore {
   memberships: Membership[];
   isLoading: boolean;
   error: string | null;
   fetchMemberships: (memberId?: string) => Promise<void>;
-  createMembership: (membership: Omit<Membership, 'id' | 'createdAt'>) => Promise<void>;
+  createMembership: (data: CreateMembershipData) => Promise<void>;
   updateMembership: (id: string, membership: Partial<Membership>) => Promise<void>;
   deleteMembership: (id: string) => Promise<void>;
 }
@@ -37,21 +42,47 @@ export const useMembershipStore = create<MembershipStore>((set, get) => ({
     }
   },
 
-  createMembership: async (membership) => {
+  createMembership: async (data) => {
     set({ isLoading: true, error: null });
     try {
-      const { data, error } = await supabase
+      const { payment_method, payment_notes, ...membershipData } = data;
+      
+      // Crear la membresía
+      const { data: membership, error: membershipError } = await supabase
         .from('memberships')
-        .insert([membership])
-        .select()
+        .insert([membershipData])
+        .select(`
+          *,
+          membership_plans (
+            price,
+            name
+          )
+        `)
         .single();
 
-      if (error) throw error;
+      if (membershipError) throw membershipError;
+
+      // Si se especificó método de pago, crear el registro de pago
+      if (payment_method && membership) {
+        const { error: paymentError } = await supabase
+          .from('membership_payments')
+          .insert([{
+            membership_id: membership.id,
+            amount: membership.membership_plans?.price || 0,
+            payment_method,
+            notes: payment_notes,
+            status: 'completed'
+          }]);
+
+        if (paymentError) throw paymentError;
+      }
+
       set(state => ({
-        memberships: [data as Membership, ...state.memberships]
+        memberships: [membership as Membership, ...state.memberships]
       }));
     } catch (error) {
       set({ error: (error as Error).message });
+      throw error;
     } finally {
       set({ isLoading: false });
     }
