@@ -25,7 +25,16 @@ export const MembershipList = ({ memberId }: MembershipListProps) => {
           <CardContent>
             <Stack spacing={1}>
               <Typography variant="h6">
-                Plan {membership.plan_type === "monthly" ? "Mensual" : "Anual"}
+                {membership.plan_name || 
+                  (membership.plan_type === "monthly"
+                    ? "Mensual"
+                    : membership.plan_type === "quarterly"
+                    ? "Trimestral"
+                    : membership.plan_type === "annual"
+                    ? "Anual"
+                    : membership.plan_type === "modify"
+                    ? "Modificado"
+                    : "Desconocido")}
               </Typography>
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography variant="body2" color="text.secondary">

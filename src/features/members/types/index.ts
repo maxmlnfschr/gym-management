@@ -13,7 +13,11 @@ export interface Member {
     start_date: string;
     end_date: string;
     payment_status: "pending" | "paid";
-    plan_type: string; // Añadir esta propiedad
+    plan_type: string;
+    plan_name?: string;
+    membership_plans?: {
+      name: string;
+    };
   };
 }
 

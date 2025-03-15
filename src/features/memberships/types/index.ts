@@ -9,6 +9,7 @@ export interface Membership {
   end_date: string;
   payment_status: PaymentStatus;
   created_at: string;
+  plan_name?: string;
   members: {
     first_name: string;
     last_name: string;

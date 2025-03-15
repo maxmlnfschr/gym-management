@@ -46,7 +46,10 @@ export const useMemberStore = create<MemberState>((set) => ({
             start_date,
             end_date,
             payment_status,
-            plan_type
+            plan_type,
+            membership_plans (
+              name
+            )
           )
         `)
         .eq('status', 'active')
@@ -58,7 +61,12 @@ export const useMemberStore = create<MemberState>((set) => ({
       // Transform the data to include current_membership as a single object instead of an array
       const transformedData = data.map(member => ({
         ...member,
-        current_membership: member.current_membership?.[0] || null
+        current_membership: member.current_membership?.[0] 
+          ? {
+              ...member.current_membership[0],
+              plan_name: member.current_membership[0].membership_plans?.name || ''
+            }
+          : null
       }));
 
       set({ members: transformedData });

@@ -507,7 +507,12 @@ export const MemberList = () => {
 
                     if (!member.current_membership) return "-";
 
-                    // Actualizar el mapeo de tipos de plan
+                    // Primero intentamos usar el nombre del plan si existe
+                    if (member.current_membership.plan_name) {
+                      return member.current_membership.plan_name;
+                    }
+
+                    // Si no hay nombre de plan, usamos el tipo
                     const planTypeMap: Record<string, string> = {
                       monthly: "Mensual",
                       quarterly: "Trimestral",

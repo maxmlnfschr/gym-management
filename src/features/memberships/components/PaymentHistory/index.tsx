@@ -3,6 +3,7 @@ import { useMemberships } from '@/features/memberships/hooks/useMemberships';
 import { formatMembershipDate } from '@/utils/dateUtils';
 import { StatusChip } from '@/components/common/StatusChip';
 import { DataTable } from "@/components/common/DataTable";
+import { Membership } from '../../types';
 
 interface PaymentHistoryProps {
   memberId: string;
@@ -31,11 +32,16 @@ export const PaymentHistory = ({ memberId, emptyState }: PaymentHistoryProps) =>
               Fecha: {formatMembershipDate(membership.start_date)}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              Plan: {membership.plan_type === 'monthly' 
-                ? 'Mensual' 
-                : membership.plan_type === 'quarterly'
-                ? 'Trimestral'
-                : 'Anual'}
+              Plan: {membership.plan_name || 
+                (membership.plan_type === 'monthly' 
+                  ? 'Mensual' 
+                  : membership.plan_type === 'quarterly'
+                  ? 'Trimestral'
+                  : membership.plan_type === 'annual'
+                  ? 'Anual'
+                  : membership.plan_type === 'modify'
+                  ? 'Modificado'
+                  : 'Desconocido')}
             </Typography>
             <Typography variant="body2" gutterBottom>
               Período: {formatMembershipDate(membership.start_date)} - {formatMembershipDate(membership.end_date)}
@@ -61,11 +67,16 @@ export const PaymentHistory = ({ memberId, emptyState }: PaymentHistoryProps) =>
             id: 'plan',
             label: 'Plan',
             render: (membership) => (
-              membership.plan_type === 'monthly' 
+              membership.plan_name || 
+              (membership.plan_type === 'monthly' 
                 ? 'Mensual' 
                 : membership.plan_type === 'quarterly'
                 ? 'Trimestral'
-                : 'Anual'
+                : membership.plan_type === 'annual'
+                ? 'Anual'
+                : membership.plan_type === 'modify'
+                ? 'Modificado'
+                : 'Desconocido')
             )
           },
           {

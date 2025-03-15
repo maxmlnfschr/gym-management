@@ -113,17 +113,16 @@ export const RecentMembershipsCard = () => {
                 {membership.members?.first_name} {membership.members?.last_name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Plan{" "}
-                {membership.plan_name ||
-                  (membership.plan_type === "monthly"
-                    ? "Mensual"
-                    : membership.plan_type === "quarterly"
-                    ? "Trimestral"
-                    : membership.plan_type === "annual"
-                    ? "Anual"
-                    : membership.plan_type === "modify"
-                    ? "Modificado"
-                    : "Desconocido")}{" "}
+                {membership.plan_type === "modify" 
+                  ? membership.plan_name || "Modificado"
+                  : membership.plan_name ||
+                    (membership.plan_type === "monthly"
+                      ? "Mensual"
+                      : membership.plan_type === "quarterly"
+                      ? "Trimestral"
+                      : membership.plan_type === "annual"
+                      ? "Anual"
+                      : "Desconocido")}{" "}
                 •{" "}
                 {format(new Date(membership.start_date), "d 'de' MMMM, yyyy", {
                   locale: es,
