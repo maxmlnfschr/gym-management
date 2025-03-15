@@ -6,6 +6,7 @@ import { getMembershipStatus } from '@/utils/dateUtils';
 interface MembershipMetrics {
   activeMembers: number;
   expiringThisWeek: number;
+  expiredMemberships: number;
 }
 
 export const useMembershipMetrics = () => {
@@ -32,8 +33,7 @@ export const useMembershipMetrics = () => {
             deleted_at
           )
         `)
-        .is('members.deleted_at', null)
-        .gte('end_date', todayStr);
+        .is('members.deleted_at', null);  // Removido el filtro .gte('end_date', todayStr) para obtener todas
 
       if (activeError) throw activeError;
 
@@ -43,7 +43,7 @@ export const useMembershipMetrics = () => {
         status: getMembershipStatus(membership)
       })) || [];
 
-      // Filtrar miembros activos y por vencer
+      // Filtrar miembros activos, por vencer y vencidos
       const activeMembers = memberships.filter(m => 
         m.end_date >= todayStr
       );
@@ -53,9 +53,14 @@ export const useMembershipMetrics = () => {
         m.end_date <= nextWeekStr
       );
 
+      const expiredMembers = memberships.filter(m => 
+        m.end_date < todayStr
+      );
+
       return {
         activeMembers: activeMembers.length,
-        expiringThisWeek: expiringMembers.length
+        expiringThisWeek: expiringMembers.length,
+        expiredMemberships: expiredMembers.length
       };
     },
     refetchInterval: 5 * 60 * 1000,

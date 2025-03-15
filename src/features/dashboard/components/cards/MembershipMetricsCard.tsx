@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Typography, Skeleton } from '@mui/material';
 import { useMembershipMetrics } from '@/features/memberships/hooks/useMembershipMetrics';
-import { People, Warning } from '@mui/icons-material';
+import { People, Warning, ErrorOutline } from '@mui/icons-material';
 
 export const MembershipMetricsCard = () => {
   const { data: metrics, isLoading } = useMembershipMetrics();
@@ -36,11 +36,20 @@ export const MembershipMetricsCard = () => {
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Warning color="warning" />
-          <Typography color="warning.main">
-            {metrics?.expiringThisWeek ?? 0} membresías vencen esta semana
-          </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Warning color="warning" />
+            <Typography color="warning.main">
+              {metrics?.expiringThisWeek ?? 0} membresías vencen esta semana
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <ErrorOutline color="error" />
+            <Typography color="error">
+              {metrics?.expiredMemberships ?? 0} membresías vencidas
+            </Typography>
+          </Box>
         </Box>
       </CardContent>
     </Card>
