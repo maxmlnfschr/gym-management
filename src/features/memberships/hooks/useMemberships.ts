@@ -70,6 +70,15 @@ export const useMemberships = (memberId?: string) => {
 
   const createMembership = useMutation({
     mutationFn: async (data: MembershipFormData & { memberId: string }) => {
+      // Primero obtenemos el plan para saber su duración
+      const { data: plan, error: planError } = await supabase
+        .from('membership_plans')
+        .select('*')
+        .eq('id', data.planId)
+        .single();
+
+      if (planError) throw planError;
+
       // Verificar membresías activas existentes
       const { data: activeMemberships } = await supabase
         .from("memberships")
@@ -96,25 +105,61 @@ export const useMemberships = (memberId?: string) => {
 
       // Crear la nueva membresía
       const startDate = new Date(data.startDate);
-      const localDate = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate()
-      );
+      const endDate = new Date(startDate);
+      
+      // Asegurarnos que duration_months sea válido
+      if (!plan.duration_months || plan.duration_months <= 0) {
+        throw new Error('Invalid plan duration');
+      }
+      
+      // Calcular fecha fin
+      endDate.setMonth(endDate.getMonth() + plan.duration_months);
+      
+      // Formatear fechas usando una función más robusta
+      const formatDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      const formattedStartDate = formatDate(startDate);
+      const formattedEndDate = formatDate(endDate);
+
+      console.log('Debug - Dates:', { raw: { startDate, endDate }, formatted: { formattedStartDate, formattedEndDate } });
+
+      const membershipData = {
+        member_id: data.memberId,
+        plan_id: data.planId,
+        plan_type: 'fixed',
+        start_date: formattedStartDate,
+        end_date: formattedEndDate,
+        payment_status: data.paymentStatus,
+        amount: Number(plan.price) || 0,
+      };
+
+      console.log('Debug - Membership Data:', membershipData);
 
       const { data: membership, error } = await supabase
         .from("memberships")
-        .insert([
-          {
-            member_id: data.memberId,
-            plan_type: data.planType,
-            start_date: localDate.toISOString().split('T')[0],
-            payment_status: data.paymentStatus,
-          },
-        ])
-        .select()
+        .insert([{
+          member_id: data.memberId,
+          plan_id: data.planId,
+          plan_type: 'fixed',
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+          payment_status: data.paymentStatus,
+          amount: Number(plan.price) || 0,
+        }])
+        .select('*')  // Be explicit about what we want to select
         .single();
 
+      console.log('Debug - Supabase Request:', {
+        table: 'memberships',
+        method: 'insert',
+        data: membershipData,
+        error
+      });
       if (error) {
         console.error("Error creating membership:", error);
         throw error;

@@ -1,29 +1,15 @@
 import { Card, CardContent, Typography, Box } from '@mui/material';
-import { PlanType } from '../../types';
+import { formatCurrency } from '@/utils/formatters';
 
 interface PlanCardProps {
-  type: PlanType;
+  name: string;
   price: number;
+  duration: number;
   selected?: boolean;
   onSelect?: () => void;
 }
 
-export const PlanCard = ({ type, price, selected = false, onSelect }: PlanCardProps) => {
-  const planInfo = {
-    monthly: {
-      title: 'Mensual',
-      duration: '1 mes',
-    },
-    quarterly: {
-      title: 'Trimestral',
-      duration: '3 meses',
-    },
-    annual: {
-      title: 'Anual',
-      duration: '12 meses',
-    },
-  };
-
+export const PlanCard = ({ name, price, duration, selected = false, onSelect }: PlanCardProps) => {
   return (
     <Card
       onClick={onSelect}
@@ -39,13 +25,13 @@ export const PlanCard = ({ type, price, selected = false, onSelect }: PlanCardPr
     >
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          {planInfo[type].title}
+          {name}
         </Typography>
-        <Typography variant="h4" color="primary" gutterBottom>
-          ${price}
+        <Typography variant="h4" component="div" gutterBottom>
+          {formatCurrency(price)}
         </Typography>
         <Typography color="text.secondary">
-          Duración: {planInfo[type].duration}
+          {duration} {duration === 1 ? 'mes' : 'meses'}
         </Typography>
       </CardContent>
     </Card>

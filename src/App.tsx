@@ -26,6 +26,10 @@ import { AccessControlPage } from "@/features/access/components/AccessControlPag
 import { AccessList } from "@/features/access/components/AccessList";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { CssBaseline } from '@mui/material';
+import { SettingsLayout } from '@/features/settings/components/SettingsLayout';
+import { MembershipPlanManagement } from '@/features/memberships/components/MembershipPlanManagement';
+import { GeneralSettings } from '@/features/settings/components/GeneralSettings';
+import { Navigate } from 'react-router-dom';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -89,6 +93,12 @@ function AppContent() {
           path="/members/:id/membership"
           element={<MembershipFormContainer />}
         />
+        {/* Mover las rutas de settings aquí dentro */}
+        <Route path="/settings" element={<SettingsLayout />}>
+          <Route index element={<Navigate to="/settings/general" replace />} />
+          <Route path="general" element={<GeneralSettings />} />
+          <Route path="membership-plans" element={<MembershipPlanManagement />} />
+        </Route>
       </Route>
     </Routes>
   );

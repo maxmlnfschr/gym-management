@@ -2,9 +2,15 @@ import { useState } from 'react';
 import { Box, Button, Stack, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { PlanSelector } from '../PlanSelector';
-import { MembershipFormData, PlanType } from '../../types';
+import { MembershipFormData } from '../../types';
 import { addMonths } from 'date-fns';
-const paymentStatusOptions = [
+
+interface PaymentOption {
+  value: 'pending' | 'paid';
+  label: string;
+}
+
+const paymentStatusOptions: PaymentOption[] = [
   { value: 'pending', label: 'Pendiente' },
   { value: 'paid', label: 'Pagado' },
 ];
@@ -15,18 +21,17 @@ interface MembershipFormProps {
 }
 
 export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) => {
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>(initialData?.planType || 'monthly');
+  const [selectedPlanId, setSelectedPlanId] = useState<string>(initialData?.planId || '');
   const [startDate, setStartDate] = useState<Date | null>(initialData?.startDate || new Date());
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid'>(initialData?.paymentStatus || 'pending');
 
-  const handlePlanSelect = (plan: PlanType) => {
-    setSelectedPlan(plan);
+  const handlePlanSelect = (planId: string) => {
+    setSelectedPlanId(planId);
   };
 
   const handleSubmit = () => {
-    if (!startDate) return;
+    if (!startDate || !selectedPlanId) return;
 
-    // Crear una nueva fecha usando solo año, mes y día
     const localDate = new Date(
       startDate.getFullYear(),
       startDate.getMonth(),
@@ -34,7 +39,7 @@ export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) =
     );
 
     onSubmit({
-      planType: selectedPlan,
+      planId: selectedPlanId,
       startDate: localDate,
       paymentStatus,
     });
@@ -43,7 +48,7 @@ export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) =
   return (
     <Stack spacing={3}>
       <PlanSelector 
-        selectedPlan={selectedPlan} 
+        selectedPlan={selectedPlanId} 
         onPlanSelect={handlePlanSelect} 
       />
 

@@ -1,18 +1,19 @@
 import { Grid, Typography, Box } from '@mui/material';
 import { PlanCard } from '../PlanCard';
-import { PlanType } from '../../types';
+import { useMembershipPlans } from '../../hooks/useMembershipPlans';
+import { CircularProgress } from '@mui/material';
 
 interface PlanSelectorProps {
-  selectedPlan?: PlanType;
-  onPlanSelect: (plan: PlanType) => void;
+  selectedPlan?: string;
+  onPlanSelect: (planId: string) => void;
 }
 
 export const PlanSelector = ({ selectedPlan, onPlanSelect }: PlanSelectorProps) => {
-  const plans = [
-    { type: 'monthly' as PlanType, price: 5000 },
-    { type: 'quarterly' as PlanType, price: 13500 },
-    { type: 'annual' as PlanType, price: 48000 },
-  ];
+  const { plans, isLoading } = useMembershipPlans();
+
+  if (isLoading) {
+    return <CircularProgress />;
+  }
 
   return (
     <Box>
@@ -21,12 +22,13 @@ export const PlanSelector = ({ selectedPlan, onPlanSelect }: PlanSelectorProps) 
       </Typography>
       <Grid container spacing={2} sx={{ mt: 1 }}>
         {plans.map((plan) => (
-          <Grid item xs={12} sm={4} key={plan.type}>
+          <Grid item xs={12} sm={4} key={plan.id}>
             <PlanCard
-              type={plan.type}
+              name={plan.name}
               price={plan.price}
-              selected={selectedPlan === plan.type}
-              onSelect={() => onPlanSelect(plan.type)}
+              duration={plan.duration_months}
+              selected={selectedPlan === plan.id}
+              onSelect={() => onPlanSelect(plan.id)}
             />
           </Grid>
         ))}

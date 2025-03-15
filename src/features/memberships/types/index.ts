@@ -19,7 +19,7 @@ export interface Membership {
 }
 
 export interface MembershipFormData {
-  planType: PlanType;
+  planId: string;
   startDate: Date;
   paymentStatus: PaymentStatus;
 }

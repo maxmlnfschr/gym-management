@@ -6,6 +6,8 @@ BEGIN
     WHEN 'monthly' THEN start_date + interval '1 month'
     WHEN 'quarterly' THEN start_date + interval '3 months'
     WHEN 'annual' THEN start_date + interval '1 year'
+    WHEN 'fixed' THEN start_date + interval '1 month' -- Añadimos el caso 'fixed'
+    ELSE start_date + interval '1 month' -- Valor por defecto
   END;
 END;
 $$ LANGUAGE plpgsql;
@@ -14,7 +16,9 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION update_membership_end_date()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.end_date := calculate_end_date(NEW.start_date, NEW.plan_type);
+  IF NEW.plan_type != 'fixed' THEN
+    NEW.end_date := calculate_end_date(NEW.start_date, NEW.plan_type);
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
