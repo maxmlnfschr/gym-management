@@ -89,15 +89,12 @@ export const useMemberships = (memberId?: string) => {
       // Si hay membresías activas, actualizamos su fecha de fin
       if (activeMemberships && activeMemberships.length > 0) {
         const startDate = new Date(data.startDate);
-        startDate.setDate(startDate.getDate() - 1);
-        startDate.setHours(23, 59, 59, 999);
-
+        
+        // Ya no restamos un día, usamos la misma fecha de inicio
         await supabase
           .from("memberships")
           .update({ 
-            end_date: startDate.toISOString(),
-            // Eliminamos esta línea para mantener el estado de pago original
-            // payment_status: 'overdue'
+            end_date: startDate.toISOString().split('T')[0], // Solo la fecha, sin tiempo
           })
           .eq("member_id", data.memberId)
           .gte("end_date", new Date().toISOString());
@@ -131,21 +128,19 @@ export const useMemberships = (memberId?: string) => {
       const membershipData = {
         member_id: data.memberId,
         plan_id: data.planId,
-        plan_type: 'fixed',
+        plan_type: data.planType, // Ahora podemos usar directamente planType
         start_date: formattedStartDate,
         end_date: formattedEndDate,
         payment_status: data.paymentStatus,
         amount: Number(plan.price) || 0,
       };
 
-      console.log('Debug - Membership Data:', membershipData);
-
       const { data: membership, error } = await supabase
         .from("memberships")
         .insert([{
           member_id: data.memberId,
           plan_id: data.planId,
-          plan_type: 'fixed',
+          plan_type: data.planType, // Aquí también
           start_date: formattedStartDate,
           end_date: formattedEndDate,
           payment_status: data.paymentStatus,

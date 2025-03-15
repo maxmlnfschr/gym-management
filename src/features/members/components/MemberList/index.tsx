@@ -67,7 +67,9 @@ export const MemberList = () => {
   const [page, setPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
-  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});  // Moved here
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>(
+    {}
+  ); // Moved here
   const { ref, inView } = useInView();
   const itemsPerPage = 10;
   const [filterValues, setFilterValues] = useState<FilterValues>({
@@ -219,35 +221,42 @@ export const MemberList = () => {
   // const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
 
   // Update the handleInlineFilterChange function
-  const handleInlineFilterChange = (groupName: string, selectedFilters: string[]) => {
-    setActiveFilters(prev => ({
+  const handleInlineFilterChange = (
+    groupName: string,
+    selectedFilters: string[]
+  ) => {
+    setActiveFilters((prev) => ({
       ...prev,
-      [groupName]: selectedFilters
+      [groupName]: selectedFilters,
     }));
-  
+
     let filtered = [...members].filter(
       (member) => !member.deleted_at && member.status !== "deleted"
     );
-  
+
     if (selectedFilters.length > 0) {
-      filtered = filtered.filter(member => {
+      filtered = filtered.filter((member) => {
         const membership = member.current_membership;
-        return selectedFilters.some(filter => {
+        return selectedFilters.some((filter) => {
           switch (filter) {
-            case 'active':
+            case "active":
               // Solo verificamos la fecha de vencimiento, no el estado de pago
               return membership && new Date(membership.end_date) > new Date();
-            case 'expiring':
+            case "expiring":
               const endDate = membership ? new Date(membership.end_date) : null;
               const today = new Date();
-              const daysUntilExpiration = endDate ? 
-                Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+              const daysUntilExpiration = endDate
+                ? Math.ceil(
+                    (endDate.getTime() - today.getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                : 0;
               return daysUntilExpiration <= 7 && daysUntilExpiration > 0;
-            case 'expired':
+            case "expired":
               return membership && new Date(membership.end_date) < new Date();
-            case 'pending':
+            case "pending":
               return membership && membership.payment_status === "pending";
-            case 'no_membership':
+            case "no_membership":
               return !membership;
             default:
               return false;
@@ -255,10 +264,10 @@ export const MemberList = () => {
         });
       });
     }
-    
+
     setFilteredMembers(filtered);
   };
-  
+
   // En la vista móvil, después del SearchBar y antes del EmptyState:
   if (isMobile) {
     return (
@@ -296,13 +305,13 @@ export const MemberList = () => {
               <AddIcon fontSize="medium" />
             </IconButton>
           </Stack>
-  
+
           {/* Añadir InlineFilters aquí */}
-          <InlineFilters 
+          <InlineFilters
             filterGroups={[MEMBERSHIP_STATUS_FILTERS]}
             onFilterChange={handleInlineFilterChange}
           />
-  
+
           {/* Lista de miembros o EmptyState */}
           {filteredMembers.length === 0 ? (
             <EmptyState
@@ -411,7 +420,7 @@ export const MemberList = () => {
         </Stack>
 
         {/* Añadir InlineFilters aquí */}
-        <InlineFilters 
+        <InlineFilters
           filterGroups={[MEMBERSHIP_STATUS_FILTERS]}
           onFilterChange={handleInlineFilterChange}
         />
@@ -420,14 +429,20 @@ export const MemberList = () => {
         {filteredMembers.length === 0 ? (
           <EmptyState
             icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
-            title={filterValues.search ? "No se encontraron resultados" : "No hay miembros"}
+            title={
+              filterValues.search
+                ? "No se encontraron resultados"
+                : "No hay miembros"
+            }
             description={
-              filterValues.search 
+              filterValues.search
                 ? "Intenta con otros términos de búsqueda"
                 : "Comienza agregando un nuevo miembro"
             }
             actionText={filterValues.search ? undefined : "Agregar miembro"}
-            onAction={filterValues.search ? undefined : () => navigate("/members/add")}
+            onAction={
+              filterValues.search ? undefined : () => navigate("/members/add")
+            }
           />
         ) : (
           <>
@@ -479,6 +494,7 @@ export const MemberList = () => {
                     );
                   },
                 },
+                // En la columna plan_type del DataTable
                 {
                   id: "plan_type",
                   label: "Plan",
@@ -491,18 +507,21 @@ export const MemberList = () => {
 
                     if (!member.current_membership) return "-";
 
-                    // Convertir el plan_type a un formato más legible
+                    // Actualizar el mapeo de tipos de plan
                     const planTypeMap: Record<string, string> = {
                       monthly: "Mensual",
                       quarterly: "Trimestral",
                       annual: "Anual",
+                      modify: "Modificado",
                     };
 
                     const planType = member.current_membership.plan_type;
 
-                    // Si planType es undefined o null, mostrar un mensaje más descriptivo
                     if (!planType) {
-                      console.log("Plan type is missing for member:", member.id);
+                      console.log(
+                        "Plan type is missing for member:",
+                        member.id
+                      );
                       return "No especificado";
                     }
 
@@ -569,7 +588,12 @@ export const MemberList = () => {
               emptyMessage="No hay miembros registrados"
             />
             {hasMore && (
-              <Box ref={ref} display="flex" justifyContent="center" sx={{ mt: 2 }}>
+              <Box
+                ref={ref}
+                display="flex"
+                justifyContent="center"
+                sx={{ mt: 2 }}
+              >
                 <CircularProgress size={24} />
               </Box>
             )}

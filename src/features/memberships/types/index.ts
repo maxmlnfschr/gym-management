@@ -1,5 +1,5 @@
-export type PlanType = "monthly" | "quarterly" | "annual";
-export type PaymentStatus = "pending" | "paid"; // Removido 'overdue'
+export type PlanType = "monthly" | "quarterly" | "annual" | "modify";
+export type PaymentStatus = "pending" | "paid";
 
 export interface Membership {
   id: string;
@@ -22,4 +22,13 @@ export interface MembershipFormData {
   planId: string;
   startDate: Date;
   paymentStatus: PaymentStatus;
+  planType: PlanType;
+}
+
+export interface MembershipPlan {
+  id: string;
+  name: string;
+  price: number;
+  duration_months: number;
+  plan_type: PlanType; // Using the PlanType type alias instead of inline types
 }

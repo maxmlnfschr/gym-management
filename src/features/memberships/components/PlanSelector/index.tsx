@@ -2,10 +2,11 @@ import { Grid, Typography, Box } from '@mui/material';
 import { PlanCard } from '../PlanCard';
 import { useMembershipPlans } from '../../hooks/useMembershipPlans';
 import { CircularProgress } from '@mui/material';
+import { PlanType } from '../../types';
 
 interface PlanSelectorProps {
-  selectedPlan?: string;
-  onPlanSelect: (planId: string) => void;
+  selectedPlan: string;
+  onPlanSelect: (planId: string, planType: PlanType) => void;
 }
 
 export const PlanSelector = ({ selectedPlan, onPlanSelect }: PlanSelectorProps) => {
@@ -28,7 +29,7 @@ export const PlanSelector = ({ selectedPlan, onPlanSelect }: PlanSelectorProps) 
               price={plan.price}
               duration={plan.duration_months}
               selected={selectedPlan === plan.id}
-              onSelect={() => onPlanSelect(plan.id)}
+              onSelect={() => onPlanSelect(plan.id, plan.plan_type)}
             />
           </Grid>
         ))}

@@ -46,6 +46,7 @@ export const MembershipPlanDialog = ({
         price: 0,
         active: true,
         description: '',
+        plan_type: 'monthly', // Añadimos un valor por defecto
       });
     }
   }, [planId, plans, reset]);

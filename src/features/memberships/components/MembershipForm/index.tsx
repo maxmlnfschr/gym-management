@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { Box, Button, Stack, TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { PlanSelector } from '../PlanSelector';
-import { MembershipFormData } from '../../types';
-import { addMonths } from 'date-fns';
+import { useState } from "react";
+import { Box, Button, Stack, TextField } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { PlanSelector } from "../PlanSelector";
+import { MembershipFormData } from "../../types";
+import { addMonths } from "date-fns";
 
 interface PaymentOption {
-  value: 'pending' | 'paid';
+  value: "pending" | "paid";
   label: string;
 }
 
 const paymentStatusOptions: PaymentOption[] = [
-  { value: 'pending', label: 'Pendiente' },
-  { value: 'paid', label: 'Pagado' },
+  { value: "pending", label: "Pendiente" },
+  { value: "paid", label: "Pagado" },
 ];
 
 interface MembershipFormProps {
@@ -20,13 +20,29 @@ interface MembershipFormProps {
   initialData?: Partial<MembershipFormData>;
 }
 
-export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) => {
-  const [selectedPlanId, setSelectedPlanId] = useState<string>(initialData?.planId || '');
-  const [startDate, setStartDate] = useState<Date | null>(initialData?.startDate || new Date());
-  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid'>(initialData?.paymentStatus || 'pending');
+export const MembershipForm = ({
+  onSubmit,
+  initialData,
+}: MembershipFormProps) => {
+  const [selectedPlanId, setSelectedPlanId] = useState<string>(
+    initialData?.planId || ""
+  );
+  const [startDate, setStartDate] = useState<Date | null>(
+    initialData?.startDate || new Date()
+  );
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "paid">(
+    initialData?.paymentStatus || "pending"
+  );
+  const [planType, setPlanType] = useState<
+    "monthly" | "quarterly" | "annual" | "modify"
+  >(initialData?.planType || "monthly");
 
-  const handlePlanSelect = (planId: string) => {
+  const handlePlanSelect = (
+    planId: string,
+    type: "monthly" | "quarterly" | "annual" | "modify"
+  ) => {
     setSelectedPlanId(planId);
+    setPlanType(type);
   };
 
   const handleSubmit = () => {
@@ -42,14 +58,15 @@ export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) =
       planId: selectedPlanId,
       startDate: localDate,
       paymentStatus,
+      planType, // Añadimos el tipo de plan
     });
   };
 
   return (
     <Stack spacing={3}>
-      <PlanSelector 
-        selectedPlan={selectedPlanId} 
-        onPlanSelect={handlePlanSelect} 
+      <PlanSelector
+        selectedPlan={selectedPlanId}
+        onPlanSelect={(planId, type) => handlePlanSelect(planId, type)}
       />
 
       <DatePicker
@@ -80,23 +97,19 @@ export const MembershipForm = ({ onSubmit, initialData }: MembershipFormProps) =
         select
         label="Estado de pago"
         value={paymentStatus}
-        onChange={(e) => setPaymentStatus(e.target.value as 'pending' | 'paid')}
+        onChange={(e) => setPaymentStatus(e.target.value as "pending" | "paid")}
         fullWidth
         SelectProps={{
           native: true,
         }}
       >
-        {paymentStatusOptions.map(option => (
+        {paymentStatusOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
       </TextField>
-      <Button 
-        variant="contained" 
-        onClick={handleSubmit}
-        fullWidth
-      >
+      <Button variant="contained" onClick={handleSubmit} fullWidth>
         Guardar Membresía
       </Button>
     </Stack>
