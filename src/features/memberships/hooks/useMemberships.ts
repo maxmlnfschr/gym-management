@@ -1,15 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { MembershipFormData, Membership } from "@/features/memberships/types";
+import { getMembershipStatus } from "@/utils/dateUtils";
 
 export const useMemberships = (memberId?: string) => {
   const queryClient = useQueryClient();
+  
+  // Consulta para obtener todas las membresías (historial)
   const getMemberships = useQuery({
     queryKey: ["memberships", memberId],
     queryFn: async () => {
-      // Obtener todas las membresías para el historial
       const { data, error } = await supabase
-        .from("memberships")  // Cambiamos de latest_memberships a memberships
+        .from("memberships")
         .select(`
           *,
           members!inner(
@@ -25,6 +27,43 @@ export const useMemberships = (memberId?: string) => {
 
       if (error) throw error;
       return data as Membership[];
+    },
+    enabled: !!memberId,
+  });
+
+  // Consulta específica para la membresía actual
+  const getCurrentMembership = useQuery({
+    queryKey: ["current-membership", memberId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("latest_memberships")
+        .select(`
+          *,
+          members!inner(
+            first_name,
+            last_name,
+            email,
+            deleted_at,
+            status
+          )
+        `)
+        .eq("member_id", memberId)
+        .single();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      const status = getMembershipStatus(data);
+      return {
+        ...data,
+        status: status.status,
+        statusLabel: status.label,
+        statusColor: status.color
+      } as Membership & {
+        status: string;
+        statusLabel: string;
+        statusColor: string;
+      };
     },
     enabled: !!memberId,
   });
@@ -83,21 +122,16 @@ export const useMemberships = (memberId?: string) => {
       return membership;
     },
     onSuccess: () => {
+      // Invalidar todas las queries relacionadas
       queryClient.invalidateQueries({ queryKey: ["memberships", memberId] });
+      queryClient.invalidateQueries({ queryKey: ["current-membership", memberId] });
+      queryClient.invalidateQueries({ queryKey: ["membership-metrics"] });
     },
   });
-  const getCurrentMembership = () => {
-    if (!getMemberships.data) return null;
-    
-    // Ordenar por fecha de creación, la más reciente primero
-    return getMemberships.data.sort((a, b) => {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    })[0];
-  };
   return {
     memberships: getMemberships.data || [],
-    currentMembership: getCurrentMembership(),
-    isLoading: getMemberships.isLoading,
+    currentMembership: getCurrentMembership.data,
+    isLoading: getMemberships.isLoading || getCurrentMembership.isLoading,
     createMembership,
   };
 };

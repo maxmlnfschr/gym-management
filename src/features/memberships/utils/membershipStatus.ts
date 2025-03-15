@@ -1,3 +1,8 @@
+interface Membership {
+  end_date: string;
+  payment_status: 'paid' | 'pending' | 'overdue';
+}
+
 interface MembershipStatusInfo {
   color: string;
   status: string;
@@ -5,7 +10,7 @@ interface MembershipStatusInfo {
   paymentStatus?: string;
 }
 
-export const getMembershipStatus = (membership: any): MembershipStatusInfo => {
+export const getMembershipStatus = (membership: Membership | null): MembershipStatusInfo => {
   if (!membership) {
     return {
       color: '#9e9e9e',

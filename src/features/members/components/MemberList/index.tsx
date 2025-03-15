@@ -224,7 +224,7 @@ export const MemberList = () => {
       ...prev,
       [groupName]: selectedFilters
     }));
-
+  
     let filtered = [...members].filter(
       (member) => !member.deleted_at && member.status !== "deleted"
     );
@@ -235,9 +235,8 @@ export const MemberList = () => {
         return selectedFilters.some(filter => {
           switch (filter) {
             case 'active':
-              return membership && 
-                     membership.payment_status === "paid" && 
-                     new Date(membership.end_date) > new Date();
+              // Solo verificamos la fecha de vencimiento, no el estado de pago
+              return membership && new Date(membership.end_date) > new Date();
             case 'expiring':
               const endDate = membership ? new Date(membership.end_date) : null;
               const today = new Date();

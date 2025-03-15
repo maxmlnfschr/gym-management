@@ -12,10 +12,13 @@ interface MembershipStatusProps {
 export const MembershipStatus = ({ memberId, variant = 'default' }: MembershipStatusProps) => {
   const { currentMembership, isLoading } = useMemberships(memberId);
   
-  if (isLoading) return null;
+  if (isLoading || !currentMembership) return null;
   
   // Obtener el estado de la membresía usando la función centralizada
-  const { status, severity } = getMembershipStatus(currentMembership);
+  const { status, severity } = getMembershipStatus({
+    end_date: currentMembership.end_date,
+    payment_status: currentMembership.payment_status
+  });
   
   // Crear el chip de estado de membresía
   const membershipChip = (
