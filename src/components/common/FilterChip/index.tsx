@@ -1,16 +1,24 @@
-import { Chip } from "@mui/material";
+import { Chip, SxProps, Theme } from "@mui/material";
 
 interface FilterChipProps {
   label: string;
   isSelected: boolean;
   onSelect: () => void;
-  id: string; // Añadimos el id para identificar el tipo de filtro
+  id: string;
+  type?: string;  // Añadimos type como prop opcional
+  sx?: SxProps<Theme>;
 }
 
-export const FilterChip = ({ label, isSelected, onSelect, id }: FilterChipProps) => {
-  const getChipColor = (filterId: string, isSelected: boolean) => {
+export const FilterChip = ({ label, isSelected, onSelect, id, type, sx }: FilterChipProps) => {
+  const getChipColor = (filterId: string, isSelected: boolean, type?: string) => {
     if (!isSelected) return { bg: 'grey.300', color: 'text.primary' };
 
+    // Si es un filtro de fecha, usar color negro
+    if (type === 'date') {
+      return { bg: 'grey.900', color: 'common.white' };
+    }
+
+    // Para otros tipos de filtros, mantener la lógica existente
     switch (filterId) {
       case 'active':
         return { bg: 'success.main', color: 'success.contrastText' };
@@ -26,7 +34,7 @@ export const FilterChip = ({ label, isSelected, onSelect, id }: FilterChipProps)
     }
   };
 
-  const colors = getChipColor(id, isSelected);
+  const colors = getChipColor(id, isSelected, type);
 
   return (
     <Chip
@@ -43,6 +51,7 @@ export const FilterChip = ({ label, isSelected, onSelect, id }: FilterChipProps)
         transition: 'all 0.2s ease-in-out',
         height: '32px',
         fontSize: '0.875rem',
+        ...sx  // Combinamos los estilos base con los props sx
       }}
     />
   );

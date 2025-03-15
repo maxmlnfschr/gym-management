@@ -91,13 +91,7 @@ export const AccessList = ({ accesses, emptyState }: AccessListProps) => {
   return (
     <Box>
       <Stack spacing={3}>
-        <SearchBar
-          placeholder="Buscar accesos..."
-          value={filterValues.search}
-          onChange={(value) => handleFilter({ search: value })}
-        />
-
-        {filteredAccesses.length === 0 && filterValues.search ? (
+        {filteredAccesses.length === 0 ? (
           <EmptyState
             icon={<History sx={{ fontSize: 40, color: "text.secondary" }} />}
             title="No se encontraron accesos"
