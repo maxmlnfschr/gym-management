@@ -3,17 +3,29 @@ import { supabase } from "@/lib/supabase";
 import { MembershipFormData, Membership } from "@/features/memberships/types";
 import { getMembershipStatus } from "@/utils/dateUtils";
 
+// Eliminar esta primera declaración
+// export const useMemberships = (memberId: string) => {
+//   const queryKey = ['memberships', memberId];
+//   
+//   return useQuery(queryKey, async () => {
+//     const response = await axios.get(`/api/members/${memberId}/memberships`, {
+//       params: {
+//         include: ['membership_plans'], // Asegurarnos de incluir los planes
+//       }
+//     });
+//     return response.data;
+//   });
+// };
+
 export const useMemberships = (memberId?: string) => {
   const queryClient = useQueryClient();
 
-  // Consulta para obtener todas las membresías (historial)
   const getMemberships = useQuery({
     queryKey: ["memberships", memberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("memberships")
-        .select(
-          `
+        .select(`
           *,
           members!inner(
             first_name,
@@ -21,9 +33,13 @@ export const useMemberships = (memberId?: string) => {
             email,
             deleted_at,
             status
+          ),
+          membership_plans(
+            name,
+            price,
+            description
           )
-        `
-        )
+        `)
         .eq("member_id", memberId)
         .order("start_date", { ascending: false });
 
@@ -94,7 +110,6 @@ export const useMemberships = (memberId?: string) => {
       if (activeMemberships && activeMemberships.length > 0) {
         const startDate = new Date(data.startDate);
 
-        // Ya no restamos un día, usamos la misma fecha de inicio
         await supabase
           .from("memberships")
           .update({

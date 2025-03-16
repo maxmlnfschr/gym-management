@@ -32,12 +32,16 @@ import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { ActionMenu } from "@/components/common/ActionMenu";
 import { CardMembership } from "@mui/icons-material";
 import { EmptyState } from "@/components/common/EmptyState";
+import { TabPanel } from "@/components/common/TabPanel";  // Añadir esta importación
+import { Tabs, Tab } from "@mui/material";  // Añadir esta importación
+import { useMembershipPayments } from "@/features/memberships/hooks/useMembershipPayments"; // Añadir esta importación
+import { MembershipPayments } from "@/features/memberships/components/MembershipPayments";  // Añadir esta importación
 
 export const MemberDetails = () => {
   const theme = useTheme();
-  // Modificar esta línea
-  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // Cambiado de "sm" a "md"
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [showQR, setShowQR] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const { id } = useParams();
   const navigate = useNavigate();
   const { member, isLoading } = useMember(id);
@@ -46,6 +50,8 @@ export const MemberDetails = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   // Agregar este hook junto a los demás hooks
   const { currentMembership } = useMemberships(id!);
+  const { payments, isLoading: isLoadingPayments } = useMembershipPayments(id!);
+
   // Agregar esta función antes del return
   const handleMembershipAction = () => {
     if (currentMembership) {
@@ -58,6 +64,10 @@ export const MemberDetails = () => {
     } else {
       navigate(`/members/${id}/membership`);
     }
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
   };
 
   const handleDeleteClick = () => {
@@ -151,14 +161,6 @@ export const MemberDetails = () => {
                     Mostrar QR
                   </Button>
                 </Stack>
-                <Button
-                  startIcon={<Payment />}
-                  variant="outlined"
-                  onClick={() => navigate(`/members/${id}/payments`)}
-                  fullWidth
-                >
-                  Ver pagos
-                </Button>
               </Stack>
             ) : (
               // Vista desktop
@@ -179,13 +181,6 @@ export const MemberDetails = () => {
                   </Button>
                   <Button variant="outlined" onClick={() => setShowQR(true)}>
                     Mostrar QR
-                  </Button>
-                  <Button
-                    startIcon={<Payment />}
-                    variant="outlined"
-                    onClick={() => navigate(`/members/${id}/payments`)}
-                  >
-                    Ver pagos
                   </Button>
                   <ActionMenu
                     actions={[
@@ -226,22 +221,34 @@ export const MemberDetails = () => {
           </Stack>
         </Paper>
 
-        {/* Segunda Paper - Historial */}
+        {/* Segunda Paper - Historial Unificado */}
         <Paper sx={{ p: 3 }}>
           <Stack spacing={2}>
-            <Typography variant="h6">
-              Historial de membresías
-            </Typography>
-            <MembershipHistory 
-              memberId={id!} 
-              emptyState={
-                <EmptyState
-                  icon={<CardMembership sx={{ fontSize: 40, color: "text.secondary" }} />}
-                  title="Sin historial de membresías"
-                  description="Este miembro aún no tiene registros de membresías"
-                />
-              }
-            />
+            <Typography variant="h6">Historial</Typography>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={activeTab} onChange={handleTabChange}>
+                <Tab label="Membresías" />
+                <Tab label="Pagos" />
+              </Tabs>
+            </Box>
+            <TabPanel value={activeTab} index={0}>
+              <MembershipHistory 
+                memberId={id!} 
+                emptyState={
+                  <EmptyState
+                    icon={<CardMembership sx={{ fontSize: 40, color: "text.secondary" }} />}
+                    title="Sin historial de membresías"
+                    description="Este miembro aún no tiene registros de membresías"
+                  />
+                }
+              />
+            </TabPanel>
+            <TabPanel value={activeTab} index={1}>
+              <MembershipPayments 
+                payments={payments || []}
+                isLoading={isLoadingPayments}
+              />
+            </TabPanel>
           </Stack>
         </Paper>
       </Stack>

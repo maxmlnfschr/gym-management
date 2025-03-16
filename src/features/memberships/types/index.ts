@@ -1,5 +1,6 @@
 export type PlanType = "monthly" | "quarterly" | "annual" | "modify";
 export type PaymentStatus = "pending" | "paid";
+export type MembershipStatus = 'active' | 'expired' | 'expiring' | 'inactive';
 
 export interface Membership {
   id: string;
@@ -9,6 +10,7 @@ export interface Membership {
   start_date: string;
   end_date: string;
   payment_status: PaymentStatus;
+  status: MembershipStatus;
   created_at: string;
   plan_name?: string;
   members: {
@@ -21,6 +23,7 @@ export interface Membership {
   membership_plans?: {  // Añadimos la relación con membership_plans
     price: number;
     name: string;
+    description?: string;  // Agregamos el campo description como opcional
   };
 }
 
@@ -38,5 +41,6 @@ export interface MembershipPlan {
   name: string;
   price: number;
   duration_months: number;
-  plan_type: PlanType; // Using the PlanType type alias instead of inline types
+  plan_type: PlanType;
+  description?: string;  // Agregamos el campo description como opcional
 }

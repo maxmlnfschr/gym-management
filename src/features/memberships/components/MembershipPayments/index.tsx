@@ -9,11 +9,15 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TablePagination,
+  Stack,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { formatCurrency } from "@/utils/formatters";
+import { StatusChip } from "@/components/common/StatusChip";
+import { ResponsiveCard, ResponsiveCardContent } from "@/components/common/ResponsiveCard";
 
 interface Payment {
   id: string;
@@ -47,29 +51,68 @@ export const MembershipPayments = ({
   payments,
   isLoading,
 }: MembershipPaymentsProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   if (isLoading) {
     return <Typography>Cargando pagos...</Typography>;
   }
 
+  if (isMobile) {
+    return (
+      <Stack spacing={2} sx={{ minHeight: '60vh' }}>
+        {payments.map((payment) => (
+          <ResponsiveCard key={payment.id}>
+            <ResponsiveCardContent>
+              <Stack spacing={1}>
+                <Stack direction="row" spacing={1}>
+                  <Typography color="text.secondary">Fecha:</Typography>
+                  <Typography>
+                    {format(new Date(payment.payment_date), "dd/MM/yyyy", {
+                      locale: es,
+                    })}
+                  </Typography>
+                </Stack>
+
+                <Stack direction="row" spacing={1}>
+                  <Typography color="text.secondary">Monto:</Typography>
+                  <Typography>{formatCurrency(payment.amount)}</Typography>
+                </Stack>
+
+                <Stack direction="row" spacing={1}>
+                  <Typography color="text.secondary">Método:</Typography>
+                  <Typography>
+                    {paymentMethodLabels[payment.payment_method]}
+                  </Typography>
+                </Stack>
+
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography color="text.secondary">Estado:</Typography>
+                  <StatusChip 
+                    status={payment.status} 
+                    label={statusLabels[payment.status]}
+                    context="payment"
+                  />
+                </Stack>
+
+                {payment.notes && (
+                  <Stack direction="row" spacing={1}>
+                    <Typography color="text.secondary">Notas:</Typography>
+                    <Typography>{payment.notes}</Typography>
+                  </Stack>
+                )}
+              </Stack>
+            </ResponsiveCardContent>
+          </ResponsiveCard>
+        ))}
+      </Stack>
+    );
+  }
+
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        Historial de Pagos
-      </Typography>
+    <Box sx={{ minHeight: '60vh' }}>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -95,22 +138,18 @@ export const MembershipPayments = ({
                   <TableCell>
                     {paymentMethodLabels[payment.payment_method]}
                   </TableCell>
-                  <TableCell>{statusLabels[payment.status]}</TableCell>
+                  <TableCell>
+                    <StatusChip 
+                      status={payment.status} 
+                      label={statusLabels[payment.status]}
+                      context="payment"
+                    />
+                  </TableCell>
                   <TableCell>{payment.notes || "-"}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
         </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={payments.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Filas por página"
-        />
       </TableContainer>
     </Box>
   );
