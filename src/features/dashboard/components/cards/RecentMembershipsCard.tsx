@@ -1,9 +1,9 @@
-import { Card, CardContent, Typography, Box, Stack } from "@mui/material";
+import { Box, Stack, Skeleton } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Skeleton } from "@mui/material";
+import { DashboardCard, MetricValue, MetricLabel } from "../common/DashboardCard";
 
 interface Member {
   first_name: string;
@@ -36,20 +36,14 @@ interface SupabaseMembership {
 }
 
 export const RecentMembershipsCard = () => {
-  const { data: recentMemberships, isLoading } = useQuery<Membership[]>({
+  const { data: memberships, isLoading } = useQuery({
     queryKey: ["recent-memberships"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("memberships")
         .select(
           `
-          id,
-          start_date,
-          end_date,
-          plan_type,
-          membership_plans (
-            name
-          ),
+          *,
           members (
             first_name,
             last_name
@@ -60,78 +54,47 @@ export const RecentMembershipsCard = () => {
         .limit(5);
 
       if (error) throw error;
-
-      // Safely transform the data with proper type casting
-      const typedData = data as unknown as SupabaseMembership[];
-      return typedData.map((membership) => ({
-        id: membership.id,
-        start_date: membership.start_date,
-        end_date: membership.end_date,
-        plan_type: membership.plan_type as
-          | "monthly"
-          | "quarterly"
-          | "annual"
-          | "modify",
-        plan_name: membership.membership_plans?.name || "",
-        members: {
-          first_name: membership.members.first_name,
-          last_name: membership.members.last_name,
-        },
-      }));
+      return data;
     },
-    refetchInterval: 5 * 60 * 1000,
   });
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Últimas membresías
-          </Typography>
-          {[...Array(5)].map((_, index) => (
-            <Box key={index} sx={{ mb: 2 }}>
-              <Skeleton variant="text" width="60%" />
-              <Skeleton variant="text" width="40%" />
-            </Box>
+      <DashboardCard title="Últimas membresías">
+        <Stack spacing={2}>
+          {[...Array(3)].map((_, index) => (
+            <Skeleton key={index} variant="rectangular" height={60} />
           ))}
-        </CardContent>
-      </Card>
+        </Stack>
+      </DashboardCard>
     );
   }
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Últimas membresías
-        </Typography>
-        <Stack spacing={2}>
-          {recentMemberships?.map((membership) => (
-            <Box key={membership.id}>
-              <Typography variant="subtitle1">
+    <DashboardCard title="Últimas membresías">
+      <Stack spacing={2}>
+        {memberships && memberships.length > 0 ? (
+          memberships.map((membership) => (
+            <Box
+              key={membership.id}
+              sx={{
+                p: 2,
+                borderRadius: 1,
+                bgcolor: "background.default",
+              }}
+            >
+              <MetricValue sx={{ fontSize: '1.1rem' }}>
                 {membership.members?.first_name} {membership.members?.last_name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {membership.plan_type === "modify" 
-                  ? membership.plan_name || "Modificado"
-                  : membership.plan_name ||
-                    (membership.plan_type === "monthly"
-                      ? "Mensual"
-                      : membership.plan_type === "quarterly"
-                      ? "Trimestral"
-                      : membership.plan_type === "annual"
-                      ? "Anual"
-                      : "Desconocido")}{" "}
-                •{" "}
-                {format(new Date(membership.start_date), "d 'de' MMMM, yyyy", {
-                  locale: es,
-                })}
-              </Typography>
+              </MetricValue>
+              <MetricLabel>
+                {format(new Date(membership.created_at), "PPP", { locale: es })}
+              </MetricLabel>
             </Box>
-          ))}
-        </Stack>
-      </CardContent>
-    </Card>
+          ))
+        ) : (
+          <MetricLabel>No hay membresías recientes</MetricLabel>
+        )}
+      </Stack>
+    </DashboardCard>
   );
 };

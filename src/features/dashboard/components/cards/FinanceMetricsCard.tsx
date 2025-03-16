@@ -1,81 +1,58 @@
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Stack,
-  Skeleton,
-} from "@mui/material";
+import { Stack, Skeleton } from "@mui/material";
 import { useFinanceMetrics } from "@/features/memberships/hooks/useFinanceMetrics";
 import { formatCurrency } from "@/utils/formatters";
+import {
+  DashboardCard,
+  MetricValue,
+  MetricLabel,
+  MetricContainer,
+} from "../common/DashboardCard";
 
 export const FinanceMetricsCard = () => {
   const { data: metrics, isLoading, error } = useFinanceMetrics();
 
-  console.log('Finance Metrics:', { metrics, isLoading, error }); // Add this line for debugging
+  console.log("Finance Metrics:", { metrics, isLoading, error }); // Add this line for debugging
 
   if (isLoading || !metrics) {
     return (
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Finanzas
-          </Typography>
-          <Stack spacing={2}>
-            <Box>
-              <Skeleton variant="text" width="60%" />
-              <Skeleton variant="text" width="40%" />
-            </Box>
-            <Box>
-              <Skeleton variant="text" width="60%" />
-              <Skeleton variant="text" width="40%" />
-            </Box>
-          </Stack>
-        </CardContent>
-      </Card>
+      <DashboardCard title="Finanzas">
+        <Skeleton variant="text" width="60%" />
+        <Skeleton variant="text" width="40%" />
+        <Skeleton variant="rectangular" height={60} />
+      </DashboardCard>
     );
   }
 
   if (error) {
-    console.error('Finance metrics error:', error);
+    console.error("Finance metrics error:", error);
     return (
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom color="error">
-            Error al cargar métricas financieras
-          </Typography>
-        </CardContent>
-      </Card>
+      <DashboardCard title="Finanzas">
+        <MetricLabel color="error">
+          Error al cargar métricas financieras
+        </MetricLabel>
+      </DashboardCard>
     );
   }
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Finanzas
-        </Typography>
+    <DashboardCard title="Finanzas">
+      <Stack spacing={2}>
+        <MetricContainer>
+          <MetricValue>
+            {formatCurrency(metrics.currentMonthIncome)}
+          </MetricValue>
+          <MetricLabel>Ingresos del mes</MetricLabel>
+        </MetricContainer>
 
-        <Stack spacing={3}>
-          <Box>
-            <Typography variant="h4" component="div">
-              {formatCurrency(metrics.currentMonthIncome)}
-            </Typography>
-            <Typography color="text.secondary" variant="subtitle1">
-              Ingresos del mes
-            </Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="h4" component="div" color="warning.main">
-              {formatCurrency(metrics.pendingAmount)}
-            </Typography>
-            <Typography color="text.secondary" variant="subtitle1">
-              Pagos pendientes ({metrics.pendingPayments})
-            </Typography>
-          </Box>
-        </Stack>
-      </CardContent>
-    </Card>
+        <MetricContainer>
+          <MetricValue color="warning.main">
+            {formatCurrency(metrics.pendingPayments)}
+          </MetricValue>
+          <MetricLabel>
+            Pagos pendientes ({metrics.pendingPayments})
+          </MetricLabel>
+        </MetricContainer>
+      </Stack>
+    </DashboardCard>
   );
 };
