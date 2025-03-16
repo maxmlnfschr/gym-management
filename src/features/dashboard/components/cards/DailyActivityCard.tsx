@@ -21,8 +21,11 @@ import {
   MetricLabel,
   MetricContainer,
 } from "../common/DashboardCard";
+import { useTheme, useMediaQuery } from "@mui/material";
 
 export const DailyActivityCard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [openDialog, setOpenDialog] = useState(false);
   const { data: metrics, isLoading } = useCheckInMetrics();
 
@@ -37,13 +40,13 @@ export const DailyActivityCard = () => {
   }
 
   return (
-    <DashboardCard 
+    <DashboardCard
       title="Actividad reciente"
       action={
-        <Button 
-          variant="text" 
-          color="primary" 
-          size="small" 
+        <Button
+          variant="text"
+          color="primary"
+          size="small"
           onClick={() => setOpenDialog(true)}
         >
           Ver todos
@@ -66,34 +69,40 @@ export const DailyActivityCard = () => {
       </MetricLabel>
       <List dense>
         {metrics.todayCheckIns.length > 0 ? (
-          metrics.todayCheckIns.slice(0, window.innerWidth < 600 ? 5 : 2).map((checkIn, index) => {
-            if (!checkIn || !checkIn.member) {
-              return null;
-            }
+          metrics.todayCheckIns
+            .slice(0, isMobile ? 5 : 2)
+            .map((checkIn, index) => {
+              if (!checkIn || !checkIn.member) {
+                return null;
+              }
 
-            return (
-              <Box key={checkIn.id}>
-                <ListItem
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                    borderRadius: 1,
-                    mb: index < metrics.todayCheckIns.length - 1 ? 1 : 0,
-                  }}
-                >
-                  <ListItemText
-                    primary={`${checkIn.member.first_name || ""} ${
-                      checkIn.member.last_name || ""
-                    }`}
-                    secondary={formatDistanceToNow(new Date(checkIn.check_in), {
-                      addSuffix: true,
-                      locale: es,
-                    })}
-                  />
-                </ListItem>
-              </Box>
-            );
-          })
+              return (
+                <Box key={checkIn.id}>
+                  <ListItem
+                    sx={{
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 1,
+                      p: { xs: 1.5, sm: 2 }, // Reducido el padding en móvil
+                      mb: index < metrics.todayCheckIns.length - 1 ? 1 : 0,
+                    }}
+                  >
+                    <ListItemText
+                      primary={`${checkIn.member.first_name || ""} ${
+                        checkIn.member.last_name || ""
+                      }`}
+                      secondary={formatDistanceToNow(
+                        new Date(checkIn.check_in),
+                        {
+                          addSuffix: true,
+                          locale: es,
+                        }
+                      )}
+                    />
+                  </ListItem>
+                </Box>
+              );
+            })
         ) : (
           <ListItem
             sx={{

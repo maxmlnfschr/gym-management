@@ -1,25 +1,11 @@
-import {
-  Box,
-  Stack,
-  Skeleton,
-  ListItemText,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-} from "@mui/material";
+import { Box, Stack, Skeleton, ListItemText, Button, Dialog, DialogTitle, DialogContent, List, ListItem } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import {
-  DashboardCard,
-  MetricValue,
-  MetricLabel,
-} from "../common/DashboardCard";
+import { DashboardCard, MetricValue, MetricLabel } from "../common/DashboardCard";
 import { useState } from "react";
+import { useTheme, useMediaQuery } from "@mui/material";
 
 interface Member {
   first_name: string;
@@ -52,6 +38,8 @@ interface SupabaseMembership {
 }
 
 export const RecentMembershipsCard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [openDialog, setOpenDialog] = useState(false);
   const { data: memberships, isLoading } = useQuery({
     queryKey: ["recent-memberships"],
@@ -91,10 +79,10 @@ export const RecentMembershipsCard = () => {
     <DashboardCard
       title="Últimas membresías"
       action={
-        <Button
-          variant="text"
-          color="primary"
-          size="small"
+        <Button 
+          variant="text" 
+          color="primary" 
+          size="small" 
           onClick={() => setOpenDialog(true)}
         >
           Ver todos
@@ -102,29 +90,26 @@ export const RecentMembershipsCard = () => {
       }
     >
       <Stack spacing={2}>
-        {/* Mostrar solo los primeros 2 items en la tarjeta */}
-        {memberships
-          ?.slice(0, window.innerWidth < 600 ? 5 : 2)
-          .map((membership) => (
-            <Box
-              key={membership.id}
-              sx={{
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 1,
-                p: 2,
-              }}
-            >
-              <ListItemText
-                primary={`${membership.members?.first_name} ${membership.members?.last_name}`}
-                secondary={format(new Date(membership.created_at), "PPP", {
-                  locale: es,
-                })}
-                primaryTypographyProps={{ variant: "body2" }}
-                secondaryTypographyProps={{ variant: "caption" }}
-              />
-            </Box>
-          ))}
+        {memberships?.slice(0, isMobile ? 5 : 2).map((membership) => (
+          <Box
+            key={membership.id}
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+              p: { xs: 1.5, sm: 2 },  // Reducido el padding en móvil
+            }}
+          >
+            <ListItemText
+              primary={`${membership.members?.first_name} ${membership.members?.last_name}`}
+              secondary={format(new Date(membership.created_at), "PPP", {
+                locale: es,
+              })}
+              primaryTypographyProps={{ variant: "body2" }}
+              secondaryTypographyProps={{ variant: "caption" }}
+            />
+          </Box>
+        ))}
       </Stack>
 
       {/* Dialog con la lista completa */}

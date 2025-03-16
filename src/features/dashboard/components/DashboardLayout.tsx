@@ -9,7 +9,7 @@ export const DashboardLayout = () => {
     <Box sx={{ width: '100%' }}>
       <Grid 
         container 
-        spacing={3}
+        spacing={{ xs: 2, sm: 2, md: 2 }}  // Reducido el espaciado en todos los breakpoints
         sx={{
           width: '100%',
           margin: 0,

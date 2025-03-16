@@ -18,7 +18,7 @@ export const DashboardPage = () => {
   }, []);
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: "100%" }}>
       {/* Sección de bienvenida */}
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
@@ -34,7 +34,7 @@ export const DashboardPage = () => {
       </Paper>
 
       {/* Dashboard Cards */}
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 1, sm: 1.5 }}>
         <Grid item xs={12} sm={6} lg={3}>
           <DailyActivityCard />
         </Grid>
