@@ -1,4 +1,4 @@
-import { Grid, Typography, Box } from '@mui/material';
+import { Grid, Typography, Box, Theme } from '@mui/material';
 import { PlanCard } from '../PlanCard';
 import { useMembershipPlans } from '../../hooks/useMembershipPlans';
 import { CircularProgress } from '@mui/material';
@@ -30,6 +30,22 @@ export const PlanSelector = ({ selectedPlan, onPlanSelect }: PlanSelectorProps) 
               duration={plan.duration_months}
               selected={selectedPlan === plan.id}
               onSelect={() => onPlanSelect(plan.id, plan.plan_type)}
+              sx={{
+                transition: 'all 0.2s ease-in-out',
+                border: (theme: Theme) => selectedPlan === plan.id 
+                  ? `2px solid ${theme.palette.success.main}` 
+                  : '1px solid rgba(0, 0, 0, 0.12)',
+                bgcolor: selectedPlan === plan.id 
+                  ? 'success.lighter' 
+                  : 'background.paper',
+                transform: selectedPlan === plan.id 
+                  ? 'scale(1.02)' 
+                  : 'scale(1)',
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                  borderColor: 'success.main',
+                }
+              }}
             />
           </Grid>
         ))}

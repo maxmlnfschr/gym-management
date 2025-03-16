@@ -25,7 +25,7 @@ import { useTheme, useMediaQuery } from "@mui/material";
 
 export const DailyActivityCard = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [openDialog, setOpenDialog] = useState(false);
   const { data: metrics, isLoading } = useCheckInMetrics();
 
@@ -70,7 +70,7 @@ export const DailyActivityCard = () => {
       <List dense>
         {metrics.todayCheckIns.length > 0 ? (
           metrics.todayCheckIns
-            .slice(0, isMobile ? 5 : 2)
+            .slice(0, isMobile ? 5 : 1)
             .map((checkIn, index) => {
               if (!checkIn || !checkIn.member) {
                 return null;

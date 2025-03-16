@@ -4,7 +4,7 @@ import { AccessHistory } from "@/features/access/components/AccessHistory";
 
 export const AccessControlPage = () => {
   return (
-    <Grid container spacing={3}>
+    <Grid container>  {/* Quitado el spacing */}
       <Grid item xs={12} md={6}>
         <CheckInScanner />
       </Grid>

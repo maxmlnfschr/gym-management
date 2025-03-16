@@ -1,24 +1,33 @@
-import { Card, CardContent, Typography, Box } from '@mui/material';
-import { formatCurrency } from '@/utils/formatters';
+import { Card, CardContent, Typography, Box } from "@mui/material";
+import { formatCurrency } from "@/utils/formatters";
+import { SxProps, Theme } from "@mui/material";
 
 interface PlanCardProps {
   name: string;
   price: number;
   duration: number;
-  selected?: boolean;
-  onSelect?: () => void;
+  selected: boolean;
+  onSelect: () => void;
+  sx?: SxProps<Theme>; // Add this line to support the sx prop
 }
 
-export const PlanCard = ({ name, price, duration, selected = false, onSelect }: PlanCardProps) => {
+export const PlanCard = ({
+  name,
+  price,
+  duration,
+  selected,
+  onSelect,
+  sx,
+}: PlanCardProps) => {
   return (
     <Card
       onClick={onSelect}
       sx={{
-        cursor: 'pointer',
-        transition: 'all 0.15s ease-out',
-        transform: selected ? 'scale(1.01)' : 'none',
+        cursor: "pointer",
         boxShadow: selected ? 3 : 1,
-        '&:hover': {
+        border: selected ? "2px solid #4caf50" : "none",
+        bgcolor: selected ? "#e8f5e9" : "background.paper",
+        "&:hover": {
           boxShadow: 2,
         },
       }}
@@ -31,7 +40,7 @@ export const PlanCard = ({ name, price, duration, selected = false, onSelect }: 
           {formatCurrency(price)}
         </Typography>
         <Typography color="text.secondary">
-          {duration} {duration === 1 ? 'mes' : 'meses'}
+          {duration} {duration === 1 ? "mes" : "meses"}
         </Typography>
       </CardContent>
     </Card>
