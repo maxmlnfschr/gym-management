@@ -35,7 +35,7 @@ interface Payment {
   payment_method: 'cash' | 'card' | 'transfer' | 'other';
   payment_date?: string;
   created_at: string;
-  status: 'completed' | 'pending';
+  status: 'paid' | 'pending';
   notes?: string;
   memberships?: {
     plan_name?: string;

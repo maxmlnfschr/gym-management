@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Box,
   Paper,
@@ -10,32 +10,32 @@ import {
   TableRow,
   Typography,
   TablePagination,
-} from '@mui/material';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { formatCurrency } from '@/utils/formatters';
+} from "@mui/material";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { formatCurrency } from "@/utils/formatters";
 
 interface Payment {
   id: string;
   amount: number;
   payment_date: string;
-  payment_method: 'cash' | 'card' | 'transfer' | 'other';
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  payment_method: "cash" | "card" | "transfer" | "other";
+  status: "paid" | "pending" | "failed" | "refunded";
   notes?: string;
 }
 
 const paymentMethodLabels = {
-  cash: 'Efectivo',
-  card: 'Tarjeta',
-  transfer: 'Transferencia',
-  other: 'Otro'
+  cash: "Efectivo",
+  card: "Tarjeta",
+  transfer: "Transferencia",
+  other: "Otro",
 };
 
 const statusLabels = {
-  completed: 'Completado',
-  pending: 'Pendiente',
-  failed: 'Fallido',
-  refunded: 'Reembolsado'
+  paid: "Pagado",
+  pending: "Pendiente",
+  failed: "Fallido",
+  refunded: "Reembolsado",
 };
 
 interface MembershipPaymentsProps {
@@ -43,7 +43,10 @@ interface MembershipPaymentsProps {
   isLoading?: boolean;
 }
 
-export const MembershipPayments = ({ payments, isLoading }: MembershipPaymentsProps) => {
+export const MembershipPayments = ({
+  payments,
+  isLoading,
+}: MembershipPaymentsProps) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -51,7 +54,9 @@ export const MembershipPayments = ({ payments, isLoading }: MembershipPaymentsPr
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -82,14 +87,18 @@ export const MembershipPayments = ({ payments, isLoading }: MembershipPaymentsPr
               .map((payment) => (
                 <TableRow key={payment.id}>
                   <TableCell>
-                    {format(new Date(payment.payment_date), 'dd/MM/yyyy', { locale: es })}
+                    {format(new Date(payment.payment_date), "dd/MM/yyyy", {
+                      locale: es,
+                    })}
                   </TableCell>
                   <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                  <TableCell>{paymentMethodLabels[payment.payment_method]}</TableCell>
+                  <TableCell>
+                    {paymentMethodLabels[payment.payment_method]}
+                  </TableCell>
                   <TableCell>{statusLabels[payment.status]}</TableCell>
-                  <TableCell>{payment.notes || '-'}</TableCell>
+                  <TableCell>{payment.notes || "-"}</TableCell>
                 </TableRow>
-            ))}
+              ))}
           </TableBody>
         </Table>
         <TablePagination

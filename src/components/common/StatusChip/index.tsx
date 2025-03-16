@@ -13,8 +13,8 @@ export const StatusChip = ({ status, customLabel, context = 'membership', ...pro
     // Para estados de pago
     if (context === 'payment') {
       switch (status) {
-        case 'completed':
-          return { color: 'success', label: customLabel || 'Completado' };
+        case 'paid':
+          return { color: 'success', label: customLabel || 'Pagado' };
         case 'pending':
           return { color: 'warning', label: customLabel || 'Pendiente' };
         case 'failed':
