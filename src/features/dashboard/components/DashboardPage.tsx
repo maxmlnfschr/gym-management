@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { Box, Typography, Paper, Grid } from "@mui/material";
 import { useAuthStore } from "@/features/shared/stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
-import { MembershipStatusMonitor } from "@/features/memberships/components/MembershipStatusMonitor";
+// Eliminar esta línea
+// import { MembershipStatusMonitor } from "@/features/memberships/components/MembershipStatusMonitor";
 import { DashboardMetrics } from "./DashboardMetrics";
 import { RecentMembershipsCard } from "./cards/RecentMembershipsCard";
 
@@ -40,15 +41,6 @@ export const DashboardPage = () => {
       {/* Sección de membresías recientes y monitor de estado */}
       <Grid item xs={12} md={6}>
         <RecentMembershipsCard />
-      </Grid>
-
-      <Grid item xs={12} md={6}>
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Estado de Membresías
-          </Typography>
-          <MembershipStatusMonitor />
-        </Paper>
       </Grid>
     </Grid>
   );
