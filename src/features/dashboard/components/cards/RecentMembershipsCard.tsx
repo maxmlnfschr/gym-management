@@ -1,9 +1,25 @@
-import { Box, Stack, Skeleton } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Skeleton,
+  ListItemText,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  List,
+  ListItem,
+} from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { DashboardCard, MetricValue, MetricLabel } from "../common/DashboardCard";
+import {
+  DashboardCard,
+  MetricValue,
+  MetricLabel,
+} from "../common/DashboardCard";
+import { useState } from "react";
 
 interface Member {
   first_name: string;
@@ -36,6 +52,7 @@ interface SupabaseMembership {
 }
 
 export const RecentMembershipsCard = () => {
+  const [openDialog, setOpenDialog] = useState(false);
   const { data: memberships, isLoading } = useQuery({
     queryKey: ["recent-memberships"],
     queryFn: async () => {
@@ -71,30 +88,68 @@ export const RecentMembershipsCard = () => {
   }
 
   return (
-    <DashboardCard title="Últimas membresías">
+    <DashboardCard
+      title="Últimas membresías"
+      action={
+        <Button
+          variant="text"
+          color="primary"
+          size="small"
+          onClick={() => setOpenDialog(true)}
+        >
+          Ver todos
+        </Button>
+      }
+    >
       <Stack spacing={2}>
-        {memberships && memberships.length > 0 ? (
-          memberships.map((membership) => (
+        {/* Mostrar solo los primeros 2 items en la tarjeta */}
+        {memberships
+          ?.slice(0, window.innerWidth < 600 ? 5 : 2)
+          .map((membership) => (
             <Box
               key={membership.id}
               sx={{
-                p: 2,
+                border: "1px solid",
+                borderColor: "divider",
                 borderRadius: 1,
-                bgcolor: "background.default",
+                p: 2,
               }}
             >
-              <MetricValue sx={{ fontSize: '1.1rem' }}>
-                {membership.members?.first_name} {membership.members?.last_name}
-              </MetricValue>
-              <MetricLabel>
-                {format(new Date(membership.created_at), "PPP", { locale: es })}
-              </MetricLabel>
+              <ListItemText
+                primary={`${membership.members?.first_name} ${membership.members?.last_name}`}
+                secondary={format(new Date(membership.created_at), "PPP", {
+                  locale: es,
+                })}
+                primaryTypographyProps={{ variant: "body2" }}
+                secondaryTypographyProps={{ variant: "caption" }}
+              />
             </Box>
-          ))
-        ) : (
-          <MetricLabel>No hay membresías recientes</MetricLabel>
-        )}
+          ))}
       </Stack>
+
+      {/* Dialog con la lista completa */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Últimas membresías</DialogTitle>
+        <DialogContent>
+          <List>
+            {memberships?.map((membership) => (
+              <ListItem key={membership.id}>
+                <ListItemText
+                  primary={`${membership.members?.first_name} ${membership.members?.last_name}`}
+                  secondary={format(new Date(membership.created_at), "PPP", {
+                    locale: es,
+                  })}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
     </DashboardCard>
   );
 };

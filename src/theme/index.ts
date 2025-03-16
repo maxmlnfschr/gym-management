@@ -1,6 +1,7 @@
 import { createTheme } from '@mui/material';
 
 export const theme = createTheme({
+  spacing: 8, // Adding base spacing unit
   palette: {
     primary: {
       main: '#000000',
@@ -20,6 +21,40 @@ export const theme = createTheme({
     },
   },
   components: {
+    MuiGrid: {
+      styleOverrides: {
+        root: {
+          marginTop: 0,
+          marginBottom: 0,
+        },
+        container: {
+          spacing: 2,
+        }
+      }
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          height: '100%',
+        }
+      }
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: 16,
+          '&:last-child': {
+            paddingBottom: 16,
+          },
+          "@media (min-width: 600px)": {
+            padding: 24,
+            '&:last-child': {
+              paddingBottom: 24,
+            },
+          },
+        }
+      }
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {

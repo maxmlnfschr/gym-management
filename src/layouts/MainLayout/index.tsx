@@ -20,19 +20,9 @@ export const MainLayout = () => {
 
   const getMaxWidth = () => {
     if (location.pathname === '/members/form') {
-      return {
-        xs: '100%',
-        sm: '400px',
-        md: '400px',
-        lg: '400px'
-      }
+      return 'sm' as const; // Para formularios pequeños
     }
-    return {
-      xs: '100%',
-      sm: '600px',
-      md: '900px',
-      lg: '1200px'
-    }
+    return false as const; // Para usar todo el ancho disponible
   };
 
   const getPageTitle = () => {
@@ -86,12 +76,12 @@ export const MainLayout = () => {
         isCollapsed={isDrawerCollapsed} 
       />
       <Container 
-        component="main" 
+        component="main"
+        maxWidth={getMaxWidth()} 
         sx={{ 
           flex: 1,
           p: 3,
           pt: 4,
-          maxWidth: getMaxWidth(),
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
