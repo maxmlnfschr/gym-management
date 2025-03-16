@@ -279,7 +279,14 @@ export const MemberDetails = () => {
           QR de Acceso - {member.first_name} {member.last_name}
         </DialogTitle>
         <DialogContent sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-          <QRCodeSVG value={id || ""} size={256} />
+          <QRCodeSVG 
+            value={JSON.stringify({
+              v: '1',
+              id: id,
+              n: `${member.first_name} ${member.last_name}`
+            })} 
+            size={256} 
+          />
         </DialogContent>
       </Dialog>
 

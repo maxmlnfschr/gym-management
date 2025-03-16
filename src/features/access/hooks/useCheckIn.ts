@@ -6,12 +6,22 @@ import { CheckInResponse } from '../types';
 export const useCheckIn = () => {
   const queryClient = useQueryClient();
   const checkInMutation = useMutation<CheckInResponse, Error, string>({
-    mutationFn: async (memberId: string) => {
+    mutationFn: async (qrData: string) => {
+      let memberId: string;
+      
+      try {
+        // Intentar parsear el QR como JSON (nuevo formato)
+        const parsedQR = JSON.parse(qrData);
+        memberId = parsedQR.v === '1' ? parsedQR.id : qrData;
+      } catch {
+        // Si falla el parse, asumimos que es un QR antiguo
+        memberId = qrData;
+      }
+
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const nowISOString = today.toISOString();
-
-      // Verificar membresía usando latest_memberships
+      
+      // El resto de la lógica se mantiene exactamente igual
       const { data: memberships, error: membershipError } = await supabase
         .from('latest_memberships')
         .select(`
