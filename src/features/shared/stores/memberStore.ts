@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import create from 'zustand';
 import { Member, MemberFormData } from "@/features/members/types";
 import { supabase } from "@/lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";

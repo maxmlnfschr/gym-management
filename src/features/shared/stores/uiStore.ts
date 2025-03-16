@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import create from 'zustand';
 import { ToastState, ToastMessage } from '@/features/shared/types/common';
 
 interface UIState {
