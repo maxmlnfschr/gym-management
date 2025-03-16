@@ -317,22 +317,22 @@ export const MemberList = () => {
             <EmptyState
               icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
               title={
-                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? "No se encontraron miembros"
                   : "No hay miembros"
               }
               description={
-                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? "Prueba ajustando los filtros aplicados"
                   : "Comienza agregando un nuevo miembro"
               }
               actionText={
-                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? undefined
                   : "Agregar miembro"
               }
               onAction={
-                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? undefined
                   : () => navigate("/members/add")
               }
@@ -430,18 +430,24 @@ export const MemberList = () => {
           <EmptyState
             icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
             title={
-              filterValues.search
+              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                 ? "No se encontraron resultados"
                 : "No hay miembros"
             }
             description={
-              filterValues.search
-                ? "Intenta con otros términos de búsqueda"
+              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                ? "Prueba ajustando los filtros aplicados"
                 : "Comienza agregando un nuevo miembro"
             }
-            actionText={filterValues.search ? undefined : "Agregar miembro"}
+            actionText={
+              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                ? undefined
+                : "Agregar miembro"
+            }
             onAction={
-              filterValues.search ? undefined : () => navigate("/members/add")
+              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                ? undefined
+                : () => navigate("/members/add")
             }
           />
         ) : (
