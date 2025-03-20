@@ -57,6 +57,7 @@ import { People } from "@mui/icons-material";
 import { EmptyState } from "@/components/common/EmptyState";
 import { InlineFilters } from "@/components/common/InlineFilters";
 import { MEMBERSHIP_STATUS_FILTERS } from "@/features/memberships/constants/filters";
+import { LoadingButton } from "@/components/common/LoadingButton";
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -173,13 +174,20 @@ export const MemberList = () => {
     setConfirmDialogOpen(true);
   };
 
+  // Agregar estado para controlar la carga de eliminación
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  
   const handleConfirmDelete = async () => {
     if (memberToDelete) {
       try {
+        setIsDeletingId(memberToDelete);
         await deleteMember(memberToDelete);
-        // La lista se actualizará automáticamente gracias al store
       } catch (error) {
         console.error("Error al eliminar miembro:", error);
+      } finally {
+        setIsDeletingId(null);
+        setConfirmDialogOpen(false);
+        setMemberToDelete(null);
       }
     }
     setConfirmDialogOpen(false);
@@ -208,17 +216,6 @@ export const MemberList = () => {
   if (loading) {
     return <LoadingScreen fullScreen={false} message="Cargando miembros..." />;
   }
-
-  // Eliminamos este bloque de código que retornaba solo el EmptyState
-  // if (!loading && filteredMembers.length === 0) {
-  //   return (
-  //     <EmptyState ... />
-  //   );
-  // }
-
-  // Primero añadimos el manejador después de los estados existentes
-  // Remove this duplicate declaration
-  // const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
 
   // Update the handleInlineFilterChange function
   const handleInlineFilterChange = (
@@ -317,22 +314,26 @@ export const MemberList = () => {
             <EmptyState
               icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
               title={
-                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search ||
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? "No se encontraron miembros"
                   : "No hay miembros"
               }
               description={
-                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search ||
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? "Prueba ajustando los filtros aplicados"
                   : "Comienza agregando un nuevo miembro"
               }
               actionText={
-                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search ||
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? undefined
                   : "Agregar miembro"
               }
               onAction={
-                filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+                filterValues.search ||
+                activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                   ? undefined
                   : () => navigate("/members/add")
               }
@@ -430,22 +431,26 @@ export const MemberList = () => {
           <EmptyState
             icon={<People sx={{ fontSize: 48, color: "text.secondary" }} />}
             title={
-              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+              filterValues.search ||
+              activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                 ? "No se encontraron resultados"
                 : "No hay miembros"
             }
             description={
-              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+              filterValues.search ||
+              activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                 ? "Prueba ajustando los filtros aplicados"
                 : "Comienza agregando un nuevo miembro"
             }
             actionText={
-              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+              filterValues.search ||
+              activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                 ? undefined
                 : "Agregar miembro"
             }
             onAction={
-              filterValues.search || activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
+              filterValues.search ||
+              activeFilters[MEMBERSHIP_STATUS_FILTERS.name]?.length > 0
                 ? undefined
                 : () => navigate("/members/add")
             }
@@ -569,26 +574,30 @@ export const MemberList = () => {
                   label: "Acciones",
                   render: (member: Member) => (
                     <>
-                      <IconButton
+                      <LoadingButton
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/members/edit/${member.id}`);
                         }}
                         color="inherit"
                         size="small"
+                        startIcon={<EditIcon />}
                       >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
+                        Editar
+                      </LoadingButton>
+                      <LoadingButton
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteClick(member.id);
                         }}
-                        color="inherit"
+                        color="error"
                         size="small"
+                        loading={isDeletingId === member.id}
+                        loadingText="Eliminando..."
+                        startIcon={<DeleteIcon />}
                       >
-                        <DeleteIcon />
-                      </IconButton>
+                        Eliminar
+                      </LoadingButton>
                     </>
                   ),
                 },

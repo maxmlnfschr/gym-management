@@ -4,6 +4,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { PlanSelector } from "../PlanSelector";
 import { MembershipFormData } from "../../types";
 import { addMonths } from "date-fns";
+import { LoadingButton } from "@/components/common/LoadingButton";
+import { PaymentForm } from "../PaymentForm";
 
 interface PaymentOption {
   value: "pending" | "paid";
@@ -50,6 +52,7 @@ export const MembershipForm = ({
     "cash" | "card" | "transfer" | "other" | ""
   >("");
   const [paymentNotes, setPaymentNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePlanSelect = (
     planId: string,
@@ -59,37 +62,46 @@ export const MembershipForm = ({
     setPlanType(type);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!startDate || !selectedPlanId) return;
 
-    const localDate = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate()
-    );
+    try {
+      setIsSubmitting(true);
+      const localDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+      );
 
-    onSubmit({
-      planId: selectedPlanId,
-      startDate: localDate,
-      paymentStatus,
-      planType,
-      ...(paymentStatus === "paid" &&
-        paymentMethod && {
-          payment_method: paymentMethod,
-          payment_notes: paymentNotes,
-        }),
-    });
+      await onSubmit({
+        planId: selectedPlanId,
+        startDate: localDate,
+        paymentStatus,
+        planType,
+        ...(paymentStatus === "paid" &&
+          paymentMethod && {
+            payment_method: paymentMethod,
+            payment_notes: paymentNotes,
+          }),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePaymentChange = ({
+    payment_method,
+    payment_notes,
+  }: {
+    payment_method: typeof paymentMethod;
+    payment_notes: string;
+  }) => {
+    setPaymentMethod(payment_method);
+    setPaymentNotes(payment_notes);
   };
 
   return (
-    <Paper
-      elevation={1}
-      sx={{
-        p: { xs: 2, sm: 3 },
-        borderRadius: 2,
-        bgcolor: "background.paper",
-      }}
-    >
+    <Paper elevation={1} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2, bgcolor: "background.paper" }}>
       <Stack spacing={3}>
         <PlanSelector
           selectedPlan={selectedPlanId}
@@ -123,13 +135,9 @@ export const MembershipForm = ({
           select
           label="Estado de pago"
           value={paymentStatus}
-          onChange={(e) =>
-            setPaymentStatus(e.target.value as "pending" | "paid")
-          }
+          onChange={(e) => setPaymentStatus(e.target.value as "pending" | "paid")}
           fullWidth
-          SelectProps={{
-            native: true,
-          }}
+          SelectProps={{ native: true }}
         >
           {paymentStatusOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -139,52 +147,23 @@ export const MembershipForm = ({
         </TextField>
 
         {paymentStatus === "paid" && (
-          <>
-            <TextField
-              select
-              label="Método de pago"
-              value={paymentMethod}
-              onChange={(e) =>
-                setPaymentMethod(
-                  e.target.value as "cash" | "card" | "transfer" | "other"
-                )
-              }
-              fullWidth
-              required
-              InputLabelProps={{
-                shrink: true,
-              }}
-              SelectProps={{
-                native: true,
-              }}
-            >
-              <option value="">Seleccionar método</option>
-              {paymentMethodOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </TextField>
-
-            <TextField
-              label="Notas de pago"
-              value={paymentNotes}
-              onChange={(e) => setPaymentNotes(e.target.value)}
-              fullWidth
-              multiline
-              rows={2}
-            />
-          </>
+          <PaymentForm
+            onPaymentChange={handlePaymentChange}
+            initialMethod={paymentMethod}
+            initialNotes={paymentNotes}
+          />
         )}
 
-        <Button
+        <LoadingButton
           variant="contained"
           onClick={handleSubmit}
           fullWidth
           disabled={paymentStatus === "paid" && !paymentMethod}
+          loading={isSubmitting}
+          loadingText="Guardando..."
         >
           Guardar membresía
-        </Button>
+        </LoadingButton>
       </Stack>
     </Paper>
   );

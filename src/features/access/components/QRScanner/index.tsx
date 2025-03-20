@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Box, Paper, Typography, Button } from "@mui/material";
-import { QrCode2 } from "@mui/icons-material"; // Añadir este import
+import { QrCode2 } from "@mui/icons-material";
+import { LoadingButton } from "@/components/common/LoadingButton";
 
 interface QRScannerProps {
   onScanSuccess: (memberId: string) => void;
@@ -200,14 +201,22 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
             width: "100%",
           }}
         >
-          <Button
+          <LoadingButton
             variant="contained"
             onClick={isScanning ? stopScanning : startScanning}
+            loading={isScanning}
+            loadingText="Escaneando..."
             fullWidth
           >
             {isScanning ? "Detener escaneo" : "Usar cámara"}
-          </Button>
-          <Button variant="outlined" component="label" fullWidth>
+          </LoadingButton>
+          <LoadingButton
+            variant="outlined"
+            component="label"
+            loading={status === "Analizando imagen..."}
+            loadingText="Analizando..."
+            fullWidth
+          >
             Subir imagen
             <input
               type="file"
@@ -215,7 +224,7 @@ export const QRScanner = ({ onScanSuccess, onScanError }: QRScannerProps) => {
               accept="image/*"
               onChange={handleFileUpload}
             />
-          </Button>
+          </LoadingButton>
         </Box>
       </Box>
     </Paper>

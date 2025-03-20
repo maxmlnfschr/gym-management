@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { memberSchema } from "@/features/members/validations/memberSchema";
 import type { MemberFormData } from "@/features/members/types";
 import { useLocation } from 'react-router-dom';
+import { LoadingButton } from "@/components/common/LoadingButton";
 
 interface Props {
   onSubmit: (data: MemberFormData) => Promise<void>;
@@ -27,19 +28,8 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
   });
   // Eliminar el useState y formValues que habíamos agregado
   return (
-    <Paper 
-      elevation={1}
-      sx={{ 
-        p: { xs: 2, sm: 3 },
-        borderRadius: 2,
-        bgcolor: 'background.paper'
-      }}
-    >
-      <Box 
-        component="form" 
-        onSubmit={handleSubmit(onSubmit)} 
-        noValidate
-      >
+    <Paper elevation={1} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2, bgcolor: 'background.paper' }}>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack spacing={3}>
           <TextField
             {...register("first_name")}
@@ -93,15 +83,15 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
             helperText={errors.notes?.message}
           />
 
-          <Button
+          <LoadingButton
             type="submit"
             variant="contained"
             fullWidth
-            size="large"
-            disabled={isSubmitting}
+            loading={isSubmitting}
+            loadingText="Guardando..."
           >
             {initialData ? "Actualizar" : "Guardar"}
-          </Button>
+          </LoadingButton>
         </Stack>
       </Box>
     </Paper>

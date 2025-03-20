@@ -1,10 +1,12 @@
-import { Box, Typography, Button, SxProps, Theme } from "@mui/material";
+import { Box, Typography, SxProps, Theme } from "@mui/material";
+import { LoadingButton } from "@/components/common/LoadingButton";
+import { useState } from "react";
 
 interface EmptyStateProps {
   title: string;
   description?: string;
   actionText?: string;
-  onAction?: () => void;
+  onAction?: () => void | Promise<void>;
   icon?: React.ReactNode;
   sx?: SxProps<Theme>;
 }
@@ -17,6 +19,18 @@ export const EmptyState = ({
   icon,
   sx
 }: EmptyStateProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleAction = async () => {
+    if (!onAction) return;
+    setIsLoading(true);
+    try {
+      await onAction();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Box
       display="flex"
@@ -37,9 +51,14 @@ export const EmptyState = ({
         </Typography>
       )}
       {actionText && onAction && (
-        <Button variant="contained" onClick={onAction}>
+        <LoadingButton
+          variant="contained"
+          onClick={handleAction}
+          loading={isLoading}
+          loadingText="Cargando..."
+        >
           {actionText}
-        </Button>
+        </LoadingButton>
       )}
     </Box>
   );

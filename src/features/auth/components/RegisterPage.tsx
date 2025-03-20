@@ -1,4 +1,5 @@
-import { Box, TextField, Button, Typography, Link } from "@mui/material";
+import { Box, TextField, Typography, Link } from "@mui/material";
+import { LoadingButton } from "@/components/common/LoadingButton";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -82,15 +83,18 @@ export const RegisterPage = () => {
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
       />
-      <Button
+      <LoadingButton
         type="submit"
         fullWidth
         variant="contained"
         sx={{ mt: 3, mb: 2 }}
-        disabled={loading}
+        loading={loading}
+        loadingText="Registrando..."
+        disabled={!email || !password || !confirmPassword || password !== confirmPassword}
       >
-        {loading ? "Registrando..." : "Registrarse"}
-      </Button>
+        Registrarse
+      </LoadingButton>
+      
       <Link href={ROUTES.LOGIN} variant="body2">
         {"¿Ya tenés una cuenta? Iniciá sesión"}
       </Link>

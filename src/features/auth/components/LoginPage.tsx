@@ -1,4 +1,5 @@
-import { Box, TextField, Button, Typography, Link } from "@mui/material";
+import { Box, TextField, Typography, Link } from "@mui/material";
+import { LoadingButton } from "@/components/common/LoadingButton";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -65,15 +66,17 @@ export const LoginPage = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <Button
+      <LoadingButton
         type="submit"
         fullWidth
         variant="contained"
         sx={{ mt: 3, mb: 2 }}
-        disabled={loading}
+        loading={loading}
+        loadingText="Iniciando sesión..."
+        disabled={!email || !password}
       >
-        {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
-      </Button>
+        Iniciar Sesión
+      </LoadingButton>
       <Link href={ROUTES.REGISTER} variant="body2">
         {"¿No tenés una cuenta? Registrate"}
       </Link>
