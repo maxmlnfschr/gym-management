@@ -46,7 +46,7 @@ export const FinanceMetricsCard = () => {
 
         <MetricContainer>
           <MetricValue color="warning.main">
-            {formatCurrency(metrics.pendingPayments)}
+            {formatCurrency(metrics.pendingAmount)}
           </MetricValue>
           <MetricLabel>
             Pagos pendientes ({metrics.pendingPayments})

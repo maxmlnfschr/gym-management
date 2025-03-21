@@ -41,25 +41,43 @@ export const useFinanceMetrics = () => {
 
       if (monthError) throw monthError;
 
-      // Obtener pagos pendientes
-      const { data: pendingPayments, error: pendingError } = await supabase
-        .from("membership_payments")
-        .select("amount")
-        .eq("status", "pending");
-
-      if (pendingError) throw pendingError;
-
       const currentMonthIncome =
         monthPayments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
-      const pendingAmount =
-        pendingPayments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
+
+      // Obtener membresías activas con pagos pendientes
+      const { data: pendingMemberships, error: membershipsError } = await supabase
+        .from("memberships")
+        .select(`
+          id,
+          member_id,
+          amount,
+          members!inner (
+            deleted_at
+          )
+        `)
+        .eq("payment_status", "pending")
+        .is("members.deleted_at", null);
+      
+      if (membershipsError) throw membershipsError;
+
+      // Calcular el monto total pendiente
+      const totalPendingAmount =
+        pendingMemberships?.reduce(
+          (sum, membership) => sum + (membership.amount || 0),
+          0
+        ) || 0;
+
+      // Contar miembros únicos con pagos pendientes
+      const uniquePendingMembers = new Set(
+        pendingMemberships?.map((m) => m.member_id)
+      ).size;
 
       return {
         currentMonthIncome,
-        pendingPayments: pendingPayments?.length || 0,
-        pendingAmount,
+        pendingPayments: uniquePendingMembers,
+        pendingAmount: totalPendingAmount,
       };
     },
-    refetchInterval: 5 * 60 * 1000, // Refrescar cada 5 minutos
+    refetchInterval: 5 * 60 * 1000,
   });
 };
