@@ -8,10 +8,6 @@ import {
   TableRow,
   Paper,
   Typography,
-  Box,
-  useTheme,
-  useMediaQuery,
-  Stack,
 } from '@mui/material';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -64,11 +60,21 @@ export const PaymentHistory = ({ memberId, emptyState }: PaymentHistoryProps) =>
 
   const renderMobileItem = (payment: Payment) => (
     <InfoCard
-      title={`${format(new Date(payment.payment_date || payment.created_at), 'dd/MM/yyyy', { locale: es })} ${formatCurrency(payment.amount)}`}
+      title={formatCurrency(payment.amount)}
       subtitle={
         <>
-          {paymentMethodLabels[payment.payment_method]}
-          {payment.memberships?.plan_name && ` - ${payment.memberships.plan_name}`}
+          <Typography variant="body2" color="text.secondary">
+            {format(new Date(payment.payment_date || payment.created_at), 'dd/MM/yyyy', { locale: es })}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {paymentMethodLabels[payment.payment_method]}
+            {payment.memberships?.plan_name && ` - ${payment.memberships.plan_name}`}
+          </Typography>
+          {payment.notes && (
+            <Typography variant="body2" color="text.secondary">
+              {payment.notes}
+            </Typography>
+          )}
         </>
       }
       action={<StatusChip status={payment.status} context="payment" />}
