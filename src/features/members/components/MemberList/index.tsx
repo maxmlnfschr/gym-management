@@ -58,6 +58,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { InlineFilters } from "@/components/common/InlineFilters";
 import { MEMBERSHIP_STATUS_FILTERS } from "@/features/memberships/constants/filters";
 import { LoadingButton } from "@/components/common/LoadingButton";
+import { InfoCard } from "@/components/common/InfoCard";
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -346,11 +347,32 @@ export const MemberList = () => {
                   onClick={() => navigate(`/members/${member.id}`)}
                   sx={{ cursor: "pointer" }}
                 >
-                  <MemberCard
-                    key={member.id}
-                    member={member}
-                    onEdit={(id: string) => navigate(`/members/edit/${id}`)}
-                    onDelete={(id: string) => handleDeleteClick(id)}
+                  <InfoCard
+                    title={`${member.first_name} ${member.last_name}`}
+                    subtitle={
+                      <>
+                        <Typography variant="body2" color="text.secondary">
+                          {member.email}
+                        </Typography>
+                        {member.phone && (
+                          <Typography variant="body2" color="text.secondary">
+                            {member.phone}
+                          </Typography>
+                        )}
+                      </>
+                    }
+                    action={
+                      <StatusChip
+                        status={
+                          !member.current_membership
+                            ? "no_membership"
+                            : new Date(member.current_membership.end_date) > new Date()
+                            ? "active"
+                            : "expired"
+                        }
+                        customLabel={!member.current_membership ? "Sin membresía" : undefined}
+                      />
+                    }
                   />
                 </Box>
               ))}
