@@ -1,11 +1,19 @@
 import { useState } from "react";
-import { Box, Button, Stack, TextField, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  Stack,
+  TextField,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { PlanSelector } from "../PlanSelector";
 import { MembershipFormData } from "../../types";
 import { addMonths } from "date-fns";
 import { LoadingButton } from "@/components/common/LoadingButton";
 import { PaymentForm } from "@/features/payments/components/PaymentForm";
+import { CustomLink } from "@/components/common/CustomLink";
 
 interface PaymentOption {
   value: "pending" | "paid";
@@ -107,6 +115,12 @@ export const MembershipForm = ({
           selectedPlan={selectedPlanId}
           onPlanSelect={(planId, type) => handlePlanSelect(planId, type)}
         />
+
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <CustomLink to="/settings/membership-plans" color="primary">
+            Configurar planes
+          </CustomLink>
+        </Box>
 
         <DatePicker
           label="Fecha de inicio"
