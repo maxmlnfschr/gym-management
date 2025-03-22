@@ -32,10 +32,14 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
   });
 
   const handleFormSubmit = async (data: MemberFormData) => {
-    await onSubmit({
-      ...data,
-      membership: membershipData || undefined
-    });
+    try {
+      await onSubmit({
+        ...data,
+        membership: membershipData || undefined
+      });
+    } catch (error) {
+      console.error('Error al guardar:', error);
+    }
   };
 
   return (
@@ -106,6 +110,7 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
               return Promise.resolve();
             }}
             isEmbedded={true}
+            onDataChange={setMembershipData}
           />
 
           <LoadingButton

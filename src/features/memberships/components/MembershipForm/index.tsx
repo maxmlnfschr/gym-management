@@ -14,6 +14,7 @@ import { addMonths } from "date-fns";
 import { LoadingButton } from "@/components/common/LoadingButton";
 import { PaymentForm } from "@/features/payments/components/PaymentForm";
 import { CustomLink } from "@/components/common/CustomLink";
+import { useEffect } from "react";
 
 interface PaymentOption {
   value: "pending" | "paid";
@@ -38,13 +39,18 @@ interface MembershipFormProps {
     payment_notes?: string;
   }) => Promise<void>;
   initialData?: Partial<MembershipFormData>;
-  isEmbedded?: boolean;  // Add this prop
+  isEmbedded?: boolean;
+  onDataChange?: (data: MembershipFormData & {
+    payment_method?: "cash" | "card" | "transfer" | "other";
+    payment_notes?: string;
+  }) => void;
 }
 
 export const MembershipForm = ({
   onSubmit,
   initialData,
-  isEmbedded = false
+  isEmbedded = false,
+  onDataChange
 }: MembershipFormProps) => {
   const [selectedPlanId, setSelectedPlanId] = useState(
     initialData?.planId || ""
@@ -93,6 +99,25 @@ export const MembershipForm = ({
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isEmbedded && startDate && selectedPlanId && onDataChange) {
+      const localDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+      );
+
+      onDataChange({
+        planId: selectedPlanId,
+        startDate: localDate,
+        paymentStatus,
+        planType,
+        payment_method: paymentMethod || "other",
+        payment_notes: paymentNotes,
+      });
+    }
+  }, [selectedPlanId, startDate, paymentStatus, planType, paymentMethod, paymentNotes, onDataChange, isEmbedded]);
 
   const handlePaymentChange = ({
     payment_method,
@@ -164,15 +189,17 @@ export const MembershipForm = ({
         initialNotes={paymentNotes}
       />
 
-      <LoadingButton
-        variant="contained"
-        onClick={handleSubmit}
-        fullWidth
-        loading={isSubmitting}
-        loadingText="Guardando..."
-      >
-        Guardar membresía
-      </LoadingButton>
+      {!isEmbedded && (
+        <LoadingButton
+          variant="contained"
+          onClick={handleSubmit}
+          fullWidth
+          loading={isSubmitting}
+          loadingText="Guardando..."
+        >
+          Guardar membresía
+        </LoadingButton>
+      )}
     </Stack>
   );
 
