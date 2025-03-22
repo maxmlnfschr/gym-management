@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Stack, TextField } from "@mui/material";
 
 const paymentMethodOptions = [
+  { value: "transfer", label: "Transferencia" },
   { value: "cash", label: "Efectivo" },
   { value: "card", label: "Tarjeta" },
-  { value: "transfer", label: "Transferencia" },
   { value: "other", label: "Otro" },
 ];
 
@@ -17,7 +17,7 @@ interface PaymentFormProps {
   initialNotes?: string;
 }
 
-export const PaymentForm = ({ onPaymentChange, initialMethod = "", initialNotes = "" }: PaymentFormProps) => {
+export const PaymentForm = ({ onPaymentChange, initialMethod = "transfer", initialNotes = "" }: PaymentFormProps) => {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "transfer" | "other" | "">(initialMethod as any);
   const [paymentNotes, setPaymentNotes] = useState(initialNotes);
 
@@ -39,12 +39,10 @@ export const PaymentForm = ({ onPaymentChange, initialMethod = "", initialNotes 
         value={paymentMethod}
         onChange={(e) => handleMethodChange(e.target.value as typeof paymentMethod)}
         fullWidth
-        required
         SelectProps={{
           native: true,
         }}
       >
-        <option value="">Seleccionar método</option>
         {paymentMethodOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

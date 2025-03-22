@@ -32,11 +32,10 @@ import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { ActionMenu } from "@/components/common/ActionMenu";
 import { CardMembership } from "@mui/icons-material";
 import { EmptyState } from "@/components/common/EmptyState";
-import { TabPanel } from "@/components/common/TabPanel";  // Añadir esta importación
-import { Tabs, Tab } from "@mui/material";  // Añadir esta importación
-import { useMembershipPayments } from "@/features/memberships/hooks/useMembershipPayments"; // Añadir esta importación
-import { MembershipPayments } from "@/features/memberships/components/MembershipPayments";  // Añadir esta importación
-import { PaymentHistory } from "@/features/memberships/components/PaymentHistory";
+import { TabPanel } from "@/components/common/TabPanel";
+import { Tabs, Tab } from "@mui/material";
+import { usePayments } from "@/features/payments/hooks/usePayments";
+import { PaymentHistory } from "@/features/payments/components/PaymentHistory";
 
 export const MemberDetails = () => {
   const theme = useTheme();
@@ -51,7 +50,7 @@ export const MemberDetails = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   // Agregar este hook junto a los demás hooks
   const { currentMembership } = useMemberships(id!);
-  const { payments, isLoading: isLoadingPayments } = useMembershipPayments(id!);
+  const { payments, isLoading: isLoadingPayments } = usePayments(id!);
 
   // Agregar esta función antes del return
   const handleMembershipAction = () => {

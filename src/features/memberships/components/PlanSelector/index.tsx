@@ -22,7 +22,7 @@ export const PlanSelector = ({
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Seleccionar Plan
+        Elegir plan
       </Typography>
       <Grid container spacing={2} sx={{ mt: 1 }}>
         {plans.map((plan) => (

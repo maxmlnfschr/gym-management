@@ -3,20 +3,6 @@ import { supabase } from "@/lib/supabase";
 import { MembershipFormData, Membership } from "@/features/memberships/types";
 import { getMembershipStatus } from "@/utils/dateUtils";
 
-// Eliminar esta primera declaración
-// export const useMemberships = (memberId: string) => {
-//   const queryKey = ['memberships', memberId];
-//   
-//   return useQuery(queryKey, async () => {
-//     const response = await axios.get(`/api/members/${memberId}/memberships`, {
-//       params: {
-//         include: ['membership_plans'], // Asegurarnos de incluir los planes
-//       }
-//     });
-//     return response.data;
-//   });
-// };
-
 export const useMemberships = (memberId?: string) => {
   const queryClient = useQueryClient();
 
@@ -25,7 +11,8 @@ export const useMemberships = (memberId?: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("memberships")
-        .select(`
+        .select(
+          `
           *,
           members!inner(
             first_name,
@@ -39,7 +26,8 @@ export const useMemberships = (memberId?: string) => {
             price,
             description
           )
-        `)
+        `
+        )
         .eq("member_id", memberId)
         .order("start_date", { ascending: false });
 
@@ -168,24 +156,22 @@ export const useMemberships = (memberId?: string) => {
         throw error;
       }
 
-      // Crear el pago si es necesario
-      if (data.payment_method && data.paymentStatus === "paid") {
-        const { error: paymentError } = await supabase
-          .from("membership_payments")
-          .insert([
-            {
-              membership_id: membership.id,
-              amount: Number(plan.price) || 0,
-              payment_method: data.payment_method,
-              notes: data.payment_notes,
-              status: "paid",
-            },
-          ]);
+      // Modificar la sección de creación de pago
+      const { error: paymentError } = await supabase
+        .from("membership_payments")
+        .insert([
+          {
+            membership_id: membership.id,
+            amount: Number(plan.price) || 0,
+            payment_method: data.payment_method || "other",
+            notes: data.payment_notes || "Pago pendiente",
+            status: data.paymentStatus, // Usar el estado de pago de la membresía
+          },
+        ]);
 
-        if (paymentError) {
-          console.error("Error creating payment:", paymentError);
-          throw paymentError;
-        }
+      if (paymentError) {
+        console.error("Error creating payment:", paymentError);
+        throw paymentError;
       }
 
       return membership;

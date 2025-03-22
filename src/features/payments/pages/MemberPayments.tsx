@@ -1,5 +1,5 @@
 import { Paper, Typography, Stack } from '@mui/material';
-import { PaymentHistory } from '../components/PaymentHistory';
+import { PaymentHistory } from "@/features/payments/components/PaymentHistory";
 import { Payment } from '@mui/icons-material';
 import { EmptyState } from '@/components/common/EmptyState';
 import { useParams } from 'react-router-dom';

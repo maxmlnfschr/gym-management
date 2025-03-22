@@ -5,7 +5,7 @@ import { PlanSelector } from "../PlanSelector";
 import { MembershipFormData } from "../../types";
 import { addMonths } from "date-fns";
 import { LoadingButton } from "@/components/common/LoadingButton";
-import { PaymentForm } from "../PaymentForm";
+import { PaymentForm } from "@/features/payments/components/PaymentForm";
 
 interface PaymentOption {
   value: "pending" | "paid";
@@ -50,7 +50,7 @@ export const MembershipForm = ({
   const [planType, setPlanType] = useState(initialData?.planType || "monthly");
   const [paymentMethod, setPaymentMethod] = useState<
     "cash" | "card" | "transfer" | "other" | ""
-  >("");
+  >("transfer");
   const [paymentNotes, setPaymentNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -78,11 +78,8 @@ export const MembershipForm = ({
         startDate: localDate,
         paymentStatus,
         planType,
-        ...(paymentStatus === "paid" &&
-          paymentMethod && {
-            payment_method: paymentMethod,
-            payment_notes: paymentNotes,
-          }),
+        payment_method: paymentMethod || "other",
+        payment_notes: paymentNotes,
       });
     } finally {
       setIsSubmitting(false);
@@ -101,7 +98,10 @@ export const MembershipForm = ({
   };
 
   return (
-    <Paper elevation={1} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2, bgcolor: "background.paper" }}>
+    <Paper
+      elevation={1}
+      sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2, bgcolor: "background.paper" }}
+    >
       <Stack spacing={3}>
         <PlanSelector
           selectedPlan={selectedPlanId}
@@ -135,7 +135,9 @@ export const MembershipForm = ({
           select
           label="Estado de pago"
           value={paymentStatus}
-          onChange={(e) => setPaymentStatus(e.target.value as "pending" | "paid")}
+          onChange={(e) =>
+            setPaymentStatus(e.target.value as "pending" | "paid")
+          }
           fullWidth
           SelectProps={{ native: true }}
         >
@@ -146,19 +148,16 @@ export const MembershipForm = ({
           ))}
         </TextField>
 
-        {paymentStatus === "paid" && (
-          <PaymentForm
-            onPaymentChange={handlePaymentChange}
-            initialMethod={paymentMethod}
-            initialNotes={paymentNotes}
-          />
-        )}
+        <PaymentForm
+          onPaymentChange={handlePaymentChange}
+          initialMethod="transfer"
+          initialNotes={paymentNotes}
+        />
 
         <LoadingButton
           variant="contained"
           onClick={handleSubmit}
           fullWidth
-          disabled={paymentStatus === "paid" && !paymentMethod}
           loading={isSubmitting}
           loadingText="Guardando..."
         >
