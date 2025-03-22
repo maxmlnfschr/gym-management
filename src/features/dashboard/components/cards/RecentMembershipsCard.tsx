@@ -9,6 +9,7 @@ import { ResponsiveDataView } from "@/components/common/ResponsiveDataView";
 import { formatCurrency } from "@/utils/formatters";
 import { StatusChip } from "@/components/common/StatusChip";
 import { PlanType } from "@/features/memberships/types";
+import { InfoCard } from "@/components/common/InfoCard";
 
 export const RecentMembershipsCard = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -45,30 +46,18 @@ export const RecentMembershipsCard = () => {
   });
 
   const renderMobileItem = (membership: any) => (
-    <Paper
-      sx={{
-        p: 2,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <Box>
-        <Typography variant="subtitle1">
-          {membership.member?.first_name || ""} {membership.member?.last_name || ""}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
+    <InfoCard
+      title={`${membership.member?.first_name} ${membership.member?.last_name}`}
+      subtitle={
+        <>
           {format(new Date(membership.created_at), "dd/MM/yyyy", { locale: es })} {formatCurrency(membership.amount)}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {membership.membership_plans?.name || getPlanTypeLabel(membership.plan_type)}
-        </Typography>
-      </Box>
-      <StatusChip 
-        status={membership.payment_status} 
-        context="payment"
-      />
-    </Paper>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            {membership.membership_plans?.name || getPlanTypeLabel(membership.plan_type)}
+          </Typography>
+        </>
+      }
+      action={<StatusChip status={membership.payment_status} context="payment" />}
+    />
   );
 
   const renderDesktopView = () => (

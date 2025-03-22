@@ -36,6 +36,7 @@ import { TabPanel } from "@/components/common/TabPanel";  // Añadir esta import
 import { Tabs, Tab } from "@mui/material";  // Añadir esta importación
 import { useMembershipPayments } from "@/features/memberships/hooks/useMembershipPayments"; // Añadir esta importación
 import { MembershipPayments } from "@/features/memberships/components/MembershipPayments";  // Añadir esta importación
+import { PaymentHistory } from "@/features/memberships/components/PaymentHistory";
 
 export const MemberDetails = () => {
   const theme = useTheme();
@@ -249,6 +250,38 @@ export const MemberDetails = () => {
                 isLoading={isLoadingPayments}
               />
             </TabPanel>
+            <Box sx={{ mt: 4 }}>
+              <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
+                <Tab label="Membresías" />
+                <Tab label="Pagos" />
+              </Tabs>
+
+              <TabPanel value={activeTab} index={0}>
+                <MembershipHistory 
+                  memberId={id!} 
+                  emptyState={
+                    <EmptyState
+                      icon={<CardMembership />}
+                      title="Sin membresías"
+                      description="Este miembro no tiene membresías registradas"
+                    />
+                  }
+                />
+              </TabPanel>
+
+              <TabPanel value={activeTab} index={1}>
+                <PaymentHistory 
+                  memberId={id!}
+                  emptyState={
+                    <EmptyState
+                      icon={<Payment />}
+                      title="Sin pagos"
+                      description="Este miembro no tiene pagos registrados"
+                    />
+                  }
+                />
+              </TabPanel>
+            </Box>
           </Stack>
         </Paper>
       </Stack>

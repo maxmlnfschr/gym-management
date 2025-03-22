@@ -24,6 +24,7 @@ import {
 } from "../common/DashboardCard";
 import { ResponsiveDataView } from "@/components/common/ResponsiveDataView";
 import { StatusChip } from "@/components/common/StatusChip";
+import { InfoCard } from "@/components/common/InfoCard";
 
 export const DailyActivityCard = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -45,26 +46,13 @@ export const DailyActivityCard = () => {
     }
 
     return (
-      <Paper
-        sx={{
-          p: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Box>
-          <Typography variant="subtitle1">
-            {checkIn.member.first_name} {checkIn.member.last_name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {format(new Date(checkIn.check_in), "dd/MM/yyyy HH:mm", {
-              locale: es,
-            })}
-          </Typography>
-        </Box>
-        <StatusChip status="success" customLabel="Permitido" />
-      </Paper>
+      <InfoCard
+        title={`${checkIn.member.first_name} ${checkIn.member.last_name}`}
+        subtitle={format(new Date(checkIn.check_in), "dd/MM/yyyy HH:mm", {
+          locale: es,
+        })}
+        action={<StatusChip status="success" customLabel="Permitido" />}
+      />
     );
   };
 
@@ -74,30 +62,7 @@ export const DailyActivityCard = () => {
         if (!checkIn || !checkIn.member) {
           return null;
         }
-
-        return (
-          <Paper
-            key={checkIn.id}
-            sx={{
-              p: 2,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <Typography variant="subtitle1">
-                {checkIn.member.first_name} {checkIn.member.last_name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {format(new Date(checkIn.check_in), "dd/MM/yyyy HH:mm", {
-                  locale: es,
-                })}
-              </Typography>
-            </Box>
-            <StatusChip status="success" customLabel="Permitido" />
-          </Paper>
-        );
+        return renderMobileItem(checkIn);
       })}
     </Stack>
   );
@@ -161,29 +126,7 @@ export const DailyActivityCard = () => {
         {/* También actualizamos el diálogo para mantener consistencia */}
         <DialogContent>
           <Stack spacing={2}>
-            {metrics?.todayCheckIns.map((checkIn) => (
-              <Paper
-                key={checkIn.id}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle1">
-                    {checkIn.member?.first_name} {checkIn.member?.last_name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {format(new Date(checkIn.check_in), "dd/MM/yyyy HH:mm", {
-                      locale: es,
-                    })}
-                  </Typography>
-                </Box>
-                <StatusChip status="success" customLabel="Permitido" />
-              </Paper>
-            ))}
+            {metrics?.todayCheckIns.map((checkIn) => renderMobileItem(checkIn))}
           </Stack>
         </DialogContent>
       </Dialog>

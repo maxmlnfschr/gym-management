@@ -13,6 +13,7 @@ import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { History } from "@mui/icons-material";
 import { EmptyState } from "@/components/common/EmptyState";
 import { type AccessLogWithMember } from "../../types";
+import { InfoCard } from "@/components/common/InfoCard";
 
 interface AccessListProps {
   accesses: AccessLogWithMember[];
@@ -100,27 +101,14 @@ export const AccessList = ({ accesses, emptyState }: AccessListProps) => {
         ) : isMobile ? (
           <Stack spacing={2}>
             {filteredAccesses.map((access) => (
-              <Paper
+              <InfoCard
                 key={access.id}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle1">
-                    {access.members.first_name} {access.members.last_name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {format(new Date(access.check_in), "dd/MM/yyyy HH:mm", {
-                      locale: es,
-                    })}
-                  </Typography>
-                </Box>
-                <StatusChip status="success" customLabel="Permitido" />
-              </Paper>
+                title={`${access.members.first_name} ${access.members.last_name}`}
+                subtitle={format(new Date(access.check_in), "dd/MM/yyyy HH:mm", {
+                  locale: es,
+                })}
+                action={<StatusChip status="success" customLabel="Permitido" />}
+              />
             ))}
           </Stack>
         ) : (
