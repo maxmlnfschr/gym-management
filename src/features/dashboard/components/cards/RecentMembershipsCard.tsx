@@ -1,138 +1,127 @@
-import { Box, Stack, Skeleton, ListItemText, Button, Dialog, DialogTitle, DialogContent, List, ListItem } from "@mui/material";
+import { Stack, ListItemText, Button, Dialog, DialogTitle, DialogContent, List, ListItem, Typography, Paper, Box } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DashboardCard, MetricValue, MetricLabel } from "../common/DashboardCard";
 import { useState } from "react";
-import { useTheme, useMediaQuery } from "@mui/material";
-
-interface Member {
-  first_name: string;
-  last_name: string;
-}
-
-interface Membership {
-  id: string;
-  start_date: string;
-  end_date: string;
-  plan_type: "monthly" | "quarterly" | "annual" | "modify";
-  plan_name: string;
-  members: Member;
-}
-
-interface SupabaseMember {
-  first_name: string;
-  last_name: string;
-}
-
-interface SupabaseMembership {
-  id: string;
-  start_date: string;
-  end_date: string;
-  plan_type: string;
-  members: SupabaseMember;
-  membership_plans: {
-    name: string;
-  };
-}
+import { ResponsiveDataView } from "@/components/common/ResponsiveDataView";
+import { formatCurrency } from "@/utils/formatters";
+import { StatusChip } from "@/components/common/StatusChip";
+import { PlanType } from "@/features/memberships/types";
 
 export const RecentMembershipsCard = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [openDialog, setOpenDialog] = useState(false);
+
+  const getPlanTypeLabel = (type: PlanType) => {
+    const labels: Record<PlanType, string> = {
+      monthly: "Mensual",
+      quarterly: "Trimestral",
+      annual: "Anual",
+      modify: "Modificado"
+    };
+    return labels[type] || "Desconocido";
+  };
+
   const { data: memberships, isLoading } = useQuery({
     queryKey: ["recent-memberships"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("memberships")
-        .select(
-          `
+        .select(`
           *,
-          members (
+          member:members (
             first_name,
             last_name
+          ),
+          membership_plans (
+            name
           )
-        `
-        )
+        `)
         .order("created_at", { ascending: false })
         .limit(5);
-
-      if (error) throw error;
       return data;
     },
   });
 
-  if (isLoading) {
-    return (
-      <DashboardCard title="Últimas membresías">
-        <Stack spacing={2}>
-          {[...Array(3)].map((_, index) => (
-            <Skeleton key={index} variant="rectangular" height={60} />
-          ))}
-        </Stack>
-      </DashboardCard>
-    );
-  }
+  const renderMobileItem = (membership: any) => (
+    <Paper
+      sx={{
+        p: 2,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <Box>
+        <Typography variant="subtitle1">
+          {membership.member?.first_name || ""} {membership.member?.last_name || ""}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {format(new Date(membership.created_at), "dd/MM/yyyy", { locale: es })} {formatCurrency(membership.amount)}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {membership.membership_plans?.name || getPlanTypeLabel(membership.plan_type)}
+        </Typography>
+      </Box>
+      <StatusChip 
+        status={membership.payment_status} 
+        context="payment"
+      />
+    </Paper>
+  );
+
+  const renderDesktopView = () => (
+    <Stack spacing={2}>
+      {memberships?.slice(0, 1).map((membership) => renderMobileItem(membership))}
+    </Stack>
+  );
 
   return (
     <DashboardCard
-      title="Últimas membresías"
+      title="Membresías recientes"
       action={
-        <Button 
-          variant="text" 
-          color="primary" 
-          size="small" 
+        <Button
+          variant="text"
+          color="primary"
+          size="small"
           onClick={() => setOpenDialog(true)}
         >
-          Ver todos
+          Ver todas
         </Button>
       }
     >
-      <Stack spacing={2}>
-        {memberships?.slice(0, isMobile ? 5 : 2).map((membership) => (
-          <Box
-            key={membership.id}
+      <ResponsiveDataView
+        data={memberships || []}
+        renderMobileItem={renderMobileItem}
+        renderDesktopView={renderDesktopView}
+        emptyState={
+          <ListItem
             sx={{
               border: "1px solid",
               borderColor: "divider",
               borderRadius: 1,
-              p: { xs: 1.5, sm: 2 },  // Reducido el padding en móvil
             }}
           >
             <ListItemText
-              primary={`${membership.members?.first_name} ${membership.members?.last_name}`}
-              secondary={format(new Date(membership.created_at), "PPP", {
-                locale: es,
-              })}
-              primaryTypographyProps={{ variant: "body2" }}
-              secondaryTypographyProps={{ variant: "caption" }}
+              primary="No hay membresías recientes"
+              secondary="No se han registrado membresías recientemente"
             />
-          </Box>
-        ))}
-      </Stack>
+          </ListItem>
+        }
+      />
 
-      {/* Dialog con la lista completa */}
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Últimas membresías</DialogTitle>
+        <DialogTitle>Membresías recientes</DialogTitle>
         <DialogContent>
-          <List>
-            {memberships?.map((membership) => (
-              <ListItem key={membership.id}>
-                <ListItemText
-                  primary={`${membership.members?.first_name} ${membership.members?.last_name}`}
-                  secondary={format(new Date(membership.created_at), "PPP", {
-                    locale: es,
-                  })}
-                />
-              </ListItem>
-            ))}
-          </List>
+          <Stack spacing={2}>
+            {memberships?.map((membership) => renderMobileItem(membership))}
+          </Stack>
         </DialogContent>
       </Dialog>
     </DashboardCard>
