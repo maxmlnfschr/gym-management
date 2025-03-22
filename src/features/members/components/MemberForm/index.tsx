@@ -1,19 +1,23 @@
-import { Box, TextField, Button, Stack, Paper } from "@mui/material";
+import { Box, TextField, Button, Stack, Paper, Typography, Divider } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { memberSchema } from "@/features/members/validations/memberSchema";
 import type { MemberFormData } from "@/features/members/types";
 import { useLocation } from 'react-router-dom';
 import { LoadingButton } from "@/components/common/LoadingButton";
+import { MembershipForm } from "@/features/memberships/components/MembershipForm";
+import { useState } from "react";
+import type { MembershipFormData } from "@/features/memberships/types";
 
 interface Props {
-  onSubmit: (data: MemberFormData) => Promise<void>;
+  onSubmit: (data: MemberFormData & { membership?: MembershipFormData }) => Promise<void>;
   initialData?: MemberFormData;
 }
 
 export const MemberForm = ({ onSubmit, initialData }: Props) => {
   const location = useLocation();
   const defaultName = location.state?.defaultName || '';
+  const [membershipData, setMembershipData] = useState<MembershipFormData | null>(null);
 
   const {
     register,
@@ -26,14 +30,23 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
       first_name: defaultName || initialData?.first_name || ''
     },
   });
-  // Eliminar el useState y formValues que habíamos agregado
+
+  const handleFormSubmit = async (data: MemberFormData) => {
+    await onSubmit({
+      ...data,
+      membership: membershipData || undefined
+    });
+  };
+
   return (
     <Paper elevation={1} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2, bgcolor: 'background.paper' }}>
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} noValidate>
         <Stack spacing={3}>
+          <Typography variant="h6">Información Personal</Typography>
+          
+          {/* Existing member form fields */}
           <TextField
             {...register("first_name")}
-            id="first-name"
             label="Nombre"
             fullWidth
             error={!!errors.first_name}
@@ -83,6 +96,18 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
             helperText={errors.notes?.message}
           />
 
+          <Divider sx={{ my: 3 }} />
+          
+          <Typography variant="h6">Membresía</Typography>
+          
+          <MembershipForm 
+            onSubmit={(data) => {
+              setMembershipData(data);
+              return Promise.resolve();
+            }}
+            isEmbedded={true}
+          />
+
           <LoadingButton
             type="submit"
             variant="contained"
@@ -90,7 +115,7 @@ export const MemberForm = ({ onSubmit, initialData }: Props) => {
             loading={isSubmitting}
             loadingText="Guardando..."
           >
-            {initialData ? "Actualizar" : "Guardar"}
+            Guardar
           </LoadingButton>
         </Stack>
       </Box>

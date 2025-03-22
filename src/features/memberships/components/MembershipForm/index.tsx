@@ -33,18 +33,18 @@ const paymentMethodOptions = [
 ];
 
 interface MembershipFormProps {
-  onSubmit: (
-    data: MembershipFormData & {
-      payment_method?: "cash" | "card" | "transfer" | "other";
-      payment_notes?: string;
-    }
-  ) => void;
+  onSubmit: (data: MembershipFormData & {
+    payment_method?: "cash" | "card" | "transfer" | "other";
+    payment_notes?: string;
+  }) => Promise<void>;
   initialData?: Partial<MembershipFormData>;
+  isEmbedded?: boolean;  // Add this prop
 }
 
 export const MembershipForm = ({
   onSubmit,
   initialData,
+  isEmbedded = false
 }: MembershipFormProps) => {
   const [selectedPlanId, setSelectedPlanId] = useState(
     initialData?.planId || ""
@@ -105,79 +105,85 @@ export const MembershipForm = ({
     setPaymentNotes(payment_notes);
   };
 
-  return (
+  const content = (
+    <Stack spacing={3}>
+      <PlanSelector
+        selectedPlan={selectedPlanId}
+        onPlanSelect={(planId, type) => handlePlanSelect(planId, type)}
+      />
+
+      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <CustomLink to="/settings/membership-plans" color="primary">
+          Configurar planes
+        </CustomLink>
+      </Box>
+
+      <DatePicker
+        label="Fecha de inicio"
+        value={startDate}
+        onChange={(newValue: Date | null) => {
+          if (newValue) {
+            const localDate = new Date(
+              newValue.getFullYear(),
+              newValue.getMonth(),
+              newValue.getDate()
+            );
+            setStartDate(localDate);
+          } else {
+            setStartDate(null);
+          }
+        }}
+        slotProps={{
+          textField: {
+            fullWidth: true,
+          },
+        }}
+        format="dd/MM/yyyy"
+      />
+
+      <TextField
+        select
+        label="Estado de pago"
+        value={paymentStatus}
+        onChange={(e) =>
+          setPaymentStatus(e.target.value as "pending" | "paid")
+        }
+        fullWidth
+        SelectProps={{ native: true }}
+      >
+        {paymentStatusOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </TextField>
+
+      <PaymentForm
+        onPaymentChange={handlePaymentChange}
+        initialMethod="transfer"
+        initialNotes={paymentNotes}
+      />
+
+      <LoadingButton
+        variant="contained"
+        onClick={handleSubmit}
+        fullWidth
+        loading={isSubmitting}
+        loadingText="Guardando..."
+      >
+        Guardar membresía
+      </LoadingButton>
+    </Stack>
+  );
+
+  return isEmbedded ? (
+    content
+  ) : (
     <Paper
       elevation={1}
       sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2, bgcolor: "background.paper" }}
     >
-      <Stack spacing={3}>
-        <PlanSelector
-          selectedPlan={selectedPlanId}
-          onPlanSelect={(planId, type) => handlePlanSelect(planId, type)}
-        />
-
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <CustomLink to="/settings/membership-plans" color="primary">
-            Configurar planes
-          </CustomLink>
-        </Box>
-
-        <DatePicker
-          label="Fecha de inicio"
-          value={startDate}
-          onChange={(newValue: Date | null) => {
-            if (newValue) {
-              const localDate = new Date(
-                newValue.getFullYear(),
-                newValue.getMonth(),
-                newValue.getDate()
-              );
-              setStartDate(localDate);
-            } else {
-              setStartDate(null);
-            }
-          }}
-          slotProps={{
-            textField: {
-              fullWidth: true,
-            },
-          }}
-          format="dd/MM/yyyy"
-        />
-
-        <TextField
-          select
-          label="Estado de pago"
-          value={paymentStatus}
-          onChange={(e) =>
-            setPaymentStatus(e.target.value as "pending" | "paid")
-          }
-          fullWidth
-          SelectProps={{ native: true }}
-        >
-          {paymentStatusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </TextField>
-
-        <PaymentForm
-          onPaymentChange={handlePaymentChange}
-          initialMethod="transfer"
-          initialNotes={paymentNotes}
-        />
-
-        <LoadingButton
-          variant="contained"
-          onClick={handleSubmit}
-          fullWidth
-          loading={isSubmitting}
-          loadingText="Guardando..."
-        >
-          Guardar membresía
-        </LoadingButton>
-      </Stack>
+      {content}
     </Paper>
   );
 };
