@@ -59,6 +59,8 @@ import { InlineFilters } from "@/components/common/InlineFilters";
 import { MEMBERSHIP_STATUS_FILTERS } from "@/features/memberships/constants/filters";
 import { LoadingButton } from "@/components/common/LoadingButton";
 import { InfoCard } from "@/components/common/InfoCard";
+// Add this with other imports at the top
+import { UserAvatar } from "@/components/common/UserAvatar";
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -177,7 +179,7 @@ export const MemberList = () => {
 
   // Agregar estado para controlar la carga de eliminación
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
-  
+
   const handleConfirmDelete = async () => {
     if (memberToDelete) {
       try {
@@ -348,9 +350,23 @@ export const MemberList = () => {
                   sx={{ cursor: "pointer" }}
                 >
                   <InfoCard
+                    avatar={
+                      <UserAvatar
+                        firstName={member.first_name}
+                        lastName={member.last_name}
+                        membershipStatus={
+                          !member.current_membership
+                            ? "no_membership"
+                            : new Date(member.current_membership.end_date) >
+                              new Date()
+                            ? "active"
+                            : "expired"
+                        }
+                      />
+                    }
                     title={`${member.first_name} ${member.last_name}`}
                     subtitle={
-                      <>
+                      <Stack spacing={0.5}>
                         <Typography variant="body2" color="text.secondary">
                           {member.email}
                         </Typography>
@@ -359,19 +375,15 @@ export const MemberList = () => {
                             {member.phone}
                           </Typography>
                         )}
-                      </>
+                      </Stack>
                     }
                     action={
-                      <StatusChip
-                        status={
-                          !member.current_membership
-                            ? "no_membership"
-                            : new Date(member.current_membership.end_date) > new Date()
-                            ? "active"
-                            : "expired"
-                        }
-                        customLabel={!member.current_membership ? "Sin membresía" : undefined}
-                      />
+                      member.current_membership && (
+                        <StatusChip
+                          status={member.current_membership.payment_status || "pending"}
+                          context="payment"
+                        />
+                      )
                     }
                   />
                 </Box>
@@ -484,8 +496,24 @@ export const MemberList = () => {
                 {
                   id: "name",
                   label: "Nombre",
-                  render: (member: Member) =>
-                    `${member.first_name} ${member.last_name}`,
+                  render: (member: Member) => (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <UserAvatar
+                        firstName={member.first_name}
+                        lastName={member.last_name}
+                        membershipStatus={
+                          !member.current_membership
+                            ? "no_membership"
+                            : new Date(member.current_membership.end_date) >
+                              new Date()
+                            ? "active"
+                            : "expired"
+                        }
+                        size={32}
+                      />
+                      <Typography>{`${member.first_name} ${member.last_name}`}</Typography>
+                    </Box>
+                  ),
                 },
                 {
                   id: "email",

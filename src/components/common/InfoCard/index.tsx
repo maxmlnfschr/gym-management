@@ -1,31 +1,49 @@
-import { Paper, Box, Typography, PaperProps } from "@mui/material";
+import { Paper, Box, Typography, PaperProps, TypographyProps } from "@mui/material";
 import { ReactNode } from "react";
 
-interface InfoCardProps extends PaperProps {
-  title: string;
-  subtitle: string | ReactNode;
+interface InfoCardOwnProps {
+  title: string | ReactNode;
+  titleProps?: TypographyProps;
+  subtitle?: string | ReactNode;
+  subtitleProps?: TypographyProps;
   action?: ReactNode;
+  avatar?: ReactNode;
 }
 
-export const InfoCard = ({ title, subtitle, action, ...props }: InfoCardProps) => {
+type InfoCardProps = InfoCardOwnProps & Omit<PaperProps, keyof InfoCardOwnProps>;
+
+export const InfoCard = ({ 
+  title, 
+  titleProps = { variant: "subtitle1", sx: { fontWeight: 500 } },
+  subtitle, 
+  subtitleProps = { variant: "body2", color: "text.secondary" },
+  action, 
+  avatar, 
+  ...props 
+}: InfoCardProps) => {
   return (
     <Paper
       sx={{
         p: 2,
         display: "flex",
-        justifyContent: "space-between",
         alignItems: "center",
-        ...props.sx
+        gap: 2,
+        ...props.sx,
       }}
       {...props}
     >
-      <Box>
-        <Typography variant="subtitle1">{title}</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {subtitle}
+      {avatar && avatar}
+      <Box sx={{ flex: 1 }}>
+        <Typography {...titleProps}>
+          {typeof title === 'string' ? title : title}
         </Typography>
+        {subtitle && (
+          typeof subtitle === 'string' ? (
+            <Typography {...subtitleProps}>{subtitle}</Typography>
+          ) : subtitle
+        )}
       </Box>
-      {action}
+      {action && <Box>{action}</Box>}
     </Paper>
   );
 };

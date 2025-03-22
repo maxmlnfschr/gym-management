@@ -49,12 +49,14 @@ export const RecentMembershipsCard = () => {
     <InfoCard
       title={`${membership.member?.first_name} ${membership.member?.last_name}`}
       subtitle={
-        <>
-          {format(new Date(membership.created_at), "dd/MM/yyyy", { locale: es })} {formatCurrency(membership.amount)}
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+        <Stack spacing={0.5}>
+          <Typography variant="body2" color="text.secondary">
+            {format(new Date(membership.created_at), "dd/MM/yyyy", { locale: es })} {formatCurrency(membership.amount)}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
             {membership.membership_plans?.name || getPlanTypeLabel(membership.plan_type)}
           </Typography>
-        </>
+        </Stack>
       }
       action={<StatusChip status={membership.payment_status} context="payment" />}
     />
