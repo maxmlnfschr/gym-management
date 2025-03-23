@@ -36,7 +36,8 @@ export const RecentMembershipsCard = () => {
             last_name
           ),
           membership_plans (
-            name
+            name,
+            price
           )
         `)
         .order("created_at", { ascending: false })
@@ -51,7 +52,7 @@ export const RecentMembershipsCard = () => {
       subtitle={
         <Stack spacing={0.5}>
           <Typography variant="body2" color="text.secondary">
-            {format(new Date(membership.created_at), "dd/MM/yyyy", { locale: es })} {formatCurrency(membership.amount)}
+            {format(new Date(membership.created_at), "dd/MM/yyyy", { locale: es })} {formatCurrency(membership.membership_plans?.price || membership.amount || 0)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {membership.membership_plans?.name || getPlanTypeLabel(membership.plan_type)}
