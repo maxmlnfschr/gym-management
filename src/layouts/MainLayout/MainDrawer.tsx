@@ -177,7 +177,6 @@ export const MainDrawer = ({ open, onClose, isCollapsed }: MainDrawerProps) => {
           display: { xs: "block", sm: "none" },
           zIndex: 1100,
           boxShadow: 3,
-          pb: "calc(env(safe-area-inset-bottom) + 17px)", // Aumentado el padding inferior
         }}
         elevation={3}
       >
