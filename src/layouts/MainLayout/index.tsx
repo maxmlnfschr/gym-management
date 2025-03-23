@@ -69,12 +69,7 @@ export const MainLayout = () => {
         position="fixed"
         sx={{
           height: 64,
-          display: { xs: "none", sm: "block" },
-          backgroundColor: 'background.paper',
-          borderBottom: 1,
-          borderColor: 'divider',
-          boxShadow: 1,
-          color: 'text.primary'
+          display: { xs: "none", sm: "block" }, // Ocultar en móvil
         }}
       >
         <Toolbar sx={{ minHeight: 64 }}>
