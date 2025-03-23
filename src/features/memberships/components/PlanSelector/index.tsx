@@ -3,6 +3,7 @@ import { PlanCard } from "../PlanCard";
 import { useMembershipPlans } from "../../hooks/useMembershipPlans";
 import { CircularProgress } from "@mui/material";
 import { PlanType } from "../../types";
+import { getMembershipPlanName } from "../../utils/planUtils";
 
 interface PlanSelectorProps {
   selectedPlan: string;
@@ -28,7 +29,10 @@ export const PlanSelector = ({
         {plans.map((plan) => (
           <Grid item xs={12} sm={4} key={plan.id}>
             <PlanCard
-              name={plan.name}
+              name={getMembershipPlanName({
+                membership_plans: { name: plan.name },
+                plan_type: plan.plan_type,
+              })}
               price={plan.price}
               duration={plan.duration_months}
               selected={selectedPlan === plan.id}

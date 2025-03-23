@@ -1,32 +1,15 @@
 import {
   Typography,
   Stack,
-  IconButton,
   useTheme,
   useMediaQuery,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
   TableRow,
-  Paper,
-  Chip,
 } from "@mui/material";
-import {
-  Info,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-} from "@mui/icons-material";
-import {
-  ResponsiveCard,
-  ResponsiveCardContent,
-} from "@/components/common/ResponsiveCard";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import type { Member } from "@/features/members/types";
-import { useNavigate } from "react-router-dom";
 import { StatusChip } from "@/components/common/StatusChip";
 import { Card, CardContent, Box, Avatar } from "@mui/material";
-import { MembershipStatus } from "@/features/memberships/components/MembershipStatus";
 import { formatMembershipDate } from "@/utils/dateUtils";
 import { ActionMenu } from "@/components/common/ActionMenu";
 

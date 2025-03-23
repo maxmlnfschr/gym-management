@@ -3,16 +3,13 @@ import {
   Typography,
   Button,
   Stack,
-  Divider,
   Paper,
   Grid,
-  IconButton,
   Menu,
   MenuItem,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
-import { MembershipList } from "@/features/memberships/components/MembershipList";
 import { MembershipStatus } from "@/features/memberships/components/MembershipStatus";
 import { MembershipHistory } from "@/features/memberships/components/MembershipHistory";
 import { useMember } from "@/features/members/hooks/useMember";
@@ -225,18 +222,22 @@ export const MemberDetails = () => {
         <Paper sx={{ p: 3 }}>
           <Stack spacing={2}>
             <Typography variant="h6">Historial</Typography>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={activeTab} onChange={handleTabChange}>
                 <Tab label="Membresías" />
                 <Tab label="Pagos" />
               </Tabs>
             </Box>
             <TabPanel value={activeTab} index={0}>
-              <MembershipHistory 
-                memberId={id!} 
+              <MembershipHistory
+                memberId={id!}
                 emptyState={
                   <EmptyState
-                    icon={<CardMembership sx={{ fontSize: 40, color: "text.secondary" }} />}
+                    icon={
+                      <CardMembership
+                        sx={{ fontSize: 40, color: "text.secondary" }}
+                      />
+                    }
                     title="Sin historial de membresías"
                     description="Este miembro aún no tiene registros de membresías"
                   />
@@ -244,7 +245,7 @@ export const MemberDetails = () => {
               />
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
-              <PaymentHistory 
+              <PaymentHistory
                 memberId={id!}
                 emptyState={
                   <EmptyState
@@ -285,13 +286,13 @@ export const MemberDetails = () => {
           QR de Acceso - {member.first_name} {member.last_name}
         </DialogTitle>
         <DialogContent sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-          <QRCodeSVG 
+          <QRCodeSVG
             value={JSON.stringify({
-              v: '1',
+              v: "1",
               id: id,
-              n: `${member.first_name} ${member.last_name}`
-            })} 
-            size={256} 
+              n: `${member.first_name} ${member.last_name}`,
+            })}
+            size={256}
           />
         </DialogContent>
       </Dialog>

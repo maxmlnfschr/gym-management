@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { Box, Typography, Paper, Grid } from "@mui/material";
 import { useAuthStore } from "@/features/shared/stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
-import { DashboardLayout } from "./DashboardLayout";
-import { DashboardMetrics } from "./DashboardMetrics";
 import { RecentMembershipsCard } from "./cards/RecentMembershipsCard";
 import { DailyActivityCard } from "./cards/DailyActivityCard";
 import { MembershipMetricsCard } from "./cards/MembershipMetricsCard";

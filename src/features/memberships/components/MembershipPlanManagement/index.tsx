@@ -12,12 +12,13 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
-import { useMembershipPlans } from '../../hooks/useMembershipPlans';
-import { MembershipPlanDialog } from './MembershipPlanDialog';
-import { useState } from 'react';
-import { formatCurrency } from '@/utils/formatters';
+} from "@mui/material";
+import { Add as AddIcon, Edit as EditIcon } from "@mui/icons-material";
+import { useMembershipPlans } from "../../hooks/useMembershipPlans";
+import { MembershipPlanDialog } from "./MembershipPlanDialog";
+import { useState } from "react";
+import { formatCurrency } from "@/utils/formatters";
+import { getMembershipPlanName } from "../../utils/planUtils";
 
 export const MembershipPlanManagement = () => {
   const { plans, isLoading } = useMembershipPlans();
@@ -36,7 +37,12 @@ export const MembershipPlanManagement = () => {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5">Planes de Membresía</Typography>
         <Button
           variant="contained"
@@ -67,7 +73,10 @@ export const MembershipPlanManagement = () => {
                     <TableCell>{plan.duration_months}</TableCell>
                     <TableCell>{formatCurrency(plan.price)}</TableCell>
                     <TableCell>
-                      {plan.active ? 'Activo' : 'Inactivo'}
+                      {getMembershipPlanName({
+                        membership_plans: { name: plan.name },
+                        plan_type: plan.plan_type,
+                      })}
                     </TableCell>
                     <TableCell>
                       <IconButton

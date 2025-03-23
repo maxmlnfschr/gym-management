@@ -10,6 +10,7 @@ import { formatCurrency } from "@/utils/formatters";
 import { StatusChip } from "@/components/common/StatusChip";
 import { PlanType } from "@/features/memberships/types";
 import { InfoCard } from "@/components/common/InfoCard";
+import { getMembershipPlanName } from "@/features/memberships/utils/planUtils";
 
 export const RecentMembershipsCard = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -55,7 +56,7 @@ export const RecentMembershipsCard = () => {
             {format(new Date(membership.created_at), "dd/MM/yyyy", { locale: es })} {formatCurrency(membership.membership_plans?.price || membership.amount || 0)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {membership.membership_plans?.name || getPlanTypeLabel(membership.plan_type)}
+            {getMembershipPlanName(membership)}
           </Typography>
         </Stack>
       }

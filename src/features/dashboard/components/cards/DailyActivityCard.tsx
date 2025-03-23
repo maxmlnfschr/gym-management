@@ -1,15 +1,11 @@
 import {
-  Box,
   Skeleton,
-  List,
   ListItem,
   ListItemText,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  Paper,
-  Typography,
   Stack,
 } from "@mui/material";
 import { useState } from "react";

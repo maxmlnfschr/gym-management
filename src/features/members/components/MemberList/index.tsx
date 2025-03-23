@@ -2,19 +2,10 @@ import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
-  Menu,
-  MenuItem,
   IconButton,
   Stack,
   CircularProgress,
-  Fab,
-  Container,
-  FormControl,
-  InputLabel,
-  Select,
 } from "@mui/material";
 import {
   MoreVert as MoreVertIcon,
@@ -25,31 +16,12 @@ import {
 import { useMemberStore } from "@/features/shared/stores/memberStore";
 import { useNavigate } from "react-router-dom";
 import type { FilterValues, Member } from "@/features/members/types";
-import { FileDownload as DownloadIcon } from "@mui/icons-material";
 import { DataTable } from "@/components/common/DataTable";
 import { formatMembershipDate } from "@/utils/dateUtils";
-import {
-  ResponsiveCard,
-  ResponsiveCardContent,
-} from "@/components/common/ResponsiveCard";
-import { TextField } from "@mui/material"; // Añadir esta importación
 import { SearchBar } from "@/components/common/SearchBar";
-import { MemberCard } from "@/features/members/components/MemberCard";
-import { Chip } from "@mui/material";
-import { FilterChip } from "@/components/common/FilterChip";
-import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { FloatingActions } from "@/components/common/FloatingActions";
 import { useTheme } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
 import { StatusChip } from "@/components/common/StatusChip";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
@@ -59,8 +31,9 @@ import { InlineFilters } from "@/components/common/InlineFilters";
 import { MEMBERSHIP_STATUS_FILTERS } from "@/features/memberships/constants/filters";
 import { LoadingButton } from "@/components/common/LoadingButton";
 import { InfoCard } from "@/components/common/InfoCard";
-// Add this with other imports at the top
 import { UserAvatar } from "@/components/common/UserAvatar";
+import { getMembershipPlanName } from "@/features/memberships/utils/planUtils";
+import { PlanType } from "@/features/memberships/types";
 
 export const MemberList = () => {
   const theme = useTheme();
@@ -380,7 +353,10 @@ export const MemberList = () => {
                     action={
                       member.current_membership && (
                         <StatusChip
-                          status={member.current_membership.payment_status || "pending"}
+                          status={
+                            member.current_membership.payment_status ||
+                            "pending"
+                          }
                           context="payment"
                         />
                       )
@@ -560,38 +536,13 @@ export const MemberList = () => {
                   id: "plan_type",
                   label: "Plan",
                   render: (member: Member) => {
-                    // Añadir console.log para depuración
-                    console.log(
-                      "Member plan type:",
-                      member.current_membership?.plan_type
-                    );
-
                     if (!member.current_membership) return "-";
-
-                    // Primero intentamos usar el nombre del plan si existe
-                    if (member.current_membership.plan_name) {
-                      return member.current_membership.plan_name;
-                    }
-
-                    // Si no hay nombre de plan, usamos el tipo
-                    const planTypeMap: Record<string, string> = {
-                      monthly: "Mensual",
-                      quarterly: "Trimestral",
-                      annual: "Anual",
-                      modify: "Modificado",
-                    };
-
-                    const planType = member.current_membership.plan_type;
-
-                    if (!planType) {
-                      console.log(
-                        "Plan type is missing for member:",
-                        member.id
-                      );
-                      return "No especificado";
-                    }
-
-                    return planTypeMap[planType] || planType;
+                    return getMembershipPlanName({
+                      membership_plans:
+                        member.current_membership.membership_plans,
+                      plan_type: member.current_membership
+                        .plan_type as PlanType,
+                    });
                   },
                 },
                 {
