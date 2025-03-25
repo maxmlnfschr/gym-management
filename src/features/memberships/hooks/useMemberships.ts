@@ -138,11 +138,13 @@ export const useMemberships = (memberId?: string) => {
       const membershipData = {
         member_id: data.memberId,
         plan_id: data.planId,
-        plan_type: data.planType, // Ahora podemos usar directamente planType
+        plan_type: data.planType,
         start_date: formattedStartDate,
         end_date: formattedEndDate,
         payment_status: data.paymentStatus,
         amount: Number(plan.price) || 0,
+        paid_amount: data.paid_amount || 0,
+        pending_amount: data.pending_amount || 0,
       };
 
       const { data: membership, error } = await supabase

@@ -1,11 +1,11 @@
 export type PlanType = "monthly" | "quarterly" | "annual" | "modify";
 export type PaymentStatus = "pending" | "paid";
-export type MembershipStatus = 'active' | 'expired' | 'expiring' | 'inactive';
+export type MembershipStatus = "active" | "expired" | "expiring" | "inactive";
 
 export interface Membership {
   id: string;
   member_id: string;
-  plan_id: string;  // Añadimos el plan_id
+  plan_id: string; // Añadimos el plan_id
   plan_type: PlanType;
   start_date: string;
   end_date: string;
@@ -20,10 +20,11 @@ export interface Membership {
     deleted_at?: string | null;
     status: string;
   };
-  membership_plans?: {  // Añadimos la relación con membership_plans
+  membership_plans?: {
+    // Añadimos la relación con membership_plans
     price: number;
     name: string;
-    description?: string;  // Agregamos el campo description como opcional
+    description?: string; // Agregamos el campo description como opcional
   };
 }
 
@@ -32,8 +33,11 @@ export interface MembershipFormData {
   startDate: Date;
   paymentStatus: PaymentStatus;
   planType: PlanType;
-  payment_method?: 'cash' | 'card' | 'transfer' | 'other';
+  payment_method?: "cash" | "card" | "transfer" | "other";
   payment_notes?: string;
+  amount: number;
+  pending_amount: number;
+  paid_amount: number;
 }
 
 export interface MembershipPlan {
@@ -42,5 +46,5 @@ export interface MembershipPlan {
   price: number;
   duration_months: number;
   plan_type: PlanType;
-  description?: string;  // Agregamos el campo description como opcional
+  description?: string; // Agregamos el campo description como opcional
 }
