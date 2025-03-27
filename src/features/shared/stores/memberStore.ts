@@ -1,4 +1,4 @@
-import create from 'zustand';
+import create from "zustand";
 import { Member, MemberFormData } from "@/features/members/types";
 import { MembershipFormData } from "@/features/memberships/types";
 import { supabase } from "@/lib/supabase";
@@ -16,7 +16,9 @@ interface MemberState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   getMember: (id: string) => Promise<Member>;
-  addMember: (memberData: MemberFormData & { membership?: MembershipFormData }) => Promise<void>;
+  addMember: (
+    memberData: MemberFormData & { membership?: MembershipFormData }
+  ) => Promise<void>;
   updateMember: (
     id: string,
     memberData: Partial<MemberFormData>
@@ -85,21 +87,25 @@ export const useMemberStore = create<MemberState>((set) => ({
     }
   },
 
-  addMember: async (memberData: MemberFormData & { membership?: MembershipFormData }) => {
+  addMember: async (
+    memberData: MemberFormData & { membership?: MembershipFormData }
+  ) => {
     try {
       set({ loading: true, error: null });
-      
+
       // Crear el miembro
       const { data: member, error } = await supabase
         .from("members")
-        .insert([{
-          first_name: memberData.first_name,
-          last_name: memberData.last_name,
-          email: memberData.email,
-          phone: memberData.phone,
-          notes: memberData.notes,
-          status: "active",
-        }])
+        .insert([
+          {
+            first_name: memberData.first_name,
+            last_name: memberData.last_name,
+            email: memberData.email,
+            phone: memberData.phone,
+            notes: memberData.notes,
+            status: "active",
+          },
+        ])
         .select("*")
         .single();
 
@@ -112,19 +118,23 @@ export const useMemberStore = create<MemberState>((set) => ({
           plan_id: memberData.membership.planId,
           start_date: memberData.membership.startDate,
           payment_status: memberData.membership.paymentStatus,
-          plan_type: memberData.membership.planType
+          plan_type: memberData.membership.planType,
+          paid_amount: memberData.membership.paid_amount || 0,
+          pending_amount: memberData.membership.pending_amount || 0,
         };
 
         const { data: membership, error: membershipError } = await supabase
           .from("memberships")
           .insert([membershipData])
-          .select(`
+          .select(
+            `
             *,
             membership_plans (
               price,
               name
             )
-          `)
+          `
+          )
           .single();
 
         if (membershipError) throw membershipError;
@@ -133,14 +143,16 @@ export const useMemberStore = create<MemberState>((set) => ({
         if (memberData.membership.payment_method) {
           const { error: paymentError } = await supabase
             .from("membership_payments")
-            .insert([{
-              membership_id: membership.id,
-              amount: membership.membership_plans?.price || 0,
-              payment_method: memberData.membership.payment_method,
-              notes: memberData.membership.payment_notes,
-              status: memberData.membership.paymentStatus,
-              payment_date: new Date().toISOString(),
-            }]);
+            .insert([
+              {
+                membership_id: membership.id,
+                amount: membership.membership_plans?.price || 0,
+                payment_method: memberData.membership.payment_method,
+                notes: memberData.membership.payment_notes,
+                status: memberData.membership.paymentStatus,
+                payment_date: new Date().toISOString(),
+              },
+            ]);
 
           if (paymentError) throw paymentError;
         }
@@ -148,7 +160,7 @@ export const useMemberStore = create<MemberState>((set) => ({
       set((state) => ({ members: [...state.members, member] }));
       return member;
     } catch (error) {
-      console.error('Error completo:', error);
+      console.error("Error completo:", error);
       const pgError = error as PostgrestError;
       set({ error: pgError.message });
       throw error;
