@@ -11,6 +11,7 @@ export interface Membership {
   end_date: string;
   payment_status: PaymentStatus;
   status: MembershipStatus;
+  deleted_at?: string;
   created_at: string;
   plan_name?: string;
   members: {

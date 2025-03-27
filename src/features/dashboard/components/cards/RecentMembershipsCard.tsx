@@ -8,9 +8,10 @@ import { useState } from "react";
 import { ResponsiveDataView } from "@/components/common/ResponsiveDataView";
 import { formatCurrency } from "@/utils/formatters";
 import { StatusChip } from "@/components/common/StatusChip";
-import { PlanType } from "@/features/memberships/types";
+import { PlanType, Membership } from "@/features/memberships/types";
 import { InfoCard } from "@/components/common/InfoCard";
 import { getMembershipPlanName } from "@/features/memberships/utils/planUtils";
+import { useMembershipFilters } from "@/features/memberships/hooks/useMembershipFilters";
 
 export const RecentMembershipsCard = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -25,7 +26,7 @@ export const RecentMembershipsCard = () => {
     return labels[type] || "Desconocido";
   };
 
-  const { data: memberships, isLoading } = useQuery({
+  const { data: rawMemberships, isLoading } = useQuery({
     queryKey: ["recent-memberships"],
     queryFn: async () => {
       const { data } = await supabase
@@ -43,9 +44,27 @@ export const RecentMembershipsCard = () => {
         `)
         .order("created_at", { ascending: false })
         .limit(5);
-      return data;
+      
+      // Transform data to Membership type
+      return data?.map(membership => ({
+        ...membership,
+        member_id: membership.member_id,
+        plan_id: membership.plan_type,
+        plan_type: membership.plan_type,
+        status: membership.payment_status === "paid" ? "active" : "inactive",
+        members: {
+          first_name: membership.member?.first_name || '',
+          last_name: membership.member?.last_name || '',
+          email: '',
+          status: 'active'
+        },
+        membership_plans: membership.membership_plans
+      })) as Membership[];
     },
   });
+
+  const filters = useMembershipFilters(rawMemberships || []);
+  const memberships = filters.all;
 
   const renderMobileItem = (membership: any) => (
     <InfoCard

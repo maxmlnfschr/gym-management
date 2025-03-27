@@ -34,12 +34,55 @@ import { InfoCard } from "@/components/common/InfoCard";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { getMembershipPlanName } from "@/features/memberships/utils/planUtils";
 import { PlanType } from "@/features/memberships/types";
+import { useActiveMembers } from "../../hooks/useActiveMembers";
+import { useMembershipFilters } from "@/features/memberships/hooks/useMembershipFilters";
+import { Membership, MembershipStatus } from "@/features/memberships/types";
 
 export const MemberList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const { members, loading, fetchMembers, deleteMember } = useMemberStore();
+  const activeMembers = useActiveMembers(members);
+
+  // Move the membership creation logic to a separate function
+  const createMembershipObject = (member: Member): Membership | null => {
+    if (!member.current_membership) return null;
+    return {
+      ...member.current_membership,
+      member_id: member.id,
+      plan_id: member.current_membership.plan_type,
+      plan_type: member.current_membership.plan_type as PlanType,
+      status: member.current_membership.payment_status === "paid" ? "active" : "inactive",
+      created_at: member.created_at,
+      members: {
+        first_name: member.first_name,
+        last_name: member.last_name,
+        email: member.email,
+        status: member.status,
+      },
+      membership_plans: member.current_membership.membership_plans
+        ? {
+            ...member.current_membership.membership_plans,
+            price: 0,
+          }
+        : undefined,
+    };
+  };
+
+  // Use the hook at component level
+  const membershipFilters = useMembershipFilters(
+    activeMembers
+      .map(member => createMembershipObject(member))
+      .filter((membership): membership is Membership => membership !== null)
+  );
+
+  const getMembershipFilters = (member: Member) => {
+    const membership = createMembershipObject(member);
+    if (!membership) return null;
+    return membershipFilters;
+  };
+
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [page, setPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -65,12 +108,9 @@ export const MemberList = () => {
     };
     setFilterValues(newFilters);
 
-    // Primero filtramos los miembros eliminados
-    let filtered = [...members].filter(
-      (member) => !member.deleted_at && member.status !== "deleted"
-    );
+    // Usar activeMembers en lugar del filtro manual
+    let filtered = [...activeMembers];
 
-    // Luego aplicamos los demás filtros
     if (newFilters.search) {
       const searchLower = newFilters.search.toLowerCase();
       filtered = filtered.filter(
@@ -83,31 +123,19 @@ export const MemberList = () => {
 
     if (newFilters.status !== "all") {
       filtered = filtered.filter((member) => {
-        // Añadir console.log para debug
-        console.log(
-          "Filtering member:",
-          member.first_name,
-          member.current_membership
-        );
+        const filters = getMembershipFilters(member);
+        if (!filters) return newFilters.status === "no_membership";
 
-        const membership = member.current_membership;
         switch (newFilters.status) {
           case "active_membership":
-            const isActive =
-              membership &&
-              membership.payment_status === "paid" &&
-              new Date(membership.end_date) > new Date();
-            console.log("Is active?", isActive);
-            return isActive;
+            return filters.status.active.length > 0;
           case "overdue":
-            const isOverdue =
-              membership &&
-              (new Date(membership.end_date) < new Date() ||
-                membership.payment_status === "pending");
-            console.log("Is overdue?", isOverdue);
-            return isOverdue;
+            return (
+              filters.status.expired.length > 0 ||
+              filters.payment.pending.length > 0
+            );
           case "no_membership":
-            return !membership;
+            return !member.current_membership;
           default:
             return true;
         }
@@ -173,13 +201,18 @@ export const MemberList = () => {
   useEffect(() => {
     fetchMembers();
   }, [fetchMembers]);
+
   useEffect(() => {
-    // Filtrar miembros eliminados al inicializar
-    const activeMembers = members.filter(
-      (member) => !member.deleted_at && member.status !== "deleted"
-    );
+    // Usar activeMembers directamente
     setFilteredMembers(activeMembers);
-  }, [members]);
+  }, [activeMembers]);
+
+  // Eliminar esta línea que causa el error
+  // const activeMembers = members.filter(
+  //   (member) => !member.deleted_at && member.status !== "deleted"
+  // );
+  // setFilteredMembers(activeMembers);
+
   // Añadir estas definiciones antes del return
   const paginatedMembers = filteredMembers.slice(0, page * itemsPerPage);
   const hasMore = paginatedMembers.length < filteredMembers.length;
@@ -193,7 +226,6 @@ export const MemberList = () => {
     return <LoadingScreen fullScreen={false} message="Cargando miembros..." />;
   }
 
-  // Update the handleInlineFilterChange function
   const handleInlineFilterChange = (
     groupName: string,
     selectedFilters: string[]
@@ -203,9 +235,8 @@ export const MemberList = () => {
       [groupName]: selectedFilters,
     }));
 
-    let filtered = [...members].filter(
-      (member) => !member.deleted_at && member.status !== "deleted"
-    );
+    // Usar activeMembers del hook en lugar del filtro manual
+    let filtered = [...activeMembers];
 
     if (selectedFilters.length > 0) {
       filtered = filtered.filter((member) => {

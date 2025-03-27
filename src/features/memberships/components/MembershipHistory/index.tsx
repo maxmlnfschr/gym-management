@@ -1,5 +1,6 @@
 import { Typography, Stack } from "@mui/material";
 import { useMemberships } from "@/features/memberships/hooks/useMemberships";
+import { useMembershipFilters } from "@/features/memberships/hooks/useMembershipFilters";
 import { formatMembershipDate } from "@/utils/dateUtils";
 import { StatusChip } from "@/components/common/StatusChip";
 import { DataTable } from "@/components/common/DataTable";
@@ -19,8 +20,9 @@ export const MembershipHistory = ({
   emptyState,
 }: MembershipHistoryProps) => {
   const { memberships } = useMemberships(memberId);
+  const { status, payment, all } = useMembershipFilters(memberships);
 
-  const sortedMemberships = [...memberships]
+  const sortedMemberships = [...all]
     .sort((a, b) => {
       return (
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -28,7 +30,12 @@ export const MembershipHistory = ({
     })
     .map((membership, index) => ({
       ...membership,
-      status: index > 0 ? "expired" : membership.status,
+      status:
+        index > 0
+          ? "expired"
+          : status.expired.includes(membership)
+          ? "expired"
+          : membership.status,
       payment_status: membership.payment_status,
     }));
 
@@ -42,7 +49,7 @@ export const MembershipHistory = ({
             {formatMembershipDate(membership.end_date)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {membership.membership_plans?.description || 'Sin descripción'}
+            {membership.membership_plans?.description || "Sin descripción"}
           </Typography>
         </>
       }

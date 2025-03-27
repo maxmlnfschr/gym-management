@@ -1,14 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { addDays, format } from "date-fns";
+import { useMembershipFilters } from "./useMembershipFilters";
+import { Membership } from "../types";
 
 export const useExpirationNotifications = () => {
   const { data: memberships, isLoading } = useQuery({
     queryKey: ["membership-notifications"],
     queryFn: async () => {
-      const today = new Date();
-      const todayStr = format(today, "yyyy-MM-dd");
-
       const { data, error } = await supabase
         .from("latest_memberships")
         .select(
@@ -27,35 +26,32 @@ export const useExpirationNotifications = () => {
         .neq("members.status", "deleted");
 
       if (error) throw error;
-      return data;
+
+      // Convertir los datos al formato Membership
+      return data?.map((membership) => ({
+        ...membership,
+        member_id: membership.member_id,
+        plan_id: membership.plan_type,
+        plan_type: membership.plan_type,
+        status: membership.payment_status === "paid" ? "active" : "inactive",
+        created_at: membership.start_date,
+        members: {
+          first_name: membership.members.first_name,
+          last_name: membership.members.last_name,
+          email: membership.members.email,
+          status: membership.members.status,
+        },
+      })) as Membership[];
     },
   });
 
-  const activeMembers = memberships || [];
-
-  // Filtrar las membresías según su estado de vigencia (independiente del pago)
-  const expiredMemberships = activeMembers.filter((membership) => {
-    const endDate = new Date(membership.end_date);
-    const today = new Date();
-    return endDate < today;
-  });
-
-  const expiringMemberships = activeMembers.filter((membership) => {
-    const endDate = new Date(membership.end_date);
-    const today = new Date();
-    const sevenDaysFromNow = addDays(today, 7);
-    return endDate > today && endDate <= sevenDaysFromNow;
-  });
-
-  // Membresías con pago pendiente (independiente de su fecha de vencimiento)
-  const pendingMemberships = activeMembers.filter(
-    (membership) => membership.payment_status === "pending"
-  );
+  // Usar useMembershipFilters para obtener las membresías filtradas
+  const filters = useMembershipFilters(memberships || []);
 
   return {
-    expiredMemberships,
-    expiringMemberships,
-    pendingMemberships,
+    expiredMemberships: filters.status.expired,
+    expiringMemberships: filters.status.expiring,
+    pendingMemberships: filters.payment.pending,
     isLoading,
   };
 };

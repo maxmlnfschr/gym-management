@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { addDays, format } from 'date-fns';
-import { getMembershipStatus } from '@/utils/dateUtils';
+import { Membership } from '../types';
 
 interface MembershipMetrics {
   activeMembers: number;
@@ -9,16 +9,38 @@ interface MembershipMetrics {
   expiredMemberships: number;
 }
 
+const calculateMetrics = (memberships: Membership[]): MembershipMetrics => {
+  const today = new Date();
+  const todayStr = format(today, 'yyyy-MM-dd');
+  const nextWeek = addDays(today, 7);
+  const nextWeekStr = format(nextWeek, 'yyyy-MM-dd');
+
+  const activeMembers = memberships.filter(m => 
+    m.end_date >= todayStr && !m.deleted_at
+  );
+
+  const expiringMembers = memberships.filter(m => 
+    m.end_date >= todayStr && 
+    m.end_date <= nextWeekStr && 
+    !m.deleted_at
+  );
+
+  const expiredMembers = memberships.filter(m => 
+    m.end_date < todayStr && 
+    !m.deleted_at
+  );
+
+  return {
+    activeMembers: activeMembers.length,
+    expiringThisWeek: expiringMembers.length,
+    expiredMemberships: expiredMembers.length
+  };
+};
+
 export const useMembershipMetrics = () => {
   return useQuery({
     queryKey: ['membership-metrics'],
     queryFn: async (): Promise<MembershipMetrics> => {
-      const today = new Date();
-      const todayStr = format(today, 'yyyy-MM-dd');
-      const nextWeek = addDays(today, 7);
-      const nextWeekStr = format(nextWeek, 'yyyy-MM-dd');
-      
-      // Obtener membresías activas usando latest_memberships
       const { data: activeData, error: activeError } = await supabase
         .from('latest_memberships')
         .select(`
@@ -33,35 +55,22 @@ export const useMembershipMetrics = () => {
             deleted_at
           )
         `)
-        .is('members.deleted_at', null);  // Removido el filtro .gte('end_date', todayStr) para obtener todas
+        .is('members.deleted_at', null);
 
       if (activeError) throw activeError;
 
-      // Procesar cada membresía con getMembershipStatus
       const memberships = activeData?.map(membership => ({
         ...membership,
-        status: getMembershipStatus(membership)
-      })) || [];
+        created_at: membership.start_date,
+        members: {
+          first_name: '',
+          last_name: '',
+          email: '',
+          status: 'active'
+        }
+      })) as Membership[];
 
-      // Filtrar miembros activos, por vencer y vencidos
-      const activeMembers = memberships.filter(m => 
-        m.end_date >= todayStr
-      );
-
-      const expiringMembers = memberships.filter(m => 
-        m.end_date >= todayStr && 
-        m.end_date <= nextWeekStr
-      );
-
-      const expiredMembers = memberships.filter(m => 
-        m.end_date < todayStr
-      );
-
-      return {
-        activeMembers: activeMembers.length,
-        expiringThisWeek: expiringMembers.length,
-        expiredMemberships: expiredMembers.length
-      };
+      return calculateMetrics(memberships);
     },
     refetchInterval: 5 * 60 * 1000,
   });

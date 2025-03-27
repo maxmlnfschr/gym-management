@@ -1,5 +1,6 @@
 import { Box, Typography, Stack, Card, CardContent, Chip } from "@mui/material";
 import { useMemberships } from "@/features/memberships/hooks/useMemberships";
+import { useMembershipFilters } from "@/features/memberships/hooks/useMembershipFilters";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -9,18 +10,19 @@ interface MembershipListProps {
 
 export const MembershipList = ({ memberId }: MembershipListProps) => {
   const { memberships, isLoading } = useMemberships(memberId);
+  const { status, payment, all } = useMembershipFilters(memberships);
 
   if (isLoading) {
     return <Typography>Cargando membresías...</Typography>;
   }
 
-  if (memberships.length === 0) {
+  if (all.length === 0) {
     return <Typography>No hay membresías registradas</Typography>;
   }
 
   return (
     <Stack spacing={2}>
-      {memberships.map((membership) => (
+      {all.map((membership) => (
         <Card key={membership.id}>
           <CardContent>
             <Stack spacing={1}>
