@@ -338,18 +338,6 @@ export const MemberList = () => {
                       />
                     }
                     title={`${member.first_name} ${member.last_name}`}
-                    subtitle={
-                      <Stack spacing={0.5}>
-                        <Typography variant="body2" color="text.secondary">
-                          {member.email}
-                        </Typography>
-                        {member.phone && (
-                          <Typography variant="body2" color="text.secondary">
-                            {member.phone}
-                          </Typography>
-                        )}
-                      </Stack>
-                    }
                     action={
                       member.current_membership && (
                         <StatusChip
