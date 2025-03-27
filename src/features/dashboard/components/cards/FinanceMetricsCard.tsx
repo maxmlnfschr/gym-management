@@ -1,6 +1,7 @@
 import { Stack, Skeleton } from "@mui/material";
 import { useFinanceMetrics } from "@/features/memberships/hooks/useFinanceMetrics";
 import { formatCurrency } from "@/utils/formatters";
+import { useMemberships } from "@/features/memberships/hooks/useMemberships";
 import {
   DashboardCard,
   MetricValue,
@@ -9,9 +10,12 @@ import {
 } from "../common/DashboardCard";
 
 export const FinanceMetricsCard = () => {
-  const { data: metrics, isLoading, error } = useFinanceMetrics();
+  const { memberships, isLoading: isMembershipsLoading } = useMemberships();
+  const { data: metrics, isLoading: isMetricsLoading, error } = useFinanceMetrics(memberships);
 
-  console.log("Finance Metrics:", { metrics, isLoading, error }); // Add this line for debugging
+  const isLoading = isMembershipsLoading || isMetricsLoading;
+
+  console.log("Finance Metrics:", { metrics, isLoading, error, memberships });
 
   if (isLoading || !metrics) {
     return (

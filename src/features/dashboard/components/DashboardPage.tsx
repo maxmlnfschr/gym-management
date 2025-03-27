@@ -11,8 +11,10 @@ export const DashboardPage = () => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
+  // Remover o modificar este useEffect
   useEffect(() => {
-    queryClient.invalidateQueries();
+    // No invalidar todas las queries, solo las necesarias
+    queryClient.invalidateQueries({ queryKey: ["finance-metrics"] });
   }, []);
 
   return (

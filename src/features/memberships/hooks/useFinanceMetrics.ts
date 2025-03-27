@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { startOfMonth, endOfMonth } from "date-fns";
+import { useMembershipFilters } from "./useMembershipFilters";
+import { Membership } from "../types";
 
 interface FinanceMetrics {
   currentMonthIncome: number;
@@ -15,7 +17,9 @@ interface MembershipWithPlan {
   } | null;
 }
 
-export const useFinanceMetrics = () => {
+export const useFinanceMetrics = (memberships?: Membership[]) => {
+  const { payment: paymentFilters } = useMembershipFilters(memberships || []);
+
   return useQuery({
     queryKey: ["finance-metrics"],
     queryFn: async (): Promise<FinanceMetrics> => {
@@ -33,44 +37,48 @@ export const useFinanceMetrics = () => {
 
       // Obtener pagos del mes actual
       const { data: monthPayments, error: monthError } = await supabase
-        .from("membership_payments")
-        .select("amount")
-        .gte("payment_date", startOfMonth.toISOString())
-        .lte("payment_date", endOfMonth.toISOString())
-        .eq("status", "paid");
+        .from("memberships")
+        .select("paid_amount")
+        .gte("created_at", startOfMonth.toISOString())
+        .lte("created_at", endOfMonth.toISOString());
 
       if (monthError) throw monthError;
 
       const currentMonthIncome =
-        monthPayments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
+        monthPayments?.reduce((sum, payment) => sum + payment.paid_amount, 0) ||
+        0;
 
-      // Obtener membresías activas con pagos pendientes
-      const { data: pendingMemberships, error: membershipsError } = await supabase
+      // Obtener membresías con pagos pendientes y sus montos
+      const { data: pendingMemberships, error: pendingError } = await supabase
         .from("memberships")
-        .select(`
+        .select(
+          `
           id,
           member_id,
           amount,
-          members!inner (
-            deleted_at
-          )
-        `)
+          pending_amount
+        `
+        )
         .eq("payment_status", "pending")
-        .is("members.deleted_at", null);
-      
-      if (membershipsError) throw membershipsError;
+        .gt("end_date", currentDate.toISOString());
 
-      // Calcular el monto total pendiente
+      if (pendingError) throw pendingError;
+
       const totalPendingAmount =
         pendingMemberships?.reduce(
-          (sum, membership) => sum + (membership.amount || 0),
+          (sum, membership) => sum + (membership.pending_amount || 0),
           0
         ) || 0;
 
-      // Contar miembros únicos con pagos pendientes
       const uniquePendingMembers = new Set(
         pendingMemberships?.map((m) => m.member_id)
       ).size;
+
+      console.log("Métricas calculadas:", {
+        ingresosMes: currentMonthIncome,
+        montoPendiente: totalPendingAmount,
+        miembrosPendientes: uniquePendingMembers,
+      });
 
       return {
         currentMonthIncome,
@@ -78,6 +86,7 @@ export const useFinanceMetrics = () => {
         pendingAmount: totalPendingAmount,
       };
     },
+    enabled: true,
     refetchInterval: 5 * 60 * 1000,
   });
 };
