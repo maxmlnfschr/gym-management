@@ -36,31 +36,35 @@ const paymentMethodOptions = [
 ];
 
 interface MembershipFormProps {
-  onSubmit: (data: MembershipFormData & {
-    payment_method?: "cash" | "card" | "transfer" | "other";
-    payment_notes?: string;
-  }) => Promise<void>;
+  onSubmit: (
+    data: MembershipFormData & {
+      payment_method?: "cash" | "card" | "transfer" | "other";
+      payment_notes?: string;
+    }
+  ) => Promise<void>;
   initialData?: Partial<MembershipFormData>;
   isEmbedded?: boolean;
-  onDataChange?: (data: MembershipFormData & {
-    payment_method?: "cash" | "card" | "transfer" | "other";
-    payment_notes?: string;
-  }) => void;
+  onDataChange?: (
+    data: MembershipFormData & {
+      payment_method?: "cash" | "card" | "transfer" | "other";
+      payment_notes?: string;
+    }
+  ) => void;
 }
 
 export const MembershipForm = ({
   onSubmit,
   initialData,
   isEmbedded = false,
-  onDataChange
+  onDataChange,
 }: MembershipFormProps) => {
   const { plans } = useMembershipPlans();
-  
+
   const [selectedPlanId, setSelectedPlanId] = useState(
     initialData?.planId || ""
   );
-  const selectedPlan = plans?.find(plan => plan.id === selectedPlanId);
-  
+  const selectedPlan = plans?.find((plan) => plan.id === selectedPlanId);
+
   const [startDate, setStartDate] = useState<Date | null>(
     initialData?.startDate || new Date()
   );
@@ -83,13 +87,22 @@ export const MembershipForm = ({
   ) => {
     setSelectedPlanId(planId);
     setPlanType(type);
-    
+
     // Inicializar los montos cuando se selecciona un plan
-    const selectedPlan = plans?.find(plan => plan.id === planId);
+    const selectedPlan = plans?.find((plan) => plan.id === planId);
     if (selectedPlan) {
       setAmount(selectedPlan.price);
-      setPendingAmount(selectedPlan.price); // Inicialmente todo está pendiente
-      setPaidAmount(0); // Inicialmente no hay nada pagado
+      
+      // Si el monto pagado es mayor al nuevo precio del plan
+      if (paidAmount > selectedPlan.price) {
+        setPaidAmount(selectedPlan.price);
+        setPendingAmount(0);
+        setPaymentStatus("paid");
+      } else {
+        setPendingAmount(selectedPlan.price - paidAmount);
+        // Actualizar estado según si está totalmente pagado o no
+        setPaymentStatus(paidAmount === selectedPlan.price ? "paid" : "pending");
+      }
     }
   };
 
@@ -111,9 +124,9 @@ export const MembershipForm = ({
         planType,
         payment_method: paymentMethod || "other",
         payment_notes: paymentNotes,
-        amount: selectedPlan.price,        // Monto total del plan
-        pending_amount: pendingAmount,     // Lo que queda por pagar
-        paid_amount: paidAmount,          // Lo que se paga ahora
+        amount: selectedPlan.price, // Monto total del plan
+        pending_amount: pendingAmount, // Lo que queda por pagar
+        paid_amount: paidAmount, // Lo que se paga ahora
       });
     } finally {
       setIsSubmitting(false);
@@ -140,7 +153,19 @@ export const MembershipForm = ({
         paid_amount: paidAmount,
       });
     }
-  }, [selectedPlanId, startDate, paymentStatus, planType, paymentMethod, paymentNotes, amount, pendingAmount, paidAmount, onDataChange, isEmbedded]);
+  }, [
+    selectedPlanId,
+    startDate,
+    paymentStatus,
+    planType,
+    paymentMethod,
+    paymentNotes,
+    amount,
+    pendingAmount,
+    paidAmount,
+    onDataChange,
+    isEmbedded,
+  ]);
 
   const handlePaymentChange = ({
     payment_method,
@@ -193,9 +218,7 @@ export const MembershipForm = ({
         select
         label="Estado de pago"
         value={paymentStatus}
-        onChange={(e) =>
-          setPaymentStatus(e.target.value as "pending" | "paid")
-        }
+        onChange={(e) => setPaymentStatus(e.target.value as "pending" | "paid")}
         fullWidth
         SelectProps={{ native: true }}
       >
@@ -206,19 +229,22 @@ export const MembershipForm = ({
         ))}
       </TextField>
 
-      {/* Añadir el PaymentInput aquí */}
-      {paymentStatus === "pending" && (
-        <PaymentInput
-          totalAmount={selectedPlan?.price || 0}
-          initialPendingAmount={initialData?.pending_amount}
-          paymentStatus={paymentStatus}
-          onChange={(values) => {
-            setAmount(values.amount);         // Monto total del plan
-            setPaidAmount(values.paidAmount); // Lo que está pagando ahora
-            setPendingAmount(values.pendingAmount); // Lo que queda pendiente
-          }}
-        />
-      )}
+      {/* Quitar la condición y mostrar siempre */}
+      <PaymentInput
+        totalAmount={selectedPlan?.price || 0}
+        initialPendingAmount={initialData?.pending_amount}
+        paymentStatus={paymentStatus}
+        onChange={(values) => {
+          setAmount(values.amount);
+          setPaidAmount(values.paidAmount);
+          setPendingAmount(values.pendingAmount);
+          
+          // Solo cambiar a pendiente si el monto es menor
+          if (values.paidAmount < (selectedPlan?.price || 0)) {
+            setPaymentStatus("pending");
+          }
+        }}
+      />
 
       <PaymentForm
         onPaymentChange={handlePaymentChange}

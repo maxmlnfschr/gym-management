@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Stack,
   TextField,
@@ -25,7 +25,22 @@ export const PaymentInput = ({
   paymentStatus,
   onChange,
 }: PaymentInputProps) => {
-  const [paidAmount, setPaidAmount] = useState<string>("");
+  // Inicializar con el monto total si está pagado
+  const [paidAmount, setPaidAmount] = useState<string>(
+    paymentStatus === "paid" ? totalAmount.toString() : ""
+  );
+
+  // Actualizar cuando cambia el estado de pago
+  useEffect(() => {
+    if (paymentStatus === "paid") {
+      setPaidAmount(totalAmount.toString());
+      onChange({
+        amount: totalAmount,
+        pendingAmount: 0,
+        paidAmount: totalAmount,
+      });
+    }
+  }, [paymentStatus, totalAmount]);
 
   const handlePaidAmountChange = (value: string) => {
     // Asegurarse que el valor no exceda el monto total
