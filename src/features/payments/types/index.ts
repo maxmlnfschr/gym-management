@@ -10,6 +10,8 @@ export interface Payment {
   memberships: {
     member_id: string;
     plan_type: string;
+    paid_amount: number;
+    pending_amount: number;
     membership_plans: {
       name: string;
     };

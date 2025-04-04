@@ -8,8 +8,12 @@ export const paymentService = {
       .select(`
         *,
         memberships!inner(
+          id,
           member_id,
           plan_type,
+          paid_amount,
+          pending_amount,
+          amount,
           membership_plans(
             name
           )

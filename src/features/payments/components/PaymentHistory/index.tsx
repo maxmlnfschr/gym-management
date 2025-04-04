@@ -60,7 +60,18 @@ export const PaymentHistory = ({
 
   const renderMobileItem = (payment: Payment) => (
     <InfoCard
-      title={formatCurrency(payment.amount)}
+      title={
+        <>
+          <Typography component="span" sx={{ display: 'inline-block' }}>
+            Pagado: {formatCurrency(payment.memberships?.paid_amount || 0)}
+          </Typography>
+          {payment.memberships?.pending_amount > 0 && (
+            <Typography component="span" color="text.secondary" sx={{ ml: 0.5 }}>
+              - Pendiente: {formatCurrency(payment.memberships?.pending_amount)}
+            </Typography>
+          )}
+        </>
+      }
       subtitle={
         <>
           <Typography variant="body2" color="text.secondary">
@@ -90,7 +101,8 @@ export const PaymentHistory = ({
         <TableHead>
           <TableRow>
             <TableCell>Fecha</TableCell>
-            <TableCell>Monto</TableCell>
+            <TableCell>Monto Pagado</TableCell>
+            <TableCell>Monto Pendiente</TableCell>
             <TableCell>Método</TableCell>
             <TableCell>Plan</TableCell>
             <TableCell>Estado</TableCell>
@@ -107,7 +119,14 @@ export const PaymentHistory = ({
                   { locale: es }
                 )}
               </TableCell>
-              <TableCell>{formatCurrency(payment.amount)}</TableCell>
+              <TableCell>
+                {formatCurrency(payment.memberships?.paid_amount || 0)}
+              </TableCell>
+              <TableCell>
+                {payment.memberships?.pending_amount > 0
+                  ? formatCurrency(payment.memberships?.pending_amount)
+                  : "-"}
+              </TableCell>
               <TableCell>
                 {paymentMethodLabels[payment.payment_method]}
               </TableCell>
