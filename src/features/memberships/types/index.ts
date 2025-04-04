@@ -14,7 +14,7 @@ export interface Membership {
   deleted_at?: string;
   created_at: string;
   plan_name?: string;
-  members: {
+  members?: {
     first_name: string;
     last_name: string;
     email: string;

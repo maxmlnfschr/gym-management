@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { MembershipFormData, Membership } from "@/features/memberships/types";
 import { getMembershipStatus } from "@/utils/dateUtils";
+import { useMembershipFilters } from "@/features/memberships/hooks/useMembershipFilters";
 
 export const useMemberships = (memberId?: string) => {
   const queryClient = useQueryClient();
@@ -188,10 +189,14 @@ export const useMemberships = (memberId?: string) => {
       queryClient.invalidateQueries({ queryKey: ["finance-metrics"] });
     },
   });
+  // Add filters
+  const membershipFilters = useMembershipFilters(getMemberships.data || []);
+
   return {
     memberships: getMemberships.data || [],
     currentMembership: getCurrentMembership.data,
     isLoading: getMemberships.isLoading || getCurrentMembership.isLoading,
     createMembership,
+    filters: membershipFilters, // Add filters to return object
   };
 };

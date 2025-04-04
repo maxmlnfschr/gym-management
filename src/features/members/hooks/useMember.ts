@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Member } from "@/features/members/types";
+import { useMembershipFilters } from "@/features/memberships/hooks/useMembershipFilters";
+import { Membership } from "@/features/memberships/types";
 
 export const useMember = (id?: string) => {
   const queryClient = useQueryClient();
@@ -50,9 +52,21 @@ export const useMember = (id?: string) => {
     },
   });
   
+  // Transform current_membership to match Membership type
+  const currentMembership = getMember.data?.current_membership ? {
+    ...getMember.data.current_membership,
+    member_id: id || '',
+    status: 'active', // or calculate based on dates
+    created_at: getMember.data.current_membership.start_date, // fallback to start_date if created_at is not available
+  } as Membership : null;
+
+  const membershipFilters = useMembershipFilters(currentMembership ? [currentMembership] : []);
+  
   return {
     member: getMember.data,
     isLoading: getMember.isLoading,
     deleteMember: deleteMember.mutateAsync,
+    membershipStatus: membershipFilters.status,
+    paymentStatus: membershipFilters.payment,
   };
 };
