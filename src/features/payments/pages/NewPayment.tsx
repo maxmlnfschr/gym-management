@@ -52,7 +52,7 @@ export const NewPayment = () => {
     try {
       await createPayment.mutateAsync({
         membership_id: membership.id,
-        amount: membership.pending_amount,
+        amount: membership.membership_plans.price,
         payment_method: paymentData.payment_method,
         notes: paymentData.payment_notes,
         status: "paid",
@@ -86,7 +86,11 @@ export const NewPayment = () => {
               Plan: {membership?.membership_plans?.name}
             </Typography>
             <Typography color="warning.main" fontWeight="medium">
-              Monto a pagar: {formatCurrency(membership?.pending_amount)}
+              Monto total:{" "}
+              {formatCurrency(membership?.membership_plans?.price || 0)}
+            </Typography>
+            <Typography color="warning.main" fontWeight="medium">
+              Monto pendiente: {formatCurrency(membership?.pending_amount || 0)}
             </Typography>
           </Stack>
 
