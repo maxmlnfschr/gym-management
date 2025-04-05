@@ -33,8 +33,12 @@ import { TabPanel } from "@/components/common/TabPanel";
 import { Tabs, Tab } from "@mui/material";
 import { usePayments } from "@/features/payments/hooks/usePayments";
 import { PaymentHistory } from "@/features/payments/components/PaymentHistory";
+import { formatCurrency } from "@/utils/formatters";
 
 export const MemberDetails = () => {
+  // Agregar junto a los otros estados
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [showQR, setShowQR] = useState(false);
@@ -46,7 +50,7 @@ export const MemberDetails = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   // Agregar este hook junto a los demás hooks
-  const { currentMembership } = useMemberships(id!);
+  const { currentMembership, memberships } = useMemberships(id!);
   const { payments, isLoading: isLoadingPayments } = usePayments(id!);
 
   // Agregar esta función antes del return
@@ -89,6 +93,11 @@ export const MemberDetails = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const handlePaymentAction = () => {
+    setShowPaymentDialog(true);
+  };
+
   if (isLoading) {
     return (
       <LoadingScreen
@@ -146,10 +155,19 @@ export const MemberDetails = () => {
                       lineHeight: 1.2,
                     }}
                   >
-                    {currentMembership
-                      ? "Renovar\nmembresía"
-                      : "Nueva\nmembresía"}
+                    {currentMembership ? "Renovar\nmembresía" : "Nueva\nmembresía"}
                   </Button>
+                  {memberships?.some(m => m.payment_status === 'pending') && (
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      onClick={handlePaymentAction}
+                      sx={{ flex: 1 }}
+                      startIcon={<Payment />}
+                    >
+                      Pago{"\n"}Pendiente
+                    </Button>
+                  )}
                   <Button
                     variant="outlined"
                     onClick={() => setShowQR(true)}
@@ -170,17 +188,24 @@ export const MemberDetails = () => {
                   {member.first_name} {member.last_name}
                 </Typography>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <MembershipStatus memberId={id!} />
-                  <Button variant="contained" onClick={handleMembershipAction}>
-                    {currentMembership
-                      ? "Renovar membresía"
-                      : "Nueva membresía"}
-                  </Button>
-                  <Button variant="outlined" onClick={() => setShowQR(true)}>
-                    Mostrar QR
-                  </Button>
-                  <ActionMenu
-                    actions={[
+                    <MembershipStatus memberId={id!} />
+                    <Button variant="contained" onClick={handleMembershipAction}>
+                      {currentMembership ? "Renovar membresía" : "Nueva membresía"}
+                    </Button>
+                    {memberships?.some(m => m.payment_status === 'pending') && (
+                      <Button
+                        variant="contained"
+                        color="warning"
+                        onClick={handlePaymentAction}
+                        startIcon={<Payment />}
+                      >
+                        Pago Pendiente
+                      </Button>
+                    )}
+                    <Button variant="outlined" onClick={() => setShowQR(true)}>
+                      Mostrar QR
+                    </Button>
+                    <ActionMenu actions={[
                       {
                         label: "Editar",
                         icon: <EditIcon fontSize="small" />,
@@ -307,6 +332,54 @@ export const MemberDetails = () => {
         onCancel={() => setConfirmDialogOpen(false)}
         severity="error"
       />
+
+      <Dialog 
+        open={showPaymentDialog} 
+        onClose={() => setShowPaymentDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Pagos Pendientes</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 2 }}>
+            {memberships
+              ?.filter(m => m.payment_status === 'pending')
+              .map(membership => (
+                <Paper 
+                  key={membership.id} 
+                  sx={{ p: 2, bgcolor: 'background.default' }}
+                >
+                  <Stack spacing={1}>
+                    <Typography variant="subtitle1">
+                      Plan: {membership.membership_plans?.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Fecha: {new Date(membership.start_date).toLocaleDateString()}
+                    </Typography>
+                    <Typography color="warning.main" fontWeight="medium">
+                      Pendiente: {formatCurrency(membership.pending_amount)}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => {
+                        navigate(`/members/${id}/payments/new`, {
+                          state: { 
+                            membership,
+                            isPendingPayment: true 
+                          }
+                        });
+                        setShowPaymentDialog(false);
+                      }}
+                    >
+                      Registrar Pago
+                    </Button>
+                  </Stack>
+                </Paper>
+              ))}
+          </Stack>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

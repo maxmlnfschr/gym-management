@@ -27,13 +27,30 @@ export const paymentService = {
   },
 
   createPayment: async (data: CreatePaymentData) => {
-    const { error } = await supabase
+    // Iniciar una transacción para asegurar que ambas operaciones se completen
+    const { data: payment, error: paymentError } = await supabase
       .from("membership_payments")
       .insert([{
         ...data,
         status: data.status || "paid",
-      }]);
+      }])
+      .select()
+      .single();
 
-    if (error) throw error;
+    if (paymentError) throw paymentError;
+
+    // Actualizar el estado de la membresía
+    const { error: membershipError } = await supabase
+      .from("memberships")
+      .update({ 
+        payment_status: "paid",
+        pending_amount: 0,
+        paid_amount: data.amount // Actualizar el monto pagado
+      })
+      .eq("id", data.membership_id);
+
+    if (membershipError) throw membershipError;
+
+    return payment;
   }
 };

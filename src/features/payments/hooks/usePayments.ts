@@ -15,8 +15,10 @@ export const usePayments = (memberId?: string) => {
     mutationFn: paymentService.createPayment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance-metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["memberships"] });
       if (memberId) {
         queryClient.invalidateQueries({ queryKey: ["payments", memberId] });
+        queryClient.invalidateQueries({ queryKey: ["member-memberships", memberId] });
       }
     },
   });

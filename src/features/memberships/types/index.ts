@@ -10,6 +10,7 @@ export interface Membership {
   start_date: string;
   end_date: string;
   payment_status: PaymentStatus;
+  pending_amount: number;
   status: MembershipStatus;
   deleted_at?: string;
   created_at: string;
