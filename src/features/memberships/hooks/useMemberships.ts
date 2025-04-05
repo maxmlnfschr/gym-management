@@ -79,6 +79,19 @@ export const useMemberships = (memberId?: string) => {
 
   const createMembership = useMutation({
     mutationFn: async (data: MembershipFormData & { memberId: string }) => {
+      // Verificar si hay membresías pendientes de pago
+      const { data: pendingMemberships, error: pendingError } = await supabase
+        .from("memberships")
+        .select("*")
+        .eq("member_id", data.memberId)
+        .eq("payment_status", "pending")
+        .single();
+
+      if (pendingError && pendingError.code !== "PGRST116") throw pendingError;
+      if (pendingMemberships) {
+        throw new Error("El miembro tiene una membresía pendiente de pago. Debe saldarla antes de crear una nueva.");
+      }
+
       // Primero obtenemos el plan para saber su duración
       const { data: plan, error: planError } = await supabase
         .from("membership_plans")

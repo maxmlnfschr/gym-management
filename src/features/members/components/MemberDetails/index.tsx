@@ -34,6 +34,7 @@ import { Tabs, Tab } from "@mui/material";
 import { usePayments } from "@/features/payments/hooks/usePayments";
 import { PaymentHistory } from "@/features/payments/components/PaymentHistory";
 import { formatCurrency } from "@/utils/formatters";
+import { Tooltip } from "@mui/material";
 
 export const MemberDetails = () => {
   // Agregar junto a los otros estados
@@ -46,11 +47,11 @@ export const MemberDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { member, isLoading } = useMember(id);
+  const { currentMembership, memberships } = useMemberships(id!);
+  const hasPendingPayments = memberships?.some(m => m.payment_status === 'pending');
   const { deleteMember } = useMember();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  // Agregar este hook junto a los demás hooks
-  const { currentMembership, memberships } = useMemberships(id!);
   const { payments, isLoading: isLoadingPayments } = usePayments(id!);
 
   // Agregar esta función antes del return
@@ -146,17 +147,37 @@ export const MemberDetails = () => {
                 </Stack>
                 <MembershipStatus memberId={id!} />
                 <Stack direction="row" spacing={2}>
-                  <Button
-                    variant="contained"
-                    onClick={handleMembershipAction}
-                    sx={{
-                      flex: 1,
-                      whiteSpace: "normal",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {currentMembership ? "Renovar\nmembresía" : "Nueva\nmembresía"}
-                  </Button>
+                  {hasPendingPayments ? (
+                    <Tooltip title="Debe saldar la membresía pendiente antes de renovar">
+                      <span style={{ flex: 1 }}>
+                        <Button
+                          variant="contained"
+                          disabled
+                          onClick={handleMembershipAction}
+                          sx={{
+                            width: '100%',
+                            whiteSpace: "normal",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {currentMembership ? "Renovar\nmembresía" : "Nueva\nmembresía"}
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={handleMembershipAction}
+                      sx={{
+                        flex: 1,
+                        whiteSpace: "normal",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {currentMembership ? "Renovar\nmembresía" : "Nueva\nmembresía"}
+                    </Button>
+                  )}
+                  {/* Resto de los botones se mantienen igual */}
                   {memberships?.some(m => m.payment_status === 'pending') && (
                     <Button
                       variant="contained"
@@ -187,24 +208,59 @@ export const MemberDetails = () => {
                 <Typography variant="h5">
                   {member.first_name} {member.last_name}
                 </Typography>
+                {/* Aquí estaba el comentario que causaba el error */}
                 <Stack direction="row" spacing={2} alignItems="center">
                     <MembershipStatus memberId={id!} />
-                    <Button variant="contained" onClick={handleMembershipAction}>
-                      {currentMembership ? "Renovar membresía" : "Nueva membresía"}
-                    </Button>
-                    {memberships?.some(m => m.payment_status === 'pending') && (
+                    <Stack direction="row" spacing={2}>
+                      {hasPendingPayments ? (
+                        <Tooltip title="Debe saldar la membresía pendiente antes de renovar">
+                          <span style={{ flex: 1 }}>
+                            <Button
+                              variant="contained"
+                              disabled
+                              onClick={handleMembershipAction}
+                              sx={{
+                                width: '100%',
+                                whiteSpace: "normal",
+                                lineHeight: 1.2,
+                              }}
+                            >
+                              {currentMembership ? "Renovar\nmembresía" : "Nueva\nmembresía"}
+                            </Button>
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          onClick={handleMembershipAction}
+                          sx={{
+                            flex: 1,
+                            whiteSpace: "normal",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {currentMembership ? "Renovar\nmembresía" : "Nueva\nmembresía"}
+                        </Button>
+                      )}
+                      {memberships?.some(m => m.payment_status === 'pending') && (
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          onClick={handlePaymentAction}
+                          sx={{ flex: 1 }}
+                          startIcon={<Payment />}
+                        >
+                          Pago{"\n"}Pendiente
+                        </Button>
+                      )}
                       <Button
-                        variant="contained"
-                        color="warning"
-                        onClick={handlePaymentAction}
-                        startIcon={<Payment />}
+                        variant="outlined"
+                        onClick={() => setShowQR(true)}
+                        sx={{ flex: 1 }}
                       >
-                        Pago Pendiente
+                        Mostrar QR
                       </Button>
-                    )}
-                    <Button variant="outlined" onClick={() => setShowQR(true)}>
-                      Mostrar QR
-                    </Button>
+                    </Stack>
                     <ActionMenu actions={[
                       {
                         label: "Editar",
