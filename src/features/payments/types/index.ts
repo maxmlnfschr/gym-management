@@ -14,8 +14,13 @@ export interface Payment {
     pending_amount: number;
     membership_plans: {
       name: string;
+      price: number;
     };
   };
+  // Nuevos campos para manejar pagos relacionados
+  parent_payment_id?: string;
+  is_partial_payment?: boolean;
+  related_transactions?: Payment[];
 }
 
 export interface CreatePaymentData {
@@ -24,4 +29,6 @@ export interface CreatePaymentData {
   payment_method: "cash" | "card" | "transfer" | "other";
   notes?: string;
   status?: "paid" | "pending";
+  parent_payment_id?: string;
+  is_partial_payment?: boolean;
 }

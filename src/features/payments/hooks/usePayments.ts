@@ -1,32 +1,38 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreatePaymentData } from "../types";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paymentService } from "../services/paymentService";
+import { CreatePaymentData } from "../types";
 
 export const usePayments = (memberId?: string) => {
   const queryClient = useQueryClient();
 
-  const getPayments = useQuery({
+  const { data: payments, isLoading, error } = useQuery({
     queryKey: ["payments", memberId],
     queryFn: () => paymentService.getPayments(memberId!),
-    enabled: !!memberId,
+    enabled: !!memberId
   });
 
   const createPayment = useMutation({
-    mutationFn: paymentService.createPayment,
+    mutationFn: (data: CreatePaymentData) => paymentService.createPayment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["finance-metrics"] });
-      queryClient.invalidateQueries({ queryKey: ["memberships"] });
-      if (memberId) {
-        queryClient.invalidateQueries({ queryKey: ["payments", memberId] });
-        queryClient.invalidateQueries({ queryKey: ["member-memberships", memberId] });
-      }
-    },
+      queryClient.invalidateQueries({ queryKey: ["payments", memberId] });
+      queryClient.invalidateQueries({ queryKey: ["memberships", memberId] });
+    }
+  });
+
+  const createPartialPayment = useMutation({
+    mutationFn: (data: CreatePaymentData) => paymentService.createPartialPayment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payments", memberId] });
+      queryClient.invalidateQueries({ queryKey: ["memberships", memberId] });
+    }
   });
 
   return {
-    payments: getPayments.data || [],
-    isLoading: getPayments.isLoading,
-    error: getPayments.error,
+    payments,
+    isLoading,
+    error,
     createPayment,
+    createPartialPayment
   };
 };
